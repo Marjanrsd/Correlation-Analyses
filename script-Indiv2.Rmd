@@ -1,0 +1,2845 @@
+---
+title: "Behavioral indiv"
+output: html_document
+date: "2023-11-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r, warning=FALSE}
+## import data
+file_path<-"D:/liz/lizzzz/Chronic.csv"
+df<-read.csv(file_path)
+View(df)
+```
+
+```{r, warning=FALSE}
+## simple linear regression
+lm_model<-lm(df$numerrors~df$Spatial.anxiety, data=df)
+summary(lm_model)
+plot(df$Spatial.anxiety,df$numerrors, main="Spatial Anxiety vs Errors in Route Learing Task", xlab = "Spatial Anxiety Levels", ylab ="Errors")
+abline(lm_model)
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression with ggplot - Route Learning vs Spatial Anxiety
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$numerrors~df$Spatial.anxiety)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Spatial.anxiety`))
+ggplot(df,aes(x=df$Spatial.anxiety, y=df$numerrors))+ geom_point(color=brewer.pal(8,"Dark2")[6])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[6], color=brewer.pal(8,"Dark2")[6])+labs(title="Spatial Anxiety vs Errors in Route Learing Task", x="Spatial Anxiety Levels", y="Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.2, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+
+```{r, warning=FALSE}
+## simple linear regression with ggplot - Route Learning vs Composite Stress
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$numerrors~df$CompositeStress, data=df)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$CompositeStress`))
+ggplot(df, aes(x=df$CompositeStress, y=df$numerrors))+ geom_point(color=brewer.pal(8,"Dark2")[6])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[6], color=brewer.pal(8,"Dark2")[6])+labs(title="Composite Stress vs Errors in Route Learing Task", x="Composite Stress Levels", y="Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression with ggplot - Solution Index vs Composite Stress
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$SI~df$CompositeStress, data=df)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$CompositeStress`))
+ggplot(df, aes(x=df$CompositeStress, y=df$SI))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Composite Stress vs Solution Index in DSP Task", x="Composite Stress Levels", y="Solution Index (SI)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression - Solution Index vs Spatial Anxiety
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$SI~df$Spatial.anxiety, data=df)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Spatial.anxiety`))
+ggplot(df, aes(x=df$Spatial.anxiety, y=df$SI))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Spatial Anxiety vs Solution Index in DSP Task", x="Spatial Anxiety Levels", y="Solution Index (SI)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.2, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression - Pointing error (DSP) vs Spatial Anxiety
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$Angle.Error.pointing~df$Spatial.anxiety, data=df)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Spatial.anxiety`))
+ggplot(df, aes(x=df$Spatial.anxiety, y=df$Angle.Error.pointing))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Spatial Anxiety vs Angular Errors in DSP-Pointing Task", x="Spatial Anxiety Levels", y="Angle Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.1, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.08, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+
+```
+
+```{r, warning=FALSE}
+## simple linear regression - Pointing error (DSP) vs Composite Stress
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$Angle.Error.pointing~df$CompositeStress, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$CompositeStress`))
+ggplot(df, aes(x=df$CompositeStress, y=df$Angle.Error.pointing))+ geom_point(color=brewer.pal(8,"Dark2")[4])+geom_smooth(method="lm", se=FALSE,fill=brewer.pal(8,"Dark2")[4], color=brewer.pal(8,"Dark2")[4])+labs(title="Composite Stress vs Angular Errors in DSP-Pointing Task", x="Composite Stress Levels", y="Angle Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.3, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression - Silcton (Within route pointing error) vs Composite Stress
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$Silcton.Within.Pointing.Error~df$CompositeStress, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$CompositeStress`))
+ggplot(df, aes(x=df$CompositeStress, y=df$Silcton.Within.Pointing.Error))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Composite Stress vs Within Pointing Errors in Silcton Task", x="Composite Stress Levels", y="Within Pointing Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.3, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+```{r, warning=FALSE}
+## simple linear regression - Silcton (Within route pointing error) vs Spatial Anxiety
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$Silcton.Within.Pointing.Error~df$Spatial.anxiety, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Spatial.anxiety`))
+ggplot(df, aes(x=df$Spatial.anxiety, y=df$Silcton.Within.Pointing.Error))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Spatial Anxiety vs Within Pointing Errors in Silcton Task", x="Spatial Anxiety Levels", y="Within Pointing Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.15, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.3, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression - Silcton (Between route pointing error) vs Composite Stress
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$Silcton.Between.Pointing.Error~df$CompositeStress, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$CompositeStress`))
+ggplot(df, aes(x=df$CompositeStress, y=df$Silcton.Between.Pointing.Error))+ geom_point(color=brewer.pal(8,"Dark2")[6])+geom_smooth(method="lm", se=FALSE,fill=brewer.pal(8,"Dark2")[6], color=brewer.pal(8,"Dark2")[6])+labs(title="Composite Stress vs Between Pointing Errors in Silcton Task", x="Composite Stress Levels", y="Between Pointing Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.35, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression - Silcton (Between route pointing error) vs Spatial Anxiety
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$Silcton.Between.Pointing.Error~df$Spatial.anxiety, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Spatial.anxiety`))
+ggplot(df, aes(x=df$Spatial.anxiety, y=df$Silcton.Between.Pointing.Error))+ geom_point(color=brewer.pal(8,"Dark2")[6])+geom_smooth(method="lm", se=FALSE,fill=brewer.pal(8,"Dark2")[6], color=brewer.pal(8,"Dark2")[6])+labs(title="Spatial Anxiety vs Between Pointing Errors in Silcton Task", x="Spatial Anxiety Levels", y="Between Pointing Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.1, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression - Silcton (Between route pointing error) vs Route Learning
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$Silcton.Between.Pointing.Error~df$numerrors, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$numerrors`))
+ggplot(df, aes(x=df$numerrors, y=df$Silcton.Between.Pointing.Error))+ geom_point(color=brewer.pal(8,"Dark2")[7])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[7], color=brewer.pal(8,"Dark2")[7])+labs(title="Virtual Silcton vs Route Learning", x="Errors", y="Virtual Silcton - Between Pointing Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.15, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression - Silcton (Within route pointing error) vs Route Learning
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$Silcton.Within.Pointing.Error~df$numerrors, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$numerrors`))
+ggplot(df, aes(x=df$numerrors, y=df$Silcton.Within.Pointing.Error))+ geom_point(color=brewer.pal(8,"Dark2")[7])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[7], color=brewer.pal(8,"Dark2")[7])+labs(title="Virtual Silcton vs Route Learning", x="Errors", y="Virtual Silcton - Within Pointing Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.15, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression - Solution Index vs Silcton (Between pointing error)
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$Silcton.Between.Pointing.Error~df$SI, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$SI`))
+ggplot(df, aes(x=df$SI, y=df$Silcton.Between.Pointing.Error))+ geom_point(color=brewer.pal(8,"Dark2")[8])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[8], color=brewer.pal(8,"Dark2")[8])+labs(title="Virtual Silcton vs Solution Index in the DSP task", x="Solution Index (SI)", y="Virtual Silcton - Between Pointing Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression - Solution Index vs Silcton (Within pointing error)
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$Silcton.Within.Pointing.Error~df$SI, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$SI`))
+ggplot(df, aes(x=df$SI, y=df$Silcton.Within.Pointing.Error))+ geom_point(color=brewer.pal(8,"Dark2")[8])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[8], color=brewer.pal(8,"Dark2")[8])+labs(title="Virtual Silcton vs Solution Index in the DSP task", x="Solution Index (SI)", y="Virtual Silcton - Within Pointing Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression - Pointing error (DSP) vs Silcton (Between pointing error)
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$Silcton.Between.Pointing.Error~df$Angle.Error.pointing, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Angle.Error.pointing`))
+ggplot(df, aes(x=df$Angle.Error.pointing, y=df$Silcton.Between.Pointing.Error))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Virtual Silcton vs DSP Pointing", x="Angle Errors", y="Virtual Silcton - Between Pointing Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression - Pointing erorr (DSP) vs Silcton (Within pointing error)
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$Silcton.Within.Pointing.Error~df$Angle.Error.pointing, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Angle.Error.pointing`))
+ggplot(df, aes(x=df$Angle.Error.pointing, y=df$Silcton.Within.Pointing.Error))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Virtual Silcton vs DSP Pointing", x="Angle Errors", y="Virtual Silcton - Within Pointing Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression - Solution Index vs Pointing error (DSP)
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$SI~df$Angle.Error.pointing, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Angle.Error.pointing`))
+ggplot(df, aes(x=df$Angle.Error.pointing, y=df$SI))+ geom_point(color=brewer.pal(8,"Dark2")[5])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[5], color=brewer.pal(8,"Dark2")[5])+labs(title="Solution Index (SI) vs DSP Pointing", x="Angle Errors", y="Solution Index (SI)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression - Solution Index vs Route Learning
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$SI~df$numerrors, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$SI`))
+ggplot(df, aes(x=df$numerrors, y=df$SI))+ geom_point(color=brewer.pal(8,"Dark2")[5])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[5], color=brewer.pal(8,"Dark2")[5])+labs(title="Route Learning vs DSP Soluion Index (SI)", x="Errors", y="Solution Index (SI)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+## Histogram of the Route Learning Task
+n = sum(!is.na(df$numerrors))
+ggplot(df, aes(x=df$numerrors, fill=..count..)) +geom_histogram(color="black" ,binwidth = 3, boundry = 0, alpha = 0.7) + scale_fill_viridis_c() + theme_minimal() + labs(title = "Histogram of the Performance in the Route Learning task", subtitle = paste("n =", n), x = "Errors", y = "Number of Participants") + theme(plot.title = element_text(hjust = 0.9), plot.subtitle = element_text(hjust = 0.55)) 
+```
+
+
+```{r, warning=FALSE}
+## Histogram of the Solution Index
+n = sum(!is.na(df$SI))
+ggplot(df, aes(x=df$SI, fill=..count..)) +geom_histogram(color="black" ,binwidth = 0.2, boundry = 0, alpha = 0.7) + scale_fill_viridis_c() + theme_minimal() + labs(title = "Histogram of the Strategy (SI) in the DSP Wayfinding task", subtitle = paste("n =", n), x = "Solution Index (SI)", y = "Number of Participants") + theme(plot.title = element_text(hjust = 0.9), plot.subtitle = element_text(hjust = 0.55)) 
+```
+
+
+```{r, warning=FALSE}
+## Histogram of the Pointing error (DSP)
+n = sum(!is.na(df$Angle.Error.pointing))
+ggplot(df, aes(x=df$Angle.Error.pointing, fill=..count..)) +geom_histogram(color="black" , binwidth = 5) +scale_fill_viridis_c() +theme_minimal() + labs(title = "Histogram of the Angle Errors in the DSP Pointing task", subtitle = paste("n =", n), x = "Angle Errors (Degrees)", y = "Number of Participants") + theme(plot.title = element_text(hjust = 0.9), plot.subtitle = element_text(hjust = 0.55))  
+```
+
+
+```{r, warning=FALSE}
+## Histogram of the Silcton (Between route errors)
+n = sum(!is.na(df$Silcton.Between.Pointing.Error))
+ggplot(df, aes(x=df$Silcton.Between.Pointing.Error, fill=..count..)) +geom_histogram(color="black" , binwidth = 5) +scale_fill_viridis_c() +theme_minimal() + labs(title = "Histogram of the Pointing Errors in the Virtual Silcton task", subtitle = paste("n =", n), x = "Between Pointing Errors (Degrees)", y = "Number of Participants") + theme(plot.title = element_text(hjust = 0.9), plot.subtitle = element_text(hjust = 0.55)) 
+
+```
+
+
+```{r, warning=FALSE}
+## Histogram of the Silcton (Within route errors) 
+n = sum(!is.na(df$Silcton.Within.Pointing.Error))
+ggplot(df, aes(x=df$Silcton.Within.Pointing.Error, fill=..count..)) +geom_histogram(color="black" , binwidth = 5) +scale_fill_viridis_c() +theme_minimal() + labs(title = "Histogram of the Pointing Errors in the Virtual Silcton task", subtitle = paste("n =", n), x = "Within Pointing Errors (Degrees)", y = "Number of Participants") + theme(plot.title = element_text(hjust = 0.9), plot.subtitle = element_text(hjust = 0.55)) 
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+file_path<-"D:/lizzzz/Chronic.csv"
+df<-read.csv(file_path)
+#View(df)
+summary_by_sex<-summary(df$SI~df$sex)
+t_test_result<-t.test(SI~sex, data = df)
+std_males<-sd(df$SI[df$sex== "M"], na.rm = TRUE)
+std_females<-sd(df$SI[df$sex== "F"], na.rm = TRUE)
+mean_males<-mean(df$SI[df$sex== "M"], na.rm = TRUE)
+mean_females<-mean(df$SI[df$sex== "F"], na.rm = TRUE)
+mean_diff<-abs(mean_females-mean_males)
+pooled_sd <- sqrt((std_males^2+std_females^2)/2)
+d <- mean_diff / pooled_sd
+p<-round(t_test_result$p.value, digits = 2)
+
+ggplot (df, aes(x =sex, y = SI, fill=sex )) + geom_violin(trim = FALSE) + geom_boxplot(width = 0.2, fill = "white", color = "darkblue")+geom_point(position = position_jitter(width = 0.2), color = "darkblue") + geom_text(x = 1.5,y = max(df$Angle.Error.pointing) + 2,
+    label = paste("Test Statistic: ", format(t_test_result$statistic, digits = 2), "\n", "p-value: ", format(t_test_result$p.value, digits = 4)),
+    hjust = 0.5,
+    vjust = 0.5,
+    color = ifelse(t_test_result$p.value < 0.05, "red", "green")
+  ) +
+  labs(title = "Sex Differences in wayfinding strategy in the DSP task", x = "Sex", y = "Solution Index (SI)") + theme_minimal()+geom_text(
+    x = Inf, y = -Inf, 
+    label = paste("d =", d), hjust = 1, vjust = 1,
+    color = "black" )+annotate("text",x=1.5, y=1,label=paste("d =", (round(d,2))), hjust=1.4, vjust=1, size=4, fontface="italic")+annotate("text",x=1.5, y=1,label=paste("p =", p), hjust=1.4, vjust=-1, size=4, fontface="italic")
+
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+file_path<-"D:/lizzzz/Chronic.csv"
+df<-read.csv(file_path)
+#View(df)
+summary_by_sex<-summary(df$numerrors~df$sex)
+t_test_result<-t.test(numerrors~sex, data = df)
+std_males<-sd(df$numerrors[df$sex== "M"], na.rm = TRUE)
+std_females<-sd(df$numerrors[df$sex== "F"], na.rm = TRUE)
+mean_males<-mean(df$numerrors[df$sex== "M"], na.rm = TRUE)
+mean_females<-mean(df$numerrors[df$sex== "F"], na.rm = TRUE)
+mean_diff<-abs(mean_females-mean_males)
+pooled_sd <- sqrt((std_males^2+std_females^2)/2)
+d <- mean_diff / pooled_sd
+p<-round(t_test_result$p.value, digits = 2)
+
+ggplot (df, aes(x =sex, y = numerrors, fill=sex )) + geom_violin(trim = FALSE) + geom_boxplot(width = 0.2, fill = "white", color = "darkblue")+geom_point(position = position_jitter(width = 0.2), color = "darkblue") + geom_text(x = 1.5,y = max(df$Angle.Error.pointing) + 2,
+    label = paste("Test Statistic: ", format(t_test_result$statistic, digits = 2), "\n", "p-value: ", format(t_test_result$p.value, digits = 4)),
+    hjust = 0.5,
+    vjust = 0.5,
+    color = ifelse(t_test_result$p.value < 0.05, "red", "green")
+  ) +
+  labs(title = "Sex Differences in the Route Learning task", x = "Sex", y = "Errors") + theme_minimal()+geom_text(
+    x = Inf, y = -Inf, 
+    label = paste("d =", d), hjust = 1, vjust = 1,
+    color = "black" )+annotate("text",x=1.5, y=1,label=paste("d =", (round(d,2))), hjust=1.45, vjust=-22, size=4, fontface="italic")+annotate("text",x=1.5, y=1,label=paste("p =", p), hjust=1.4, vjust=-24, size=4, fontface="italic")
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+file_path<-"D:/lizzzz/Chronic.csv"
+df<-read.csv(file_path)
+#View(df)
+summary_by_sex<-summary(df$Angle.Error.pointing~df$sex)
+t_test_result<-t.test(Angle.Error.pointing~sex, data = df)
+std_males<-sd(df$Angle.Error.pointing[df$sex== "M"], na.rm = TRUE)
+std_females<-sd(df$Angle.Error.pointing[df$sex== "F"], na.rm = TRUE)
+mean_males<-mean(df$Angle.Error.pointing[df$sex== "M"], na.rm = TRUE)
+mean_females<-mean(df$Angle.Error.pointing[df$sex== "F"], na.rm = TRUE)
+mean_diff<-mean_females-mean_males
+pooled_sd <- sqrt((std_males^2+std_females^2)/2)
+d <- abs(mean_diff / pooled_sd)
+p<-round(t_test_result$p.value, digits = 2)
+
+ggplot (df, aes(x =sex, y = Angle.Error.pointing, fill=sex )) + geom_violin(trim = FALSE) + geom_boxplot(width = 0.2, fill = "white", color = "darkblue")+geom_point(position = position_jitter(width = 0.2), color = "darkblue") + geom_text(x = 1.5,y = max(df$Angle.Error.pointing) + 2,
+    label = paste("Test Statistic: ", format(t_test_result$statistic, digits = 2), "\n", "p-value: ", format(t_test_result$p.value, digits = 4)),
+    hjust = 0.5,
+    vjust = 0.5,
+    color = ifelse(t_test_result$p.value < 0.05, "red", "green")
+  ) +
+  labs(title = "Sex Differences in the DSP Pointing task", x = "Sex", y = "Angle Errors (Degrees)") + theme_minimal()+geom_text(
+    x = Inf, y = -Inf, 
+    label = paste("d =", d), hjust = 1, vjust = 1,
+    color = "black" )+annotate("text",x=1.5, y=1,label=paste("d =", (round(d,2))), hjust=1.4, vjust=-23, size=4, fontface="italic")+annotate("text",x=1.5, y=1,label=paste("p =", p), hjust=1.5, vjust=-25, size=4, fontface="italic")
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+file_path<-"D:/lizzzz/Chronic.csv"
+df<-read.csv(file_path)
+#View(df)
+summary_by_sex<-summary(df$Silcton.Within.Pointing.Error~df$sex)
+t_test_result<-t.test(Silcton.Within.Pointing.Error~sex, data = df)
+std_males<-sd(df$Silcton.Within.Pointing.Error[df$sex== "M"], na.rm = TRUE)
+std_females<-sd(df$Silcton.Within.Pointing.Error[df$sex== "F"], na.rm = TRUE)
+mean_males<-mean(df$Silcton.Within.Pointing.Error[df$sex== "M"], na.rm = TRUE)
+mean_females<-mean(df$Silcton.Within.Pointing.Error[df$sex== "F"], na.rm = TRUE)
+mean_diff<-mean_females-mean_males
+pooled_sd <- sqrt((std_males^2+std_females^2)/2)
+d <- mean_diff / pooled_sd
+p<-round(t_test_result$p.value, digits = 2)
+
+ggplot (df, aes(x =sex, y = Silcton.Within.Pointing.Error, fill=sex )) + geom_violin(trim = FALSE) + geom_boxplot(width = 0.2, fill = "white", color = "darkblue")+geom_point(position = position_jitter(width = 0.2), color = "darkblue") + geom_text(x = 1.5,y = max(df$Silcton.Within.Pointing.Error) + 2,
+    label = paste(" ", format(t_test_result$statistic, digits = 2), "\n", "p-value: ", format(t_test_result$p.value, digits = 4)),
+    hjust = 0.5,
+    vjust = 0.5,
+    color = ifelse(t_test_result$p.value < 0.05, "red", "green")
+  ) +
+  labs(title = "Sex Differences in the Virtual Silcton task", x = "Sex", y = "Within Pointing Error") + theme_minimal()+geom_text(
+    x = Inf, y = -Inf, 
+    label = paste("d =", d), hjust = 1, vjust = 1,
+    color = "black" )+annotate("text",x=1.5, y=1,label=paste("d =", (round(d,2))), hjust=1.6, vjust=-21, size=4, fontface="italic")+annotate("text",x=1.5, y=1,label=paste("p =", p), hjust=1.5, vjust=-23, size=4, fontface="italic")
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+file_path<-"D:/lizzzz/Chronic.csv"
+df<-read.csv(file_path)
+#View(df)
+summary_by_sex<-summary(df$Silcton.Between.Pointing.Error~df$sex)
+t_test_result<-t.test(Silcton.Between.Pointing.Error~sex, data = df)
+std_males<-sd(df$Silcton.Between.Pointing.Error[df$sex== "M"], na.rm = TRUE)
+std_females<-sd(df$Silcton.Between.Pointing.Error[df$sex== "F"], na.rm = TRUE)
+mean_males<-mean(df$Silcton.Between.Pointing.Error[df$sex== "M"], na.rm = TRUE)
+mean_females<-mean(df$Silcton.Between.Pointing.Error[df$sex== "F"], na.rm = TRUE)
+mean_diff<-mean_females-mean_males
+pooled_sd <- sqrt((std_males^2+std_females^2)/2)
+d <- mean_diff / pooled_sd
+p<-t_test_result$p.value
+ggplot (df, aes(x =sex, y = Silcton.Between.Pointing.Error, fill=sex )) + geom_violin(trim = FALSE) + geom_boxplot(width = 0.2, fill = "white", color = "darkblue")+geom_point(position = position_jitter(width = 0.2), color = "darkblue") + geom_text(x = 1.5,y = max(df$Silcton.Within.Pointing.Error) + 2,
+    label = paste("Test Statistic:", format(t_test_result$statistic, digits = 2), "\n", "p-value: ", format(t_test_result$p.value, digits = 4)),
+    hjust = 0.5,
+    vjust = 0.5,
+    color = ifelse(t_test_result$p.value < 0.05, "red", "green")
+  ) +
+  labs(title = "Sex Differences in the Virtual Silcton task", x = "Sex", y = "Between Pointing Error") + theme_minimal()+geom_text(
+    x = Inf, y = -Inf, 
+    label = paste("d =", d), hjust = 1, vjust = 1,
+    color = "black" )+annotate("text",x=1.5, y=1,label=paste("d =", (round(d,2))), hjust=1.6, vjust=-23, size=4, fontface="italic")+annotate("text",x=1.5, y=1,label=paste("p<.01"), hjust=2.2, vjust=-25, size=4, fontface="italic")
+```
+
+```{r}
+##sex diff in small scales
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+file_path<-"D:/lizzzz/SmallvsLargeCorr.csv"
+df<-read.csv(file_path)
+df <- df[df$sex != "", ]
+summary_by_sex<-summary(df$Mental.Rotation~df$sex)
+t_test_result<-t.test(Mental.Rotation~sex, data = df)
+std_males<-sd(df$Mental.Rotation[df$sex== "M"], na.rm = TRUE)
+std_females<-sd(df$Mental.Rotation[df$sex== "F"], na.rm = TRUE)
+mean_males<-mean(df$Mental.Rotation[df$sex== "M"], na.rm = TRUE)
+mean_females<-mean(df$Mental.Rotation[df$sex== "F"], na.rm = TRUE)
+mean_diff<-abs(mean_females-mean_males)
+pooled_sd <- sqrt((std_males^2+std_females^2)/2)
+d <- mean_diff / pooled_sd
+p<-round(t_test_result$p.value, digits = 2)
+
+ggplot (df, aes(x =sex, y = Mental.Rotation, fill=sex )) + geom_violin(trim = FALSE) + geom_boxplot(width = 0.2, fill = "white", color = "darkblue")+geom_point(position = position_jitter(width = 0.2), color = "darkblue") + geom_text(x = 1.5,y = max(df$Mental.Rotation) + 2,
+    label = paste("Test Statistic: ", format(t_test_result$statistic, digits = 2), "\n", "p-value: ", format(t_test_result$p.value, digits = 4)),
+    hjust = 0.5,
+    vjust = 0.5,
+    color = ifelse(t_test_result$p.value < 0.05, "red", "green")
+  ) +
+  labs(title = "Sex Differences in Mental Rotation task", x = "Sex", y = "Mental Rotation (z score)") + theme_minimal()+geom_text(
+    x = Inf, y = -Inf, 
+    label = paste("d =", d), hjust = 1, vjust = 1,
+    color = "black" )+annotate("text",x=1.5, y=1,label=paste("d =", (round(d,2))), hjust=1.4, vjust=1, size=4, fontface="italic")+annotate("text",x=1.5, y=1,label=paste("p =", p), hjust=1.4, vjust=-1, size=4, fontface="italic")
+```
+```{r, warning=FALSE}
+##sex diff in paper folding
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+file_path<-"D:/lizzzz/SmallvsLargeCorr.csv"
+df<-read.csv(file_path)
+df <- df[df$sex != "", ]
+summary_by_sex<-summary(df$Paper.Folding~df$sex)
+t_test_result<-t.test(Paper.Folding~sex, data = df)
+std_males<-sd(df$Paper.Folding[df$sex== "M"], na.rm = TRUE)
+std_females<-sd(df$Paper.Folding[df$sex== "F"], na.rm = TRUE)
+mean_males<-mean(df$Paper.Folding[df$sex== "M"], na.rm = TRUE)
+mean_females<-mean(df$Paper.Folding[df$sex== "F"], na.rm = TRUE)
+mean_diff<-abs(mean_females-mean_males)
+pooled_sd <- sqrt((std_males^2+std_females^2)/2)
+d <- mean_diff / pooled_sd
+p<-round(t_test_result$p.value, digits = 2)
+
+ggplot (df, aes(x =sex, y = Mental.Rotation, fill=sex )) + geom_violin(trim = FALSE) + geom_boxplot(width = 0.2, fill = "white", color = "darkblue")+geom_point(position = position_jitter(width = 0.2), color = "darkblue") + geom_text(x = 1.5,y = max(df$Paper.Folding) + 2,
+    label = paste("Test Statistic: ", format(t_test_result$statistic, digits = 2), "\n", "p-value: ", format(t_test_result$p.value, digits = 4)),
+    hjust = 0.5,
+    vjust = 0.5,
+    color = ifelse(t_test_result$p.value < 0.05, "red", "green")
+  ) +
+  labs(title = "Sex Differences in Mental Rotation task", x = "Sex", y = "Paper Folding (Total Correct)") + theme_minimal()+geom_text(
+    x = Inf, y = -Inf, 
+    label = paste("d =", d), hjust = 1, vjust = 1,
+    color = "black" )+annotate("text",x=1.5, y=1,label=paste("d =", (round(d,2))), hjust=1.4, vjust=1, size=4, fontface="italic")+annotate("text",x=1.5, y=1,label=paste("p =", p), hjust=1.4, vjust=-1, size=4, fontface="italic")
+```
+```{r, warning=FALSE}
+##sex diff in assembling object
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+file_path<-"D:/lizzzz/SmallvsLargeCorr.csv"
+df<-read.csv(file_path)
+df <- df[df$sex != "", ]
+summary_by_sex<-summary(df$Assembling.Objects~df$sex)
+t_test_result<-t.test(Assembling.Objects~sex, data = df)
+std_males<-sd(df$Assembling.Objects[df$sex== "M"], na.rm = TRUE)
+std_females<-sd(df$Assembling.Objects[df$sex== "F"], na.rm = TRUE)
+mean_males<-mean(df$Assembling.Objects[df$sex== "M"], na.rm = TRUE)
+mean_females<-mean(df$Assembling.Objects[df$sex== "F"], na.rm = TRUE)
+mean_diff<-abs(mean_females-mean_males)
+pooled_sd <- sqrt((std_males^2+std_females^2)/2)
+d <- mean_diff / pooled_sd
+p<-round(t_test_result$p.value, digits = 2)
+
+ggplot (df, aes(x =sex, y = Mental.Rotation, fill=sex )) + geom_violin(trim = FALSE) + geom_boxplot(width = 0.2, fill = "white", color = "darkblue")+geom_point(position = position_jitter(width = 0.2), color = "darkblue") + geom_text(x = 1.5,y = max(df$Assembling.Objects) + 2,
+    label = paste("Test Statistic: ", format(t_test_result$statistic, digits = 2), "\n", "p-value: ", format(t_test_result$p.value, digits = 4)),
+    hjust = 0.5,
+    vjust = 0.5,
+    color = ifelse(t_test_result$p.value < 0.05, "red", "green")
+  ) +
+  labs(title = "Sex Differences in Mental Rotation task", x = "Sex", y = "Assembling Objects (Total Correct)") + theme_minimal()+geom_text(
+    x = Inf, y = -Inf, 
+    label = paste("d =", d), hjust = 1, vjust = 1,
+    color = "black" )+annotate("text",x=1.5, y=1,label=paste("d =", (round(d,2))), hjust=1.4, vjust=1, size=4, fontface="italic")+annotate("text",x=1.5, y=1,label=paste("p =", p), hjust=1.4, vjust=-1, size=4, fontface="italic")
+```
+```{r}
+##correlation matrix for small scales
+library(psych)
+pairs.panels(df[2:4], stars = TRUE)
+```
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+library(devtools)
+file_path<-"D:/lizzzz/Chronic.csv"
+df<-read.csv(file_path)
+mean_male <- mean(df$SI[df$sex == "M"], na.rm = TRUE)
+mean_female <- mean(df$SI[df$sex == "F"], na.rm = TRUE)
+SD_female <- sd(df$SI[df$sex == "F"], na.rm = TRUE)
+SD_male <- sd(df$SI[df$sex == "M"], na.rm = TRUE)
+ggplot(df, aes(x = SI, fill = sex)) +
+  geom_histogram(position = "identity", alpha = 0.9, bins = 30) +
+  scale_fill_manual(values = c("darkblue", "orange")) + geom_vline(xintercept = mean_male, color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean_female, color = "darkblue", linetype = "dashed", size = 1) + labs(x = "Solution Index (SI)",y = "Count") + theme_minimal()+ geom_text(aes(x = mean_male, label =paste("Mean (M):", round(mean_male, 2))), y = 5,hjust=-1, vjust = -20)
+
+
+  
+
+
+
+```
+
+```{r, warning=FALSE}
+##z scores for large scale vs small scales tasks
+file_path<-"D:/lizzzz/SmallvsLargeCorr.csv"
+df<-read.csv(file_path)
+#df <- df[df$sex != "", ]
+z_score_RL<-scale(df$Route.Learning)
+z_score_Pointing<-scale(df$DSP.Pointing)
+z_score_silcton_within<-scale(df$Silcton.Within.Route)
+z_score_silcton_between<-scale(df$Silcton.Between.Route)
+df$avg_large_scales<-rowMeans(cbind(z_score_RL, z_score_Pointing, z_score_silcton_within, z_score_silcton_between))
+
+##small scales
+z_score_MRT<-scale(df$Mental.Rotation)
+z_score_PF<-scale(df$Paper.Folding)
+z_score_assembling<-scale(df$Assembling.Objects)
+df$avg_small_scales<-rowMeans(cbind(z_score_MRT,z_score_PF,z_score_assembling))
+
+##correlations - abilities
+lm_model<-lm(df$avg_large_scales~df$avg_small_scales, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$avg_large_scales`))
+ggplot(df, aes(x=df$avg_small_scales, y=df$avg_large_scales))+ geom_point(color=brewer.pal(8,"Dark2")[7])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[7], color=brewer.pal(8,"Dark2")[7])+labs(title="Small vs Large Scale Tasks", x="Small Scale Spatial Abilities", y="Large Scale Spatial Performance (Errors)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.15, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.001)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##correlations- strategies and small scale abilities
+df$z_score_strategy<-scale(df$DSP.Wayfinding)
+lm_model<-lm(df$z_score_strategy~df$avg_small_scales, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$z_score_strategy`))
+ggplot(df, aes(x=df$avg_small_scales, y=df$z_score_strategy))+ geom_point(color=brewer.pal(8,"Dark2")[7])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[7], color=brewer.pal(8,"Dark2")[7])+labs(title="Small vs Large Scale Tasks", x="Small Scale Spatial Abilities", y="Large Scale Spatial Performance (Errors)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.15, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+
+```
+
+
+```{r, warning=FALSE}
+##interactions -large vs small scales
+library(effects)
+library(interactions)
+df <- df[df$sexdummy != "", ]
+model <- lm(avg_large_scales ~ avg_small_scales *Spatial.Anxiety, data = df)
+summary(model)
+coef(model)
+interact_plot(model, pred = avg_small_scales, modx = Spatial.Anxiety, interval = TRUE, data = df )
+
+```
+
+
+```{r, warning=FALSE}
+##interactions with sex
+library(tidyverse)
+library(modeldata)
+library(ggExtra)
+df <- df[df$sex != "", ]
+df <- df[complete.cases(df$sex), ]
+theme_set(theme_classic())
+n=sum(!is.na(lm_model$model$`df$avg_small_scales`))
+ggplot(df, aes(x=avg_small_scales, y=avg_large_scales, col=sex))+geom_point()+geom_smooth(method="lm", se=FALSE)
+model <- lm(avg_large_scales ~ avg_small_scales *sexdummy, data = df)
+summary(model)
+coef(model)
+ scatter_plot_color<- ggplot(df, aes(x=avg_small_scales, y=avg_large_scales, col=sex))+geom_point() + geom_abline(aes(intercept=-0.002, slope=-0.31, col="F"))+geom_abline(aes(intercept=-0.002-0.025, slope=-0.31+0.15, col="M"))+labs(x = "Small Scale Spatial Abilities", y = "Large Scale Spatial Abilities (Errors)")+  theme(axis.title.x = element_text(size = 18),  axis.title.y = element_text(size = 18))
+
+ggMarginal(scatter_plot_color, type = "density", groupFill = TRUE)
+
+
+```
+
+
+```{r, warning=FALSE}
+#interactions with spatial anxiety
+library(tidyverse)
+library(modeldata)
+library(interplot)
+library(ggthemes)
+df <- df[df$sex != "", ]
+df <- df[complete.cases(df$sex), ]
+df <- df[complete.cases(df$Spatial.Anxiety), ]
+theme_set(theme_minimal())
+ggplot(df, aes(x=avg_small_scales, y=avg_large_scales, col=Spatial.Anxiety))+geom_point()+geom_smooth(method="lm", se=FALSE)
+model <- lm(avg_large_scales ~ avg_small_scales *Spatial.Anxiety, data = df)
+summary(model)
+coef(model)
+interplot(m=model, var1 = "avg_small_scales", var2 = "Spatial.Anxiety")+xlab("Spatial Anxiety")+ylab("Estimated Coefficent for Small Scale Spatial Abilities (z score)")
+```
+```{r}
+library(tidyverse)
+library(modeldata)
+library(interplot)
+library(ggthemes)
+df <- df[df$sex != "", ]
+df <- df[complete.cases(df$sex), ]
+df <- df[complete.cases(df$Chronic.Stress), ]
+theme_set(theme_minimal())
+ggplot(df, aes(x=avg_small_scales, y=avg_large_scales, col=Spatial.Anxiety))+geom_point()+geom_smooth(method="lm", se=FALSE)
+model <- lm(avg_large_scales ~ avg_small_scales *Chronic.Stress, data = df)
+summary(model)
+coef(model)
+interplot(m=model, var1 = "avg_small_scales", var2 = "Chronic.Stress", hist = TRUE)+xlab("Chronic Stress Levels")+ylab("Estimated Coefficient for Small Scale Spatial Abilities")+geom_hline(yintercept = 0, linetype = "dashed")+aes(color = "pink") + theme(legend.position="none") 
+
+##other ways
+library(sjPlot)
+theme_set(theme_classic()) # Set ggplot theme
+plot_model(model, type="int", colors=rainbow(3), mdrt.values="quart", xlab="Small Scale Spatial Abilities", ylab="Large Scale Spatial abilities")
+plot_model(model, type="int", colors=rainbow(3), mdrt.values="meansd")
+```
+
+
+```{r}
+df <- df[df$sex != "", ]
+df <- df[complete.cases(df$sex), ]
+df <- df[complete.cases(df$Perceived.Stress), ]
+theme_set(theme_minimal())
+ggplot(df, aes(x=avg_small_scales, y=avg_large_scales, col=Spatial.Anxiety))+geom_point()+geom_smooth(method="lm", se=FALSE)
+model <- lm(avg_large_scales ~ avg_small_scales *Perceived.Stress, data = df)
+summary(model)
+coef(model)
+interplot(m=model, var1 = "avg_small_scales", var2 = "Perceived.Stress", hist = TRUE)+xlab("Spatial Anxiety Levels")+ylab("Estimated Coefficient for Small Scale Spatial Abilities")+geom_hline(yintercept = 0, linetype = "dashed")+aes(color = "pink") + theme(legend.position="none") 
+
+##other ways
+library(sjPlot)
+theme_set(theme_classic()) # Set ggplot theme
+plot_model(model, type="int", colors=rainbow(3), mdrt.values="quart", xlab="Small Scale Spatial Abilities", ylab="Large Scale Spatial abilities")
+plot_model(model, type="int", colors=rainbow(3), mdrt.values="meansd")
+
+```
+```{r, warning=FALSE}
+file_path<-"D:/lizzzz/SmallvsLargeCorr.csv"
+df<-read.csv(file_path)
+df <- df[df$sex != "", ]
+df <- df[complete.cases(df$sex), ]
+df <- df[complete.cases(df$Spatial.Anxiety), ]
+theme_set(theme_minimal())
+#df <- df[df$sex != "", ]
+z_score_RL<-scale(df$Route.Learning)
+z_score_Pointing<-scale(df$DSP.Pointing)
+z_score_silcton_within<-scale(df$Silcton.Within.Route)
+z_score_silcton_between<-scale(df$Silcton.Between.Route)
+df$avg_large_scales<-rowMeans(cbind(z_score_RL, z_score_Pointing, z_score_silcton_within, z_score_silcton_between))
+
+##small scales
+z_score_MRT<-scale(df$Mental.Rotation)
+z_score_PF<-scale(df$Paper.Folding)
+z_score_assembling<-scale(df$Assembling.Objects)
+df$avg_small_scales<-rowMeans(cbind(z_score_MRT,z_score_PF,z_score_assembling))
+ggplot(df, aes(x=avg_small_scales, y=avg_large_scales, col=Spatial.Anxiety))+geom_point()+geom_smooth(method="lm", se=FALSE)
+model <- lm(avg_large_scales ~ Spatial.Anxiety*Sex, data = df)
+summary(model)
+coef(model)
+interplot(m=model, var1 = "Spatial.Anxiety", var2 = "Sex", hist = TRUE)+xlab("Spatial Anxiety Levels")+ylab("Estimated Coefficient for Small Scale Spatial Abilities")+geom_hline(yintercept = 0, linetype = "dashed")+aes(color = "pink") + theme(legend.position="none") 
+
+##other ways
+library(sjPlot)
+theme_set(theme_classic()) # Set ggplot theme
+plot_model(model, type="int", colors=rainbow(3), mdrt.values="quart", xlab="Small Scale Spatial Abilities", ylab="Large Scale Spatial abilities")
+plot_model(model, type="int", colors=rainbow(3), mdrt.values="meansd")
+
+```
+
+
+```{r, warning=FALSE}
+lm_model<-lm(df$avg_small_scales~df$Chronic.Stress, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$avg_small_scales`))
+ggplot(df, aes(x=df$Chronic.Stress, y=df$avg_small_scales))+ geom_point(color=brewer.pal(8,"Dark2")[7])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[7], color=brewer.pal(8,"Dark2")[7])+labs(title="Small Scale vs Chronic Stress", x="Chronic Stress Levels", y="Small Scale Spatial Abilities (z score)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.3, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.3, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+#different way of plotting
+theme_set(theme_classic())
+qplot(y=df$avg_small_scales, x=df$Chronic.Stress)+geom_smooth(method = "lm")+xlab("Chronic Stress Levels")+ylab("Small Scale Spatial Abilities")+theme(axis.title.x = element_text(size = 18),  axis.title.y = element_text(size = 18))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.3, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.3, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+
+```{r, warning=FALSE}
+#large scale and chronic stress
+lm_model<-lm(df$avg_large_scales~df$Chronic.Stress, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$avg_large_scales`))
+ggplot(df, aes(x=df$Chronic.Stress, y=df$avg_large_scales))+ geom_point(color=brewer.pal(8,"Dark2")[8])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[8], color=brewer.pal(8,"Dark2")[8])+labs(title="Large Scale vs Chronic Stress", x="Chronic Stress Levels", y="SLarge Scale Spatial Abilities (Errors)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+##large scale
+theme_set(theme_classic())
+qplot(y=df$avg_large_scales, x=df$Chronic.Stress)+geom_smooth(method = "lm")+xlab("Chronic Stress Levels")+ylab("Large Scale Spatial Abilities")+theme(axis.title.x = element_text(size = 18),  axis.title.y = element_text(size = 18))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.3, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+```{r, warning=FALSE}
+#small scale and spatial anxiety
+lm_model<-lm(df$avg_small_scales~df$Spatial.Anxiety, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$avg_small_scales`))
+ggplot(df, aes(x=df$Spatial.Anxiety, y=df$avg_small_scales))+ geom_point(color=brewer.pal(8,"Dark2")[8])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[8], color=brewer.pal(8,"Dark2")[8])+labs(title="Small Scale vs Spatial Anxiety", x="Spatial Anxiety Levels", y="Small Scale Spatial Abilities (z score)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+qplot(y=df$avg_small_scales, x=df$Spatial.Anxiety)+geom_smooth(method = "lm")+xlab("Spatial Anxiety Levels")+ylab("Small Scale Spatial Abilities")+theme(axis.title.x = element_text(size = 18),  axis.title.y = element_text(size = 18))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.3, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.3, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+```{r}
+#large scale and spatial anxiety
+lm_model<-lm(df$avg_large_scales~df$Spatial.Anxiety, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$avg_large_scales`))
+ggplot(df, aes(x=df$Spatial.Anxiety, y=df$avg_large_scales))+ geom_point(color=brewer.pal(8,"Dark2")[8])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[8], color=brewer.pal(8,"Dark2")[8])+labs(title="Small Scale vs Spatial Anxiety", x="Spatial Anxiety Levels", y="Small Scale Spatial Abilities (z score)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+##large scale
+theme_set(theme_classic())
+qplot(y=df$avg_large_scales, x=df$Spatial.Anxiety)+geom_smooth(method = "lm")+xlab("Spatial Anxiety Levels")+ylab("Large Scale Spatial Abilities")+theme(axis.title.x = element_text(size = 18),  axis.title.y = element_text(size = 18))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.3, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+```{r}
+lm_model<-lm(df$Paper.Folding~df$Spatial.Anxiety, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Paper.Folding`))
+ggplot(df, aes(x=df$Spatial.Anxiety, y=df$Paper.Folding))+ geom_point(color=brewer.pal(8,"Dark2")[8])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[8], color=brewer.pal(8,"Dark2")[8])+labs(title="Small Scale vs Spatial Anxiety", x="Spatial Anxiety Levels", y="Small Scale Spatial Abilities (z score)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+##large scale
+theme_set(theme_classic())
+qplot(y=df$avg_large_scales, x=df$Spatial.Anxiety)+geom_smooth(method = "lm")+xlab("Spatial Anxiety Levels")+ylab("Paper Folding Score")+theme(axis.title.x = element_text(size = 18),  axis.title.y = element_text(size = 18))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.1, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+```{r}
+lm_model<-lm(df$avg_small_scales~df$Trait.Anxiety, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$avg_small_scales`))
+ggplot(df, aes(x=df$Trait.Anxiety, y=df$avg_small_scales))+ geom_point(color=brewer.pal(8,"Dark2")[8])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[8], color=brewer.pal(8,"Dark2")[8])+labs(title="Small Scale vs Trait Anxiety", x="Trait Anxiety Levels", y="Small Scale Spatial Abilities (Errors)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+##large scale
+theme_set(theme_classic())
+qplot(y=df$avg_small_scales, x=df$Trait.Anxiety)+geom_smooth(method = "lm")+xlab("Trait Anxiety Levels")+ylab("Small Scale Spatial Abilities")+theme(axis.title.x = element_text(size = 18),  axis.title.y = element_text(size = 18))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.1, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+```{r}
+lm_model<-lm(df$Paper.Folding~df$Trait.Anxiety, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Paper.Folding`))
+ggplot(df, aes(x=df$Trait.Anxiety, y=df$Paper.Folding))+ geom_point(color=brewer.pal(8,"Dark2")[8])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[8], color=brewer.pal(8,"Dark2")[8])+labs(title="Small Scale vs Trait Anxiety", x="Trait Anxiety Levels", y="Small Scale Spatial Abilities (Errors)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+##large scale
+theme_set(theme_classic())
+qplot(y=df$Paper.Folding, x=df$Trait.Anxiety)+geom_smooth(method = "lm")+xlab("Trait Anxiety Levels")+ylab("Paper Folding Score")+theme(axis.title.x = element_text(size = 18),  axis.title.y = element_text(size = 18))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.3, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.001)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.5, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+```{r}
+lm_model<-lm(df$Paper.Folding~df$Perceived.Stress, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Perceived.Stress`))
+ggplot(df, aes(x=df$Trait.Anxiety, y=df$Perceived.Stress))+ geom_point(color=brewer.pal(8,"Dark2")[8])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[8], color=brewer.pal(8,"Dark2")[8])+labs(title="Small Scale vs Trait Anxiety", x="Trait Anxiety Levels", y="Small Scale Spatial Abilities (Errors)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+##large scale
+theme_set(theme_classic())
+qplot(y=df$Paper.Folding, x=df$Perceived.Stress)+geom_smooth(method = "lm")+xlab("Perceived Stress Levels")+ylab("Paper Folding Score")+theme(axis.title.x = element_text(size = 18),  axis.title.y = element_text(size = 18))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.3, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.23,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.3, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r}
+lm_model<-lm(df$Paper.Folding~df$Chronic.Stress, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Chronic.Stress`))
+ggplot(df, aes(x=df$Trait.Anxiety, y=df$Chronic.Stress))+ geom_point(color=brewer.pal(8,"Dark2")[8])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[8], color=brewer.pal(8,"Dark2")[8])+labs(title="Small Scale vs Trait Anxiety", x="Trait Anxiety Levels", y="Small Scale Spatial Abilities (Errors)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+##large scale
+theme_set(theme_classic())
+qplot(y=df$Paper.Folding, x=df$Chronic.Stress)+geom_smooth(method = "lm")+xlab("Chronic Stress Levels")+ylab("Paper Folding Score")+theme(axis.title.x = element_text(size = 18),  axis.title.y = element_text(size = 18))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.3, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.23,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.6, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+lm_model<-lm(df$Assembling.Objects~df$Spatial.Anxiety, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Assembling.Objects`))
+ggplot(df, aes(x=df$Spatial.Anxiety, y=df$Assembling.Objects))+ geom_point(color=brewer.pal(8,"Dark2")[8])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[8], color=brewer.pal(8,"Dark2")[8])+labs(title="Small Scale vs Spatial Anxiety", x="Spatial Anxiety Levels", y="Assembling Object Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+##large scale
+theme_set(theme_classic())
+qplot(y=df$avg_large_scales, x=df$Spatial.Anxiety)+geom_smooth(method = "lm")+xlab("Spatial Anxiety Levels")+ylab("Assembling Object Score")+theme(axis.title.x = element_text(size = 18),  axis.title.y = element_text(size = 18))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.1, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+```{r, warning=FALSE}
+lm_model<-lm(df$Mental.Rotation~df$Spatial.Anxiety, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Mental.Rotation`))
+ggplot(df, aes(x=df$Spatial.Anxiety, y=df$Mental.Rotation))+ geom_point(color=brewer.pal(8,"Dark2")[8])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[8], color=brewer.pal(8,"Dark2")[8])+labs(title="Small Scale vs Spatial Anxiety", x="Spatial Anxiety Levels", y="Assembling Object Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+##large scale
+theme_set(theme_classic())
+qplot(y=df$avg_large_scales, x=df$Spatial.Anxiety)+geom_smooth(method = "lm")+xlab("Spatial Anxiety Levels")+ylab("Assembling Object Score")+theme(axis.title.x = element_text(size = 18),  axis.title.y = element_text(size = 18))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.1, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+lm_model<-lm(df$Mental.Rotation~df$Chronic.Stress, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Mental.Rotation`))
+ggplot(df, aes(x=df$Chronic.Stress, y=df$Mental.Rotation))+ geom_point(color=brewer.pal(8,"Dark2")[8])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[8], color=brewer.pal(8,"Dark2")[8])+labs(title="Small Scale vs Spatial Anxiety", x="Chronic Stress Levels", y="Mental Rotation Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+##large scale
+theme_set(theme_classic())
+qplot(y=df$avg_large_scales, x=df$Spatial.Anxiety)+geom_smooth(method = "lm")+xlab("Chronic Stress Levels")+ylab("Assembling Object Score")+theme(axis.title.x = element_text(size = 18),  axis.title.y = element_text(size = 18))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.1, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+lm_model<-lm(df$avg_small_scales~df$Chronic.Stress, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$avg_small_scales`))
+ggplot(df, aes(x=df$Chronic.Stress, y=df$avg_small_scales))+ geom_point(color=brewer.pal(8,"Dark2")[8])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[8], color=brewer.pal(8,"Dark2")[8])+labs(title="Small Scale vs Spatial Anxiety", x="Chronic Stress Levels", y="Mental Rotation Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+##large scale
+theme_set(theme_classic())
+qplot(y=df$avg_small_scales, x=df$Chronic.Stress)+geom_smooth(method = "lm")+xlab("Chronic Stress Levels")+ylab("Small Scale Spatial Abilities")+theme(axis.title.x = element_text(size = 18),  axis.title.y = element_text(size = 18))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.1, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.3, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+lm_model<-lm(df$avg_large_scales~df$Chronic.Stress, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$avg_large_scales`))
+ggplot(df, aes(x=df$Chronic.Stress, y=df$avg_large_scales))+ geom_point(color=brewer.pal(8,"Dark2")[8])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[8], color=brewer.pal(8,"Dark2")[8])+labs(title="Small Scale vs Spatial Anxiety", x="Chronic Stress Levels", y="Mental Rotation Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.18, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.1, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+##large scale
+theme_set(theme_classic())
+qplot(y=df$avg_large_scales, x=df$Spatial.Anxiety)+geom_smooth(method = "lm")+xlab("Chronic Stress Levels")+ylab("Small Scale Spatial Abilities")+theme(axis.title.x = element_text(size = 18),  axis.title.y = element_text(size = 18))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.1, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.05,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.3, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+```
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+library(devtools)
+file_path<-"D:/lizzzz/Chronic.csv"
+df<-read.csv(file_path)
+mean_male <- mean(df$numerrors[df$sex == "M"], na.rm = TRUE)
+mean_female <- mean(df$numerrors[df$sex == "F"], na.rm = TRUE)
+SD_female <- sd(df$numerrors[df$sex == "F"], na.rm = TRUE)
+SD_male <- sd(df$numerrors[df$sex == "M"], na.rm = TRUE)
+ggplot(df, aes(x = numerrors, fill = sex)) +
+  geom_histogram(position = "identity", alpha = 0.9, bins = 30) +
+  scale_fill_manual(values = c("darkblue", "orange")) + geom_vline(xintercept = mean_male, color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean_female, color = "darkblue", linetype = "dashed", size = 1) + labs(x = "Errors",y = "Count") + theme_minimal()
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+library(devtools)
+file_path<-"D:/lizzzz/Chronic.csv"
+df<-read.csv(file_path)
+mean_male <- mean(df$Angle.Error.pointing[df$sex == "M"], na.rm = TRUE)
+mean_female <- mean(df$Angle.Error.pointing[df$sex == "F"], na.rm = TRUE)
+SD_female <- sd(df$Angle.Error.pointing[df$sex == "F"], na.rm = TRUE)
+SD_male <- sd(df$Angle.Error.pointing[df$sex == "M"], na.rm = TRUE)
+ggplot(df, aes(x = Angle.Error.pointing, fill = sex)) +
+  geom_histogram(position = "identity", alpha = 0.9, bins = 30) +
+  scale_fill_manual(values = c("darkblue", "orange")) + geom_vline(xintercept = mean_male, color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean_female, color = "darkblue", linetype = "dashed", size = 1) + labs(x = "Angle Errors (Degrees)",y = "Count") + theme_minimal()
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+library(devtools)
+file_path<-"D:/lizzzz/Chronic.csv"
+df<-read.csv(file_path)
+mean_male <- mean(df$Silcton.Between.Pointing.Error[df$sex == "M"], na.rm = TRUE)
+mean_female <- mean(df$Silcton.Between.Pointing.Error[df$sex == "F"], na.rm = TRUE)
+SD_female <- sd(df$Silcton.Between.Pointing.Error[df$sex == "F"], na.rm = TRUE)
+SD_male <- sd(df$Silcton.Between.Pointing.Error[df$sex == "M"], na.rm = TRUE)
+ggplot(df, aes(x = Silcton.Between.Pointing.Error, fill = sex)) +
+  geom_histogram(position = "identity", alpha = 0.9, bins = 30) +  scale_y_continuous(breaks = c(0,5,10,15, 20))+
+  scale_fill_manual(values = c("darkblue", "orange")) + geom_vline(xintercept = mean_male, color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean_female, color = "darkblue", linetype = "dashed", size = 1) + labs(x = "Between Pointing Errors",y = "Count") + theme_minimal()
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+library(devtools)
+file_path<-"D:/lizzzz/Chronic.csv"
+df<-read.csv(file_path)
+mean_male <- mean(df$Silcton.Within.Pointing.Error[df$sex == "M"], na.rm = TRUE)
+mean_female <- mean(df$Silcton.Within.Pointing.Error[df$sex == "F"], na.rm = TRUE)
+SD_female <- sd(df$Silcton.Within.Pointing.Error[df$sex == "F"], na.rm = TRUE)
+SD_male <- sd(df$Silcton.Within.Pointing.Error[df$sex == "M"], na.rm = TRUE)
+ggplot(df, aes(x = Silcton.Within.Pointing.Error, fill = sex)) +
+  geom_histogram(position = "identity", alpha = 0.9, bins = 30) +
+  scale_fill_manual(values = c("darkblue", "orange")) + geom_vline(xintercept = mean_male, color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean_female, color = "darkblue", linetype = "dashed", size = 1) + labs(x = "Within Pointing Errors",y = "Count") + theme_minimal()
+```
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+library(devtools)
+file_path<-"D:/lizzzz/SmallvsLargeCorr.csv"
+df<-read.csv(file_path)
+df <- df[df$sex != "", ]
+n = sum(!is.na(df$Mental.Rotation))
+nmale=sum(!is.na(df$Mental.Rotation[df$sex == "M"]))
+nfemale=sum(!is.na(df$Mental.Rotation[df$sex == "F"]))
+mean_male <- mean(df$Mental.Rotation[df$sex == "M"], na.rm = TRUE)
+mean_female <- mean(df$Mental.Rotation[df$sex == "F"], na.rm = TRUE)
+SD_female <- sd(df$Mental.Rotation[df$sex == "F"], na.rm = TRUE)
+SD_male <- sd(df$Mental.Rotation[df$sex == "M"], na.rm = TRUE)
+ggplot(df, aes(x = Mental.Rotation, fill = sex)) +
+  geom_histogram(position = "identity", alpha = 0.9, bins = 30) +
+  scale_fill_manual(values = c("darkblue", "orange")) + geom_vline(xintercept = mean_male, color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean_female, color = "darkblue", linetype = "dashed", size = 1) + labs(x = "Mental Rotation abilities (z score - response time and total correct)",y = "Count") + theme_minimal()
+
+```
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+library(devtools)
+file_path<-"D:/lizzzz/SmallvsLargeCorr.csv"
+df<-read.csv(file_path)
+df <- df[df$sex != "", ]
+nmale=sum(!is.na(df$Paper.Folding[df$sex == "M"]))
+nfemale=sum(!is.na(df$Paper.Folding[df$sex == "F"]))
+mean_male <- mean(df$Paper.Folding[df$sex == "M"], na.rm = TRUE)
+mean_female <- mean(df$Paper.Folding[df$sex == "F"], na.rm = TRUE)
+SD_female <- sd(df$Paper.Folding[df$sex == "F"], na.rm = TRUE)
+SD_male <- sd(df$Paper.Folding[df$sex == "M"], na.rm = TRUE)
+ggplot(df, aes(x = Paper.Folding, fill = sex)) +
+  geom_histogram(position = "identity", alpha = 0.9, bins = 30) +
+  scale_fill_manual(values = c("darkblue", "orange")) + geom_vline(xintercept = mean_male, color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean_female, color = "darkblue", linetype = "dashed", size = 1) + labs(x = "Paper Folding abilities (Total Correct)",y = "Count") + theme_minimal()
+```
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+library(devtools)
+file_path<-"D:/lizzzz/SmallvsLargeCorr.csv"
+df<-read.csv(file_path)
+df <- df[df$sex != "", ]
+nmale=sum(!is.na(df$Assembling.Objects[df$sex == "M"]))
+nfemale=sum(!is.na(df$Assembling.Objects[df$sex == "F"]))
+mean_male <- mean(df$Assembling.Objects[df$sex == "M"], na.rm = TRUE)
+mean_female <- mean(df$Assembling.Objects[df$sex == "F"], na.rm = TRUE)
+SD_female <- sd(df$Assembling.Objects[df$sex == "F"], na.rm = TRUE)
+SD_male <- sd(df$Assembling.Objects[df$sex == "M"], na.rm = TRUE)
+ggplot(df, aes(x = Assembling.Objects, fill = sex)) +
+  geom_histogram(position = "identity", alpha = 0.9, bins = 20) +
+  scale_fill_manual(values = c("darkblue", "orange")) + geom_vline(xintercept = mean_male, color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean_female, color = "darkblue", linetype = "dashed", size = 1) + labs(x = "Assembling object abilities (Total Correct)",y = "Count") + theme_minimal()
+```
+
+
+```{r, warning=FALSE}
+##QA-SI
+## import data
+path<-"D:/lizzzz/SIqa.csv"
+dfSI<-read.csv(path)
+dfSI$Corpus_Callosum_Body
+
+
+```
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSI$SI~dfSI$Superior_Longitudinal_Fasciculus2_L, data=dfSI)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSI$Superior_Longitudinal_Fasciculus2_L`))
+ggplot(dfSI, aes(x=dfSI$Superior_Longitudinal_Fasciculus2_L, y=dfSI$SI))+ geom_point(color=brewer.pal(8,"Dark2")[6])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[6], color=brewer.pal(8,"Dark2")[6])+labs(title="Superior Longitudinal Facsiculus (SLF)", x="Qantitative Anisotropy (QA)", y="Solution Index (SI)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSI$SI~dfSI$Cingulum_Parolfactory_R, data=dfSI)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSI$Cingulum_Parolfactory_R`))
+ggplot(dfSI, aes(x=dfSI$Cingulum_Parolfactory_R, y=dfSI$SI))+ geom_point(color=brewer.pal(8,"Dark2")[6])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[6], color=brewer.pal(8,"Dark2")[6])+labs(title="Cingulum", x="Qantitative Anisotropy (QA)", y="Solution Index (SI)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1) +scale_x_continuous(limits = c(0.15,0.4))
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSI$SI~dfSI$Uncinate_Fasciculus_R, data=dfSI)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSI$Uncinate_Fasciculus_R`))
+ggplot(dfSI, aes(x=dfSI$Uncinate_Fasciculus_R, y=dfSI$SI))+ geom_point(color=brewer.pal(8,"Dark2")[6])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[6], color=brewer.pal(8,"Dark2")[6])+labs(title="Uncinate Fasciculus (R)", x="Qantitative Anisotropy (QA)", y="Solution Index (SI)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSI$SI~dfSI$Corticostriatal_Tract_Posterior_R, data=dfSI)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSI$Corticostriatal_Tract_Posterior_R`))
+ggplot(dfSI, aes(x=dfSI$Corticostriatal_Tract_Posterior_R, y=dfSI$SI))+ geom_point(color=brewer.pal(8,"Dark2")[6])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[6], color=brewer.pal(8,"Dark2")[6])+labs(title="Corticostriatal Tract (R)", x="Qantitative Anisotropy (QA)", y="Solution Index (SI)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSI$SI~dfSI$Inferior_Longitudinal_Fasciculus_R, data=dfSI)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSI$Inferior_Longitudinal_Fasciculus_R`))
+ggplot(dfSI, aes(x=dfSI$Inferior_Longitudinal_Fasciculus_R, y=dfSI$SI))+ geom_point(color=brewer.pal(8,"Dark2")[6])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[6], color=brewer.pal(8,"Dark2")[6])+labs(title="Inferior Longitudinal Fasciculus (R)", x="Qantitative Anisotropy (QA)", y="Solution Index (SI)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.4, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSI$SI~dfSI$Inferior_Fronto_Occipital_Fasciculus_R, data=dfSI)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSI$Inferior_Fronto_Occipital_Fasciculus_R`))
+ggplot(dfSI, aes(x=dfSI$Inferior_Fronto_Occipital_Fasciculus_R, y=dfSI$SI))+ geom_point(color=brewer.pal(8,"Dark2")[6])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[6], color=brewer.pal(8,"Dark2")[6])+labs(title="Inferior Fronto_Occipital Fasciculus (R)", x="Qantitative Anisotropy (QA)", y="Solution Index (SI)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+```{r}
+##QA-Silcton
+## import data
+path<-"D:/lizzzz/Silctonqa.csv"
+dfSC<-read.csv(path)
+
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSC$Within.Error~dfSC$Superior_Longitudinal_Fasciculus2_R, data=dfSC)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSC$Superior_Longitudinal_Fasciculus2_R`))
+ggplot(dfSC, aes(x=dfSC$Superior_Longitudinal_Fasciculus2_R, y=dfSC$Within.Error))+ geom_point(color=brewer.pal(8,"Dark2")[7])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[7], color=brewer.pal(8,"Dark2")[7])+labs(title="Superior Longitudinal Fasciculus (R)", x="Qantitative Anisotropy (QA)", y="Within Route Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSC$Within.Error~dfSC$Middle_Longitudinal_Fasciculus_L, data=dfSC)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSC$Middle_Longitudinal_Fasciculus_L`))
+ggplot(dfSC, aes(x=dfSC$Middle_Longitudinal_Fasciculus_L, y=dfSC$Within.Error))+ geom_point(color=brewer.pal(8,"Dark2")[7])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[7], color=brewer.pal(8,"Dark2")[7])+labs(title="Middle Longitudinal Fasciculus (L)", x="Qantitative Anisotropy (QA)", y="Within Route Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSC$Within.Error~dfSC$Inferior_Longitudinal_Fasciculus_L, data=dfSC)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSC$Inferior_Longitudinal_Fasciculus_L`))
+ggplot(dfSC, aes(x=dfSC$Inferior_Longitudinal_Fasciculus_L, y=dfSC$Within.Error))+ geom_point(color=brewer.pal(8,"Dark2")[7])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[7], color=brewer.pal(8,"Dark2")[7])+labs(title="Inferior Longitudinal Fasciculus (L)", x="Qantitative Anisotropy (QA)", y="Within Route Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSC$Within.Error~dfSC$Uncinate_Fasciculus_L, data=dfSC)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSC$Uncinate_Fasciculus_L`))
+ggplot(dfSC, aes(x=dfSC$Uncinate_Fasciculus_L, y=dfSC$Within.Error))+ geom_point(color=brewer.pal(8,"Dark2")[7])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[7], color=brewer.pal(8,"Dark2")[7])+labs(title="Uncinate Fasciculus (L)", x="Qantitative Anisotropy (QA)", y="Within Route Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSC$Within.Error~dfSC$Inferior_Fronto_Occipital_Fasciculus_L, data=dfSC)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSC$Inferior_Fronto_Occipital_Fasciculus_L`))
+ggplot(dfSC, aes(x=dfSC$Inferior_Fronto_Occipital_Fasciculus_L, y=dfSC$Within.Error))+ geom_point(color=brewer.pal(8,"Dark2")[7])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[7], color=brewer.pal(8,"Dark2")[7])+labs(title="Inferior Fronto_Occipital Fasciculus (L)", x="Qantitative Anisotropy (QA)", y="Within Route Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSC$Within.Error~dfSC$Cingulum_Frontal_Parahippocampal_L, data=dfSC)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSC$Cingulum_Frontal_Parahippocampal_L`))
+ggplot(dfSC, aes(x=dfSC$Cingulum_Frontal_Parahippocampal_L, y=dfSC$Within.Error))+ geom_point(color=brewer.pal(8,"Dark2")[7])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[7], color=brewer.pal(8,"Dark2")[7])+labs(title="Cingulum Frontal Parahippocampal (L)", x="Qantitative Anisotropy (QA)", y="Within Route Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##QA-Route Learning
+## import data
+path<-"D:/lizzzz/RouteLearningqa.csv"
+dfRL<-read.csv(path)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfRL$errors~dfRL$Cingulum_Frontal_Parahippocampal_L, data=dfRL)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfRL$Cingulum_Frontal_Parahippocampal_L`))
+ggplot(dfRL, aes(x=dfRL$Cingulum_Frontal_Parahippocampal_L, y=dfRL$errors))+ geom_point(color=brewer.pal(8,"Dark2")[2])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[2], color=brewer.pal(8,"Dark2")[2])+labs(title="Cingulum Frontal Parahippocampal (L)", x="Qantitative Anisotropy (QA)", y="Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfRL$errors~dfRL$Cingulum_Parolfactory_L, data=dfRL)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfRL$Cingulum_Parolfactory_L`))
+ggplot(dfRL, aes(x=dfRL$Cingulum_Parolfactory_L, y=dfRL$errors))+ geom_point(color=brewer.pal(8,"Dark2")[2])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[2], color=brewer.pal(8,"Dark2")[2])+labs(title="Cingulum Parolfactory (L)", x="Qantitative Anisotropy (QA)", y="Errors")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+```{r, warning=FALSE}
+##QA-spatial anxiety
+## import data
+path<-"D:/lizzzz/SpatialAnxietyqa.csv"
+dfSP<-read.csv(path)
+
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSP$spatial_anxiety~dfSP$Cingulum_Frontal_Parahippocampal_L, data=dfSP)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSP$Cingulum_Frontal_Parahippocampal_L`))
+ggplot(dfSP, aes(x=dfSP$Cingulum_Frontal_Parahippocampal_L, y=dfSP$spatial_anxiety))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Cingulum Frontal Parahippocampal (L)", x="Qantitative Anisotropy (QA)", y="Spatial Anxiety Levels")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSP$spatial_anxiety~dfSP$Cingulum_Frontal_Parietal_L, data=dfSP)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSP$Cingulum_Frontal_Parietal_L`))
+ggplot(dfSP, aes(x=dfSP$Cingulum_Frontal_Parietal_L, y=dfSP$spatial_anxiety))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Cingulum Frontal Parietal (L)", x="Qantitative Anisotropy (QA)", y="Spatial Anxiety Levels")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSP$spatial_anxiety~dfSP$Corticospinal_Tract_R, data=dfSP)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSP$Corticospinal_Tract_R`))
+ggplot(dfSP, aes(x=dfSP$Corticospinal_Tract_R, y=dfSP$spatial_anxiety))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Cingulum Frontal Parietal (L)", x="Qantitative Anisotropy (QA)", y="Spatial Anxiety Levels")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSP$spatial_anxiety~dfSP$Corticostriatal_Tract_Posterior_R, data=dfSP)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSP$Corticostriatal_Tract_Posterior_R`))
+ggplot(dfSP, aes(x=dfSP$Corticostriatal_Tract_Posterior_R, y=dfSP$spatial_anxiety))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Corticostriatal Tract Posterior (R)", x="Qantitative Anisotropy (QA)", y="Spatial Anxiety Levels")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSP$spatial_anxiety~dfSP$Inferior_Longitudinal_Fasciculus_R, data=dfSP)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSP$Inferior_Longitudinal_Fasciculus_R`))
+ggplot(dfSP, aes(x=dfSP$Inferior_Longitudinal_Fasciculus_R, y=dfSP$spatial_anxiety))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Inferior Longitudinal Fasciculus (R)", x="Qantitative Anisotropy (QA)", y="Spatial Anxiety Levels")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSP$spatial_anxiety~dfSP$Inferior_Fronto_Occipital_Fasciculus_R, data=dfSP)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSP$Inferior_Fronto_Occipital_Fasciculus_R`))
+ggplot(dfSP, aes(x=dfSP$Inferior_Fronto_Occipital_Fasciculus_R, y=dfSP$spatial_anxiety))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Inferior Longitudinal Fasciculus (R)", x="Qantitative Anisotropy (QA)", y="Spatial Anxiety Levels")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSP$spatial_anxiety~dfSP$Inferior_Fronto_Occipital_Fasciculus_L, data=dfSP)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSP$Inferior_Fronto_Occipital_Fasciculus_L`))
+ggplot(dfSP, aes(x=dfSP$Inferior_Fronto_Occipital_Fasciculus_L, y=dfSP$spatial_anxiety))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Inferior Longitudinal Fasciculus (R)", x="Qantitative Anisotropy (QA)", y="Spatial Anxiety Levels")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSP$spatial_anxiety~dfSP$Corpus_Callosum_Body, data=dfSP)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSP$Corpus_Callosum_Body`))
+ggplot(dfSP, aes(x=dfSP$Corpus_Callosum_Body, y=dfSP$spatial_anxiety))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Inferior Longitudinal Fasciculus (R)", x="Qantitative Anisotropy (QA)", y="Spatial Anxiety Levels")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfSP$spatial_anxiety~dfSP$Cerebellum_R, data=dfSP)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfSP$Cerebellum_R`))
+ggplot(dfSP, aes(x=dfSP$Cerebellum_R, y=dfSP$spatial_anxiety))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Inferior Longitudinal Fasciculus (R)", x="Qantitative Anisotropy (QA)", y="Spatial Anxiety Levels")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##QA-chronic stress
+## import data
+path<-"D:/lizzzz/Chronicqa.csv"
+dfCH<-read.csv(path)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfCH$chronic_stress~dfCH$Inferior_Longitudinal_Fasciculus_R, data=dfCH)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfCH$Inferior_Longitudinal_Fasciculus_R`))
+ggplot(dfCH, aes(x=dfCH$Inferior_Longitudinal_Fasciculus_R, y=dfCH$chronic_stress))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Inferior Longitudinal Fasciculus (R)", x="Qantitative Anisotropy (QA)", y="Chronic Stress Levels")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfCH$chronic_stress~dfCH$Inferior_Longitudinal_Fasciculus_L, data=dfCH)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfCH$Inferior_Longitudinal_Fasciculus_L`))
+ggplot(dfCH, aes(x=dfCH$Inferior_Longitudinal_Fasciculus_L, y=dfCH$chronic_stress))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Inferior Longitudinal Fasciculus (L)", x="Qantitative Anisotropy (QA)", y="Chronic Stress Levels")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.4, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfCH$chronic_stress~dfCH$Corpus_Callosum_Body, data=dfCH)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfCH$Corpus_Callosum_Body`))
+ggplot(dfCH, aes(x=dfCH$Corpus_Callosum_Body, y=dfCH$chronic_stress))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Corpus Callosum (Body)", x="Qantitative Anisotropy (QA)", y="Chronic Stress Levels")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.4, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfCH$chronic_stress~dfCH$Corpus_Callosum_Forceps_Minor, data=dfCH)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfCH$Corpus_Callosum_Forceps_Minor`))
+ggplot(dfCH, aes(x=dfCH$Corpus_Callosum_Forceps_Minor, y=dfCH$chronic_stress))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Corpus Callosum (Body)", x="Qantitative Anisotropy (QA)", y="Chronic Stress Levels")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.4, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(dfCH$chronic_stress~dfCH$Corpus_Callosum_Tapetum, data=dfCH)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`dfCH$Corpus_Callosum_Tapetum`))
+ggplot(dfCH, aes(x=dfCH$Corpus_Callosum_Tapetum, y=dfCH$chronic_stress))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Corpus Callosum (Body)", x="Qantitative Anisotropy (QA)", y="Chronic Stress Levels")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.4, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+```{r, warning=FALSE}
+## import data
+path<-"D:/lizzzz/ppfoldingstat.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Paper.Folding~df2$Corpus_Callosum_Body, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Corpus_Callosum_Body`))
+ggplot(df2, aes(x=df2$Corpus_Callosum_Body, y=df2$Paper.Folding))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Corpus Callosum (Body)", x="Qantitative Anisotropy (QA)", y="Paper Folding Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/ppfoldingstat.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Paper.Folding~df2$Inferior_Longitudinal_Fasciculus_R, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Inferior_Longitudinal_Fasciculus_R`))
+ggplot(df2, aes(x=df2$Inferior_Longitudinal_Fasciculus_R, y=df2$Paper.Folding))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Inferior Longitudinal Fasciculus (R)", x="Qantitative Anisotropy (QA)", y="Paper Folding Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/ppfoldingstat.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Paper.Folding~df2$Corticopontine_Tract_Frontal_L, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Corticopontine_Tract_Frontal_L`))
+ggplot(df2, aes(x=df2$Corticopontine_Tract_Frontal_L, y=df2$Paper.Folding))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Corticopontine Tract Frontal (L)", x="Qantitative Anisotropy (QA)", y="Paper Folding Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1) 
+```
+
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/ppfoldingstat.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Paper.Folding~df2$Fornix_R, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Fornix_R`))
+ggplot(df2, aes(x=df2$Fornix_R, y=df2$Paper.Folding))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Fornix (R)", x="Qantitative Anisotropy (QA)", y="Paper Folding Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1) 
+```
+```{r, warning=FALSE}
+path<-"D:/lizzzz/ppfoldingstat.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Paper.Folding~df2$Fornix_L, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Fornix_L`))
+ggplot(df2, aes(x=df2$Fornix_L, y=df2$Paper.Folding))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Fornix (L)", x="Qantitative Anisotropy (QA)", y="Paper Folding Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1) 
+```
+
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/ppfoldingstat.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Paper.Folding~df2$Thalamic_Radiation_Superior_L, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Thalamic_Radiation_Superior_L`))
+ggplot(df2, aes(x=df2$Thalamic_Radiation_Superior_L, y=df2$Paper.Folding))+ geom_point(color=brewer.pal(8,"Dark2")[1])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[1], color=brewer.pal(8,"Dark2")[1])+labs(title="Thalamic Radiation Superior (L)", x="Qantitative Anisotropy (QA)", y="Paper Folding Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1) 
+```
+
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/MentalRotationstat.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Mental.Rotation~df2$Thalamic_Radiation_Superior_R, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Thalamic_Radiation_Superior_R`))
+ggplot(df2, aes(x=df2$Thalamic_Radiation_Superior_R, y=df2$Mental.Rotation))+ geom_point(color=brewer.pal(8,"Dark2")[2])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[2], color=brewer.pal(8,"Dark2")[2])+labs(title="Thalamic Radiation Superior (R)", x="Qantitative Anisotropy (QA)", y="Mental Rotation Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.4, vjust=1.5, size=4)+theme(aspect.ratio = 1) 
+```
+
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/MentalRotationstat.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Mental.Rotation~df2$Corticostriatal_Tract_Superior_L, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Corticostriatal_Tract_Superior_L`))
+ggplot(df2, aes(x=df2$Corticostriatal_Tract_Superior_L, y=df2$Mental.Rotation))+ geom_point(color="darkblue")+geom_smooth(method="lm", se=TRUE,fill="darkblue", color="blue")+labs(title="Corticostriatal Tract Superior (L)", x="Qantitative Anisotropy (QA)", y="Mental Rotation Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/MentalRotationstat.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Mental.Rotation~df2$Corpus_Callosum_Body, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Corpus_Callosum_Body`))
+ggplot(df2, aes(x=df2$Corpus_Callosum_Body, y=df2$Mental.Rotation))+ geom_point(color="darkblue")+geom_smooth(method="lm", se=TRUE,fill="darkblue", color="blue")+labs(title="Corpus Callosum (Body)", x="Qantitative Anisotropy (QA)", y="Mental Rotation Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/MentalRotationstat.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Mental.Rotation~df2$Thalamic_Radiation_Superior_R, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Thalamic_Radiation_Superior_R`))
+ggplot(df2, aes(x=df2$Thalamic_Radiation_Superior_R, y=df2$Mental.Rotation))+ geom_point(color="darkblue")+geom_smooth(method="lm", se=TRUE,fill="darkblue", color="blue")+labs(title="Thalamic Radiation Superior (R)", x="Qantitative Anisotropy (QA)", y="Mental Rotation Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.4, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/MentalRotationstat.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Mental.Rotation~df2$Thalamic_Radiation_Anterior_R, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Thalamic_Radiation_Anterior_R`))
+ggplot(df2, aes(x=df2$Thalamic_Radiation_Anterior_R, y=df2$Mental.Rotation))+ geom_point(color="darkblue")+geom_smooth(method="lm", se=TRUE,fill="darkblue", color="blue")+labs(title="Thalamic Radiation Anterior (R)", x="Qantitative Anisotropy (QA)", y="Mental Rotation Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/MentalRotationstat.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Mental.Rotation~df2$Cingulum_Frontal_Parahippocampal_L, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Cingulum_Frontal_Parahippocampal_L`))
+ggplot(df2, aes(x=df2$Cingulum_Frontal_Parahippocampal_L, y=df2$Mental.Rotation))+ geom_point(color="darkblue")+geom_smooth(method="lm", se=TRUE,fill="darkblue", color="blue")+labs(title="Cingulum Frontal Parahippocampal (L)", x="Qantitative Anisotropy (QA)", y="Mental Rotation Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/MentalRotationstat.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Mental.Rotation~df2$Dentatorubrothalamic_Tract_RL, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Dentatorubrothalamic_Tract_RL`))
+ggplot(df2, aes(x=df2$Dentatorubrothalamic_Tract_RL, y=df2$Mental.Rotation))+ geom_point(color="darkblue")+geom_smooth(method="lm", se=TRUE,fill="darkblue", color="blue")+labs(title="Cingulum Frontal Parahippocampal (L)", x="Qantitative Anisotropy (QA)", y="Mental Rotation Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r}
+```
+
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/assembleobject.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Assembling.Objects~df2$Middle_Longitudinal_Fasciculus_L, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Middle_Longitudinal_Fasciculus_L`))
+ggplot(df2, aes(x=df2$Middle_Longitudinal_Fasciculus_L, y=df2$Assembling.Objects))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Middle Longitudinal Fasciculus (L)", x="Qantitative Anisotropy (QA)", y="Assembling object Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.4, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/assembleobject.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Assembling.Objects~df2$Corpus_Callosum_Tapetum, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Corpus_Callosum_Tapetum`))
+ggplot(df2, aes(x=df2$Corpus_Callosum_Tapetum, y=df2$Assembling.Objects))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Middle Longitudinal Fasciculus (L)", x="Qantitative Anisotropy (QA)", y="Assembling object Score")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.4, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##small-scales vs large-scales
+## import data
+path<-"D:/lizzzz/SmallLarge.csv"
+df2<-read.csv(path)
+
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df2$Paper.folding~df2$Mental.Rotation, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Paper.folding`))
+ggplot(df2, aes(x=df2$Mental.Rotation, y=df2$Paper.folding))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Mental Rotation vs Paper Folding", x="Mental Rotation (Total correct - z score)", y="Paper Folding (correct - (incorrect/4))")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=1.3,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.4, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df2$Assembling.objects~df2$Mental.Rotation, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Assembling.objects`))
+ggplot(df2, aes(x=df2$Mental.Rotation, y=df2$Assembling.objects))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Mental Rotation vs Assembling Objects", x="Mental Rotation (Total correct - z score)", y="Assembling Objects (Total Correct)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=6.9, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=6.3,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=6.7, vjust=1.7, size=4)+theme(aspect.ratio = 1)
+
+
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df2$Assembling.objects~df2$Paper.folding, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Assembling.objects`))
+ggplot(df2, aes(x=df2$Paper.folding, y=df2$Assembling.objects))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Paper Folding vs Assembling Objects", x="Paper Folding (correct - (incorrect/4))", y="Assembling Objects (Total Correct)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=6.9, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=6.3,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=6.7, vjust=1.7, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df2$Assembling.objects~df2$Paper.folding, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Assembling.objects`))
+ggplot(df2, aes(x=df2$Paper.folding, y=df2$Assembling.objects))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Paper Folding vs Assembling Objects", x="Paper Folding (correct - (incorrect/4))", y="Assembling Objects (Total Correct)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=6.9, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=6.3,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=6.7, vjust=1.7, size=4)+theme(aspect.ratio = 1)
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df2$Mental.Rotation~df2$Route.Learning, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Mental.Rotation`))
+ggplot(df2, aes(x=df2$Route.Learning, y=df2$Mental.Rotation))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Paper Folding vs Assembling Objects", x="Paper Folding (correct - (incorrect/4))", y="Assembling Objects (Total Correct)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=6.9, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=6.3,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=6.7, vjust=1.7, size=4)+theme(aspect.ratio = 1)
+```
+```{r}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df2$Mental.Rotation~df2$Silcton.Within.Route, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Mental.Rotation`))
+ggplot(df2, aes(x=df2$Silcton.Within.Route, y=df2$Mental.Rotation))+ geom_point(color=brewer.pal(8,"Dark2")[3])+geom_smooth(method="lm", se=TRUE,fill=brewer.pal(8,"Dark2")[3], color=brewer.pal(8,"Dark2")[3])+labs(title="Paper Folding vs Assembling Objects", x="Paper Folding (correct - (incorrect/4))", y="Assembling Objects (Total Correct)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=6.9, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=6.3,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=6.7, vjust=1.7, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library(corrplot)
+path<-"D:/lizzzz/SmallvsLargeCorr.csv"
+df2<-read.csv(path)
+
+cor_matrix<-cor(df2, use="complete.obs")
+corrplot(cor_matrix, method = "color", tl.cex = 0.8)
+```
+
+
+```{r, warning=FALSE}
+heatmap(cor_matrix, col=colorRampPalette(c("darkblue", "white", "orange"))(50), symm = TRUE, margins = c(5,5),  labRow = rownames(cor_matrix),  
+        labCol = colnames(cor_matrix),  
+        cexCol = 0.7,  
+        cexRow = 0.7)  
+```
+
+
+```{r, warning=FALSE}
+library(PerformanceAnalytics)
+layout(matrix(c(1,2), nrow = 1), widths = c(4, 20))
+chart.Correlation(df2, histogram=TRUE, pch=19)
+```
+
+
+```{r, warning=FALSE}
+correlation_matrix <- cor(df2, use="complete.obs")
+
+# Define custom colors for the scatterplots
+scatterplot_colors <- c("red", "green", "blue", "purple")
+
+# Create a custom correlation plot with customized scatterplot colors
+chart.Correlation(correlation_matrix, method = "pearson", col = scatterplot_colors)
+
+# Display the plot
+print(custom_cor_plot)
+```
+
+
+```{r, warning=FALSE}
+library(psych)
+path<-"D:/lizzzz/SmallvsLargeCorr.csv"
+df2<-read.csv(path)
+pairs.panels(df2[2:9],lm=TRUE, stars = TRUE)
+```
+
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/stresscorr.csv"
+df3<-read.csv(path)
+```
+
+
+```{r, warning=FALSE}
+library(psych)
+pairs.panels(df3[1:4],lm=TRUE, stars = TRUE)
+```
+
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/StressSmallCorr.csv"
+df3<-read.csv(path)
+```
+
+
+```{r, warning=FALSE}
+library(psych)
+pairs.panels(df3[1:7],lm=TRUE, stars = TRUE)
+```
+
+```{r, warning=FALSE}
+path<-"D:/lizzzz/RvaluePlot.csv"
+df<-read.csv(path)
+df$r.value
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+
+tasks <- df$Tasks
+r_values <- df$r.value
+plot(df$r.value, rep(0, length(tasks)), xlim = c(0, 0.55), ylim=c(-0.1,1),
+     xlab = "r Values", ylab = "", yaxt = "n", yaxs="i", main = "R Values of Different Tasks", pch = 16, col = ifelse(df$binary == 0, "darkblue", "orange"), cex = df$r.value * 5)
+axis(2, at = 0)
+colors <- rainbow(length(tasks))
+points(df$r.value, rep(0, length(tasks)), pch = 16, col = ifelse(df$binary == 0, "darkblue", "orange"), cex = df$r.value * 5)
+
+```
+##comparing visuo-spatial abilities and perspective tranformation abilities and their relationships with stress and anxiety 
+```{r, warning=FALSE}
+##comparing visuo-spatial abilities and perspective tranformation abilities and their relationships with stress and anxiety 
+## import data
+file_path<-"D:/lizzzz/datasmallscale.csv"
+df<-read.csv(file_path)
+library(psych)
+pairs.panels(df[4:11],lm=TRUE, stars = TRUE)
+
+
+```
+
+
+```{r, warning=FALSE}
+file_path<-"D:/lizzzz/datasmallscale.csv"
+df<-read.csv(file_path)
+library(psych)
+pairs.panels(df[8:14],lm=TRUE, stars = TRUE, hist.col = "pink", col="green")
+
+```
+
+
+```{r, warning=FALSE}
+#SBSOD and tasks
+library(PerformanceAnalytics)
+layout(matrix(c(1,2), nrow = 1), widths = c(4, 20))
+chart.Correlation(df, histogram=TRUE,method="pearson", smoother.method="lm", pch=19)
+```
+
+
+```{r, warning=FALSE}
+file_path<-"D:/lizzzz/datasmallscale.csv"
+df<-read.csv(file_path)
+library(corrplot)
+df <- df[complete.cases(df), ]
+non_numeric_cols <- sapply(df, function(x) !is.numeric(x))
+df[non_numeric_cols] <- lapply(df[non_numeric_cols], as.numeric)
+cor_matrix=cor(df[, c(4:7, 12:14)])
+## leave blank on non-significant coeff
+
+## add all correlation coefficients
+corrplot(cor_matrix, method = "circle", type = "upper", order = "hclust", addCoef.col = "black", number.cex = 0.7)
+any(is.na(cor_matrix))
+any(is.nan(cor_matrix))
+any(is.infinite(cor_matrix))
+
+```
+
+
+```{r, warning=FALSE}
+file_path<-"D:/lizzzz/datasmallscale.csv"
+df<-read.csv(file_path)
+library(psych)
+pairs.panels(df[, c(4:7, 12:15)],lm=TRUE, stars = TRUE, hist.col = "green", col="purple")
+```
+
+
+```{r, warning=FALSE}
+#sex diff in small scales/ SOT
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+library(devtools)
+file_path<-"D:/lizzzz/datasmallscale.csv"
+df<-read.csv(file_path)
+df <- df[df$sex != "", ]
+n = sum(!is.na(df$SOT))
+nmale=sum(!is.na(df$SOT[df$sex == "M"]))
+nfemale=sum(!is.na(df$SOT[df$sex == "F"]))
+mean_male <- mean(df$SOT[df$sex == "M"], na.rm = TRUE)
+mean_female <- mean(df$SOT[df$sex == "F"], na.rm = TRUE)
+SD_female <- sd(df$SOT[df$sex == "F"], na.rm = TRUE)
+SD_male <- sd(df$SOT[df$sex == "M"], na.rm = TRUE)
+ggplot(df, aes(x = SOT, fill = sex)) +
+  geom_histogram(position = "identity", alpha = 0.9, bins = 30) +
+  scale_fill_manual(values = c("darkblue", "orange")) + geom_vline(xintercept = mean_male, color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean_female, color = "darkblue", linetype = "dashed", size = 1) + labs(x = "Spatial Orientation Test (SOT) - angular error (degrees)",y = "Count") + theme_minimal()+ theme(axis.title.y = element_text(size=14), axis.title.x = element_text(size = 14))
+```
+
+
+```{r, warning=FALSE}
+#sex diff in small scales/ Road Map
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+library(devtools)
+file_path<-"D:/lizzzz/datasmallscale.csv"
+df<-read.csv(file_path)
+df <- df[df$sex != "", ]
+n = sum(!is.na(df$Road.map))
+nmale=sum(!is.na(df$Road.map[df$sex == "M"]))
+nfemale=sum(!is.na(df$Road.map[df$sex == "F"]))
+mean_male <- mean(df$Road.map[df$sex == "M"], na.rm = TRUE)
+mean_female <- mean(df$Road.map[df$sex == "F"], na.rm = TRUE)
+SD_female <- sd(df$Road.map[df$sex == "F"], na.rm = TRUE)
+SD_male <- sd(df$Road.map[df$sex == "M"], na.rm = TRUE)
+ggplot(df, aes(x = Road.map, fill = sex)) +
+  geom_histogram(position = "identity", alpha = 0.9, bins = 30) +
+  scale_fill_manual(values = c("darkblue", "orange")) + geom_vline(xintercept = mean_male, color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean_female, color = "darkblue", linetype = "dashed", size = 1) + labs(x = "Road Map Test (RMT) - Total numebr of corr",y = "Count") + theme_minimal() + theme(axis.title.y = element_text(size=14), axis.title.x = element_text(size = 14))
+```
+
+
+```{r, warning=FALSE}
+#sex diff in small scales/ viewpoint transformation
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+library(devtools)
+file_path<-"D:/lizzzz/datasmallscale.csv"
+df<-read.csv(file_path)
+df <- df[df$sex != "", ]
+n = sum(!is.na(df$VTT))
+nmale=sum(!is.na(df$VTT[df$sex == "M"]))
+nfemale=sum(!is.na(df$VTT[df$sex == "F"]))
+mean_male <- mean(df$VTT[df$sex == "M"], na.rm = TRUE)
+mean_female <- mean(df$VTT[df$sex == "F"], na.rm = TRUE)
+SD_female <- sd(df$VTT[df$sex == "F"], na.rm = TRUE)
+SD_male <- sd(df$VTT[df$sex == "M"], na.rm = TRUE)
+ggplot(df, aes(x = VTT, fill = sex)) +
+  geom_histogram(position = "identity", alpha = 0.9, bins = 30) +
+  scale_fill_manual(values = c("darkblue", "orange")) + geom_vline(xintercept = mean_male, color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean_female, color = "darkblue", linetype = "dashed", size = 1) + labs(x = "Viewpoint Transformation Task (VTT) - Avg of angle error and distance error",y = "Count") + theme_minimal() + theme(axis.title.y = element_text(size=14), axis.title.x = element_text(size = 14))
+```
+
+
+```{r, warning=FALSE}
+#sex diff in small scales/ corsi block
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+library(devtools)
+file_path<-"D:/lizzzz/datasmallscale.csv"
+df<-read.csv(file_path)
+df <- df[df$sex != "", ]
+n = sum(!is.na(df$Corsi.block))
+nmale=sum(!is.na(df$Corsi.block[df$sex == "M"]))
+nfemale=sum(!is.na(df$Corsi.block[df$sex == "F"]))
+mean_male <- mean(df$Corsi.block[df$sex == "M"], na.rm = TRUE)
+mean_female <- mean(df$Corsi.block[df$sex == "F"], na.rm = TRUE)
+SD_female <- sd(df$Corsi.block[df$sex == "F"], na.rm = TRUE)
+SD_male <- sd(df$Corsi.block[df$sex == "M"], na.rm = TRUE)
+ggplot(df, aes(x = Corsi.block, fill = sex)) +
+  geom_histogram(position = "identity", alpha = 0.9, bins = 30) +
+  scale_fill_manual(values = c("darkblue", "orange")) + geom_vline(xintercept = mean_male, color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean_female, color = "darkblue", linetype = "dashed", size = 1) + labs(x = "Corsi Block Task (CBT) - memory span",y = "Count") + theme_minimal() + theme(axis.title.y = element_text(size=14), axis.title.x = element_text(size = 14))
+```
+
+
+```{r, warning=FALSE}
+#sex diff in small scales/ corsi block
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+library(devtools)
+file_path<-"D:/lizzzz/datasmallscale.csv"
+df<-read.csv(file_path)
+df <- df[df$sex != "", ]
+n = sum(!is.na(df$MRT))
+nmale=sum(!is.na(df$MRT[df$sex == "M"]))
+nfemale=sum(!is.na(df$MRT[df$sex == "F"]))
+mean_male <- mean(df$MRT[df$sex == "M"], na.rm = TRUE)
+mean_female <- mean(df$MRT[df$sex == "F"], na.rm = TRUE)
+SD_female <- sd(df$MRT[df$sex == "F"], na.rm = TRUE)
+SD_male <- sd(df$MRT[df$sex == "M"], na.rm = TRUE)
+ggplot(df, aes(x = MRT, fill = sex)) +
+  geom_histogram(position = "identity", alpha = 0.9, bins = 30) +
+  scale_fill_manual(values = c("darkblue", "orange")) + geom_vline(xintercept = mean_male, color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean_female, color = "darkblue", linetype = "dashed", size = 1) + labs(x = "Mental Rotation Task (MRT) - AVg of RT and Total Corr",y = "Count") + theme_minimal() + theme(axis.title.y = element_text(size=14), axis.title.x = element_text(size = 14))
+```
+
+
+```{r, warning=FALSE}
+#sex diff in small scales/ corsi block
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+library(devtools)
+file_path<-"D:/lizzzz/datasmallscale.csv"
+df<-read.csv(file_path)
+df <- df[df$sex != "", ]
+n = sum(!is.na(df$Paper.folding))
+nmale=sum(!is.na(df$Paper.folding[df$sex == "M"]))
+nfemale=sum(!is.na(df$Paper.folding[df$sex == "F"]))
+mean_male <- mean(df$Paper.folding[df$sex == "M"], na.rm = TRUE)
+mean_female <- mean(df$Paper.folding[df$sex == "F"], na.rm = TRUE)
+SD_female <- sd(df$Paper.folding[df$sex == "F"], na.rm = TRUE)
+SD_male <- sd(df$Paper.folding[df$sex == "M"], na.rm = TRUE)
+ggplot(df, aes(x = Paper.folding, fill = sex)) +
+  geom_histogram(position = "identity", alpha = 0.9, bins = 30) +
+  scale_fill_manual(values = c("darkblue", "orange")) + geom_vline(xintercept = mean_male, color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean_female, color = "darkblue", linetype = "dashed", size = 1) + labs(x = "Paper Folding Task (PFT) - Total Corr",y = "Count") + theme_minimal() + theme(axis.title.y = element_text(size=14), axis.title.x = element_text(size = 14))
+```
+
+
+```{r, warning=FALSE}
+#sex diff in small scales/ assembling objects
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+library(devtools)
+file_path<-"D:/lizzzz/datasmallscale.csv"
+df<-read.csv(file_path)
+df <- df[df$sex != "", ]
+n = sum(!is.na(df$Assembling.objects))
+nmale=sum(!is.na(df$Assembling.objects[df$sex == "M"]))
+nfemale=sum(!is.na(df$Assembling.objects[df$sex == "F"]))
+mean_male <- mean(df$Assembling.objects[df$sex == "M"], na.rm = TRUE)
+mean_female <- mean(df$Assembling.objects[df$sex == "F"], na.rm = TRUE)
+SD_female <- sd(df$Assembling.objects[df$sex == "F"], na.rm = TRUE)
+SD_male <- sd(df$Assembling.objects[df$sex == "M"], na.rm = TRUE)
+ggplot(df, aes(x = Assembling.objects, fill = sex)) +
+  geom_histogram(position = "identity", alpha = 0.9, bins = 30) +
+  scale_fill_manual(values = c("darkblue", "orange")) + geom_vline(xintercept = mean_male, color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean_female, color = "darkblue", linetype = "dashed", size = 1) + labs(x = "Assembling Objects Task (AOT) - Total Corr",y = "Count") + theme_minimal() + theme(axis.title.y = element_text(size=14), axis.title.x = element_text(size = 14))
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+file_path<-"D:/lizzzz/datasmallscale.csv"
+df<-read.csv(file_path)
+#View(df)
+df <- df[!is.na(df$sex) & df$sex != "", , drop = FALSE]
+summary_by_sex<-summary(df$Corsi.block~df$sex)
+t_test_result<-t.test(Corsi.block~sex, data = df)
+std_males<-sd(df$Corsi.block[df$sex== "M"], na.rm = TRUE)
+std_females<-sd(df$Corsi.block[df$sex== "F"], na.rm = TRUE)
+mean_males<-mean(df$Corsi.block[df$sex== "M"], na.rm = TRUE)
+mean_females<-mean(df$Corsi.block[df$sex== "F"], na.rm = TRUE)
+mean_diff<-abs(mean_females-mean_males)
+pooled_sd <- sqrt((std_males^2+std_females^2)/2)
+d <- mean_diff / pooled_sd
+p<-round(t_test_result$p.value, digits = 2)
+
+ggplot (df, aes(x =sex, y = Corsi.block, fill=sex )) + geom_violin(trim = FALSE) + geom_boxplot(width = 0.2, fill = "white", color = "darkblue")+geom_point(position = position_jitter(width = 0.2), color = "darkblue") + geom_text(x = 1.5,y = max(df$Angle.Error.pointing) + 2,
+    label = paste( "\n", "p-value: ", format(t_test_result$p.value, digits = 4)),
+    hjust = 0.5,
+    vjust = 0.5,
+    color = ifelse(t_test_result$p.value < 0.05, "red", "green")
+  ) +
+  labs(title = "Sex Differences in the Corsi Block Task", x = "Sex", y = "Corsi Block (memory span)") + theme_minimal()+geom_text(
+    x = Inf, y = -Inf, 
+    label = paste("d =", d), hjust = 1, vjust = 1,
+    color = "black" )+annotate("text",x=1.5, y=1,label=paste("d =", (round(d,2))), hjust=1.4, vjust=-24, size=4, fontface="italic")+annotate("text",x=1.5, y=1,label=paste("p =", p), hjust=1.4, vjust=-26, size=4, fontface="italic")
+
+```
+
+
+```{r, warning=FALSE}
+#sex diff in perspective transformation tasks- SOT
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+file_path<-"D:/lizzzz/datasmallscale.csv"
+df<-read.csv(file_path)
+#View(df)
+df <- df[!is.na(df$sex) & df$sex != "", , drop = FALSE]
+summary_by_sex<-summary(df$SOT~df$sex)
+t_test_result<-t.test(SOT~sex, data = df)
+std_males<-sd(df$SOT[df$sex== "M"], na.rm = TRUE)
+std_females<-sd(df$SOT[df$sex== "F"], na.rm = TRUE)
+mean_males<-mean(df$SOT[df$sex== "M"], na.rm = TRUE)
+mean_females<-mean(df$SOT[df$sex== "F"], na.rm = TRUE)
+mean_diff<-abs(mean_females-mean_males)
+pooled_sd <- sqrt((std_males^2+std_females^2)/2)
+d <- mean_diff / pooled_sd
+p<-round(t_test_result$p.value, digits = 2)
+
+ggplot (df, aes(x =sex, y = SOT, fill=sex )) + geom_violin(trim = FALSE) + geom_boxplot(width = 0.2, fill = "white", color = "darkblue")+geom_point(position = position_jitter(width = 0.2), color = "darkblue") + geom_text(x = 1.5,y = max(df$Angle.Error.pointing) + 2,
+    label = paste( "\n", "p-value: ", format(t_test_result$p.value, digits = 4)),
+    hjust = 0.5,
+    vjust = 0.5,
+    color = ifelse(t_test_result$p.value < 0.05, "red", "green")
+  ) +
+  labs(title = "Sex Differences in the Spatial Orientation Test (SOT)", x = "Sex", y = "Spatial Orientation Test (SOT)") + theme_minimal()+geom_text(
+    x = Inf, y = -Inf, 
+    label = paste("d =", d), hjust = 1, vjust = 1,
+    color = "black" )+annotate("text",x=1.5, y=1,label=paste("d =", (round(d,2))), hjust=1.4, vjust=-23, size=4, fontface="italic")+annotate("text",x=1.5, y=1,label=paste("p =", p), hjust=1.4, vjust=-25, size=4, fontface="italic")
+```
+
+
+```{r, warning=FALSE}
+#sex diff in perspective transformation tasks- Road Map
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+file_path<-"D:/lizzzz/datasmallscale.csv"
+df<-read.csv(file_path)
+#View(df)
+df <- df[!is.na(df$sex) & df$sex != "", , drop = FALSE]
+summary_by_sex<-summary(df$Road.map~df$sex)
+t_test_result<-t.test(Road.map~sex, data = df)
+std_males<-sd(df$Road.map[df$sex== "M"], na.rm = TRUE)
+std_females<-sd(df$Road.map[df$sex== "F"], na.rm = TRUE)
+mean_males<-mean(df$Road.map[df$sex== "M"], na.rm = TRUE)
+mean_females<-mean(df$Road.map[df$sex== "F"], na.rm = TRUE)
+mean_diff<-abs(mean_females-mean_males)
+pooled_sd <- sqrt((std_males^2+std_females^2)/2)
+d <- mean_diff / pooled_sd
+p<-round(t_test_result$p.value, digits = 2)
+
+ggplot (df, aes(x =sex, y = Road.map, fill=sex )) + geom_violin(trim = FALSE) + geom_boxplot(width = 0.2, fill = "white", color = "darkblue")+geom_point(position = position_jitter(width = 0.2), color = "darkblue") + geom_text(x = 1.5,y = max(df$Angle.Error.pointing) + 2,
+    label = paste( "\n", "p-value: ", format(t_test_result$p.value, digits = 4)),
+    hjust = 0.5,
+    vjust = 0.5,
+    color = ifelse(t_test_result$p.value < 0.05, "red", "green")
+  ) +
+  labs(title = "Sex Differences in the Road Map Task (RMT)", x = "Sex", y = "Road Map Task (RMT)") + theme_minimal()+geom_text(
+    x = Inf, y = -Inf, 
+    label = paste("d =", d), hjust = 1, vjust = 1,
+    color = "black" )+annotate("text",x=1.5, y=1,label=paste("d =", (round(d,2))), hjust=1.4, vjust=-23, size=4, fontface="italic")+annotate("text",x=1.5, y=1,label=paste("p <", 0.01), hjust=1.3, vjust=-25, size=4, fontface="italic")
+```
+
+
+```{r, warning=FALSE}
+#sex diff in perspective transformation tasks- VTT
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library (ggpubr)
+file_path<-"D:/lizzzz/datasmallscale.csv"
+df<-read.csv(file_path)
+#View(df)
+df <- df[!is.na(df$sex) & df$sex != "", , drop = FALSE]
+summary_by_sex<-summary(df$VTT~df$sex)
+t_test_result<-t.test(VTT~sex, data = df)
+std_males<-sd(df$VTT[df$sex== "M"], na.rm = TRUE)
+std_females<-sd(df$VTT[df$sex== "F"], na.rm = TRUE)
+mean_males<-mean(df$VTT[df$sex== "M"], na.rm = TRUE)
+mean_females<-mean(df$VTT[df$sex== "F"], na.rm = TRUE)
+mean_diff<-abs(mean_females-mean_males)
+pooled_sd <- sqrt((std_males^2+std_females^2)/2)
+d <- mean_diff / pooled_sd
+p<-round(t_test_result$p.value, digits = 2)
+
+ggplot (df, aes(x =sex, y = VTT, fill=sex )) + geom_violin(trim = FALSE) + geom_boxplot(width = 0.2, fill = "white", color = "darkblue")+geom_point(position = position_jitter(width = 0.2), color = "darkblue") + geom_text(x = 1.5,y = max(df$Angle.Error.pointing) + 2,
+    label = paste( "\n", "p-value: ", format(t_test_result$p.value, digits = 4)),
+    hjust = 0.5,
+    vjust = 0.5,
+    color = ifelse(t_test_result$p.value < 0.05, "red", "green")
+  ) +
+  labs(title = "Sex Differences in the Viewpoint Transformation Task (VTT)", x = "Sex", y = "Viewpoint Transformation Task (VTT)") + theme_minimal()+geom_text(
+    x = Inf, y = -Inf, 
+    label = paste("d =", d), hjust = 1, vjust = 1,
+    color = "black" )+annotate("text",x=1.5, y=1,label=paste("d =", (round(d,2))), hjust=1.4, vjust=-13, size=4, fontface="italic")+annotate("text",x=1.5, y=1,label=paste("p <", 0.01), hjust=1.4, vjust=-15, size=4, fontface="italic")
+```
+
+
+```{r, warning=FALSE}
+##small-scales -Correlational tractography -QA
+## import data
+path<-"D:/lizzzz/corsiblock-qa.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Corsi.block~df2$Inferior_Fronto_Occipital_Fasciculus_L, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Inferior_Fronto_Occipital_Fasciculus_L`))
+ggplot(df2, aes(x=df2$Inferior_Fronto_Occipital_Fasciculus_L, y=df2$Corsi.block))+ geom_point(color="darkblue")+geom_smooth(method="lm", se=TRUE,fill="darkblue", color="blue")+labs(title="Inferior Fronto Occipital Fasciculus (L)", x="Qantitative Anisotropy (QA)", y="Corsi Block (memory span)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+
+
+```{r, warning=FALSE}
+##small-scales -Correlational tractography -QA
+## import data
+path<-"D:/lizzzz/corsiblock-qa.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Corsi.block~df2$Cerebellum_L, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Cerebellum_L`))
+ggplot(df2, aes(x=df2$Cerebellum_L, y=df2$Corsi.block))+ geom_point(color="darkblue")+geom_smooth(method="lm", se=TRUE,fill="darkblue", color="blue")+labs(title="Cerebellum (L)", x="Qantitative Anisotropy (QA)", y="Corsi Block (memory span)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##small-scales -Correlational tractography -QA
+## import data
+path<-"D:/lizzzz/corsiblock-qa.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Corsi.block~df2$Superior_Longitudinal_Fasciculus2_L, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Superior_Longitudinal_Fasciculus2_L`))
+ggplot(df2, aes(x=df2$Superior_Longitudinal_Fasciculus2_L, y=df2$Corsi.block))+ geom_point(color="darkblue")+geom_smooth(method="lm", se=TRUE,fill="darkblue", color="blue")+labs(title="Superior Longitudinal Fasciculus (L)", x="Qantitative Anisotropy (QA)", y="Corsi Block (memory span)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##small-scales -Correlational tractography -QA
+## import data
+path<-"D:/lizzzz/corsiblock-qa.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Corsi.block~df2$Corticostriatal_Tract_Superior_L, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Corticostriatal_Tract_Superior_L`))
+ggplot(df2, aes(x=df2$Corticostriatal_Tract_Superior_L, y=df2$Corsi.block))+ geom_point(color="darkblue")+geom_smooth(method="lm", se=TRUE,fill="darkblue", color="blue")+labs(title="Corticostriatal Tract Superior (L)", x="Qantitative Anisotropy (QA)", y="Corsi Block (memory span)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##small-scales -Correlational tractography -QA
+## import data
+path<-"D:/lizzzz/corsiblock-qa.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Corsi.block~df2$Dentatorubrothalamic_Tract_LR, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Dentatorubrothalamic_Tract_LR`))
+ggplot(df2, aes(x=df2$Dentatorubrothalamic_Tract_LR, y=df2$Corsi.block))+ geom_point(color="darkblue")+geom_smooth(method="lm", se=TRUE,fill="darkblue", color="blue")+labs(title="Dentatorubrothalamic_Tract_LR", x="Qantitative Anisotropy (QA)", y="Corsi Block (memory span)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##small-scales -Correlational tractography -QA
+## import data
+path<-"D:/lizzzz/corsiblock-qa.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Corsi.block~df2$Anterior_Commissure, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Anterior_Commissure`))
+ggplot(df2, aes(x=df2$Anterior_Commissure, y=df2$Corsi.block))+ geom_point(color="darkblue")+geom_smooth(method="lm", se=TRUE,fill="darkblue", color="blue")+labs(title="Anterior_Commissure", x="Qantitative Anisotropy (QA)", y="Corsi Block (memory span)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.4, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##small-scales -Correlational tractography -QA
+## import data
+path<-"D:/lizzzz/sot-qa.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$SOT~df2$Cerebellum_L, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Cerebellum_L`))
+ggplot(df2, aes(x=df2$Cerebellum_L, y=df2$SOT))+ geom_point(color="darkblue")+geom_smooth(method="lm", se=TRUE,fill="darkblue", color="blue")+labs(title="Cerebellum (L)", x="Qantitative Anisotropy (QA)", y="Spatial Orientation Test (SOT)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##small-scales -Correlational tractography -QA
+## import data
+path<-"D:/lizzzz/vtt-increase-increase.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$VTT~df2$Corpus_Callosum_Forceps_Major, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Corpus_Callosum_Forceps_Major`))
+ggplot(df2, aes(x=df2$Corpus_Callosum_Forceps_Major, y=df2$VTT))+ geom_point(color="darkred")+geom_smooth(method="lm", se=TRUE,fill="darkred", color="red")+labs(title="Corpus Callosum Forceps (Major)", x="Qantitative Anisotropy (QA)", y="Viewpoint Transformation Test (VTT)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##small-scales -Correlational tractography -QA
+## import data
+path<-"D:/lizzzz/vtt-increase-increase.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$VTT~df2$Corpus_Callosum_Tapetum, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Corpus_Callosum_Tapetum`))
+ggplot(df2, aes(x=df2$Corpus_Callosum_Tapetum, y=df2$VTT))+ geom_point(color="darkred")+geom_smooth(method="lm", se=TRUE,fill="darkred", color="red")+labs(title="Corpus Callosum Tapetum", x="Qantitative Anisotropy (QA)", y="Viewpoint Transformation Test (VTT)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##small-scales -Correlational tractography -QA
+## import data
+path<-"D:/lizzzz/vtt-increase-increase.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$VTT~df2$Cerebellum_L, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Cerebellum_L`))
+ggplot(df2, aes(x=df2$Cerebellum_L, y=df2$VTT))+ geom_point(color="darkred")+geom_smooth(method="lm", se=TRUE,fill="darkred", color="red")+labs(title="Cerebellum (L)", x="Qantitative Anisotropy (QA)", y="Viewpoint Transformation Test (VTT)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##small-scales -Correlational tractography -QA
+## import data
+path<-"D:/lizzzz/vtt-increase-increase.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$VTT~df2$Cerebellum_R, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Cerebellum_R`))
+ggplot(df2, aes(x=df2$Cerebellum_R, y=df2$VTT))+ geom_point(color="darkred")+geom_smooth(method="lm", se=TRUE,fill="darkred", color="red")+labs(title="Cerebellum (L)", x="Qantitative Anisotropy (QA)", y="Viewpoint Transformation Test (VTT)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+
+
+```{r, warning=FALSE}
+##small-scales -Correlational tractography -QA
+## import data
+path<-"D:/lizzzz/roadmap-qa.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Road.Map~df2$Cerebellum_R, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Cerebellum_R`))
+ggplot(df2, aes(x=df2$Cerebellum_R, y=df2$Road.Map))+ geom_point(color="darkred")+geom_smooth(method="lm", se=TRUE,fill="darkred", color="red")+labs(title="Cerebellum (L)", x="Qantitative Anisotropy (QA)", y="Road Map Task (RMT)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##small-scales -Correlational tractography -QA
+## import data
+path<-"D:/lizzzz/roadmap-qa.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Road.Map~df2$Corticospinal_Tract_L, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Corticospinal_Tract_L`))
+ggplot(df2, aes(x=df2$Corticospinal_Tract_L, y=df2$Road.Map))+ geom_point(color="darkred")+geom_smooth(method="lm", se=TRUE,fill="darkred", color="red")+labs(title="Corticospinal Tract (L)", x="Qantitative Anisotropy (QA)", y="Road Map Task (RMT)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##small-scales -Correlational tractography -QA
+## import data
+path<-"D:/lizzzz/roadmap-qa.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Road.Map~df2$Middle_Cerebellar_Peduncle, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Middle_Cerebellar_Peduncle`))
+ggplot(df2, aes(x=df2$Middle_Cerebellar_Peduncle, y=df2$Road.Map))+ geom_point(color="darkred")+geom_smooth(method="lm", se=TRUE,fill="darkred", color="red")+labs(title="Middle Cerebellar Peduncle", x="Qantitative Anisotropy (QA)", y="Road Map Task (RMT)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p <", 0.01)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+##small-scales -Correlational tractography -QA
+## import data
+path<-"D:/lizzzz/roadmap-qa.csv"
+df2<-read.csv(path)
+lm_model<-lm(df2$Road.Map~df2$Medial_Lemniscus_L, data=df2)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df2$Medial_Lemniscus_L`))
+ggplot(df2, aes(x=df2$Medial_Lemniscus_L, y=df2$Road.Map))+ geom_point(color="darkred")+geom_smooth(method="lm", se=TRUE,fill="darkred", color="red")+labs(title="Medial_Lemniscus_L", x="Qantitative Anisotropy (QA)", y="Road Map Task (RMT)")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.45, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+## cortical thickness
+file_path<-"D:/lizzzz/thickness.csv"
+df<-read.csv(file_path)
+View(df)
+
+```
+
+
+```{r, warning=FALSE}
+## simple linear regression with ggplot - left entorhinal vs MRT
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$rh.entorhinal~df$MRT)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$MRT`))
+ggplot(df,aes(x=df$rh.entorhinal, y=df$MRT))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs MRT", x="Cortical Thickness - Right Entorhinal (mm) ", y="MRT")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.2, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$lh.entorhinal~df$MRT)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$MRT`))
+ggplot(df,aes(x=df$lh.entorhinal, y=df$MRT))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs MRT", x="Cortical Thickness - Left Entorhinal (mm) ", y="MRT")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.2, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$lh.parahippocampal~df$MRT)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$MRT`))
+ggplot(df,aes(x=df$lh.parahippocampal, y=df$MRT))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs MRT", x="Cortical Thickness - Left parahippocampal (mm) ", y="MRT")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.2, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$rh.parahippocampal~df$MRT)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$MRT`))
+ggplot(df,aes(x=df$rh.parahippocampal, y=df$MRT))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs MRT", x="Cortical Thickness - Right parahippocampal (mm) ", y="MRT")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.2, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$rh.inferiortemporal~df$MRT)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$MRT`))
+ggplot(df,aes(x=df$rh.inferiortemporal, y=df$MRT))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs MRT", x="Cortical Thickness - Right inferiortemporal (mm) ", y="Mental Rotation")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+lm_model<-lm(df$lh.inferiortemporal~df$MRT)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$MRT`))
+ggplot(df,aes(x=df$lh.inferiortemporal, y=df$MRT))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs MRT", x="Cortical Thickness - Left inferiortemporal (mm) ", y="Mental Rotation")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+file_path<-"D:/lizzzz/thickness.csv"
+df<-read.csv(file_path)
+
+lm_model<-lm(df$lh.inferiortemporal~df$Paper.folding)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Paper.folding`))
+ggplot(df,aes(x=df$lh.inferiortemporal, y=df$Paper.folding))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs Paper Folding", x="Cortical Thickness - Left inferiortemporal (mm) ", y="Paper Folding")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+file_path<-"D:/lizzzz/thickness.csv"
+df<-read.csv(file_path)
+
+lm_model<-lm(df$lh.parahippocampal~df$Paper.folding)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Paper.folding`))
+ggplot(df,aes(x=df$lh.parahippocampal, y=df$Paper.folding))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs Paper Folding", x="Cortical Thickness - Left inferiortemporal (mm) ", y="Paper Folding")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+#Cortical thickness -SOT
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+file_path<-"D:/lizzzz/thickness.csv"
+df<-read.csv(file_path)
+
+lm_model<-lm(df$rh.entorhinal~df$SOT)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$SOT`))
+ggplot(df,aes(x=df$rh.entorhinal, y=df$SOT))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs Paper Folding", x="Cortical Thickness - Left inferiortemporal (mm) ", y="Paper Folding")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+#Cortical thickness -Road map
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+file_path<-"D:/lizzzz/thickness.csv"
+df<-read.csv(file_path)
+
+lm_model<-lm(df$lh.inferiortemporal~df$Road.map)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Road.map`))
+ggplot(df,aes(x=df$lh.inferiortemporal, y=df$Road.map))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs Road map", x="Cortical Thickness - Left inferiortemporal (mm) ", y="Road Map")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+#Cortical thickness -Road map
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+file_path<-"D:/lizzzz/thickness.csv"
+df<-read.csv(file_path)
+
+lm_model<-lm(df$rh.inferiortemporal~df$Road.map)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Road.map`))
+  ggplot(df,aes(x=df$rh.inferiortemporal, y=df$Road.map))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs Road map", x="Cortical Thickness - Right inferiortemporal (mm) ", y="Road Map")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+#Cortical thickness -VTT
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+file_path<-"D:/lizzzz/thickness.csv"
+df<-read.csv(file_path)
+
+lm_model<-lm(df$rh.inferiortemporal~df$VTT)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$VTT`))
+  ggplot(df,aes(x=df$rh.inferiortemporal, y=df$VTT))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs Road map", x="Cortical Thickness - Right inferiortemporal (mm) ", y="Road Map")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+#Cortical thickness -corsi block
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+file_path<-"D:/lizzzz/thickness.csv"
+df<-read.csv(file_path)
+
+lm_model<-lm(df$lh.inferiortemporal~df$Corsi.block)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Corsi.block`))
+  ggplot(df,aes(x=df$lh.inferiortemporal, y=df$Corsi.block))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs Road map", x="Cortical Thickness - Right inferiortemporal (mm) ", y="Road Map")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+```{r, warning=FALSE}
+#Cortical thickness -MRT
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+file_path<-"D:/lizzzz/thickness2.csv"
+df<-read.csv(file_path)
+
+lm_model<-lm(df$lh.fusiform~df$MRT)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$MRT`))
+  ggplot(df,aes(x=df$lh.fusiform, y=df$MRT))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs MRT", x="Cortical Thickness - Left fusiform (mm) ", y="Mental Rotation")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+file_path<-"D:/lizzzz/thickness2.csv"
+df<-read.csv(file_path)
+
+lm_model<-lm(df$lh.superiortemporal~df$VTT)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$VTT`))
+  ggplot(df,aes(x=df$lh.superiortemporal, y=df$VTT))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs VTT", x="Cortical Thickness - Left superiortemporal (mm) ", y="Viewpoint transformation")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+file_path<-"D:/lizzzz/thickness2.csv"
+df<-read.csv(file_path)
+
+lm_model<-lm(df$lh.insula~df$VTT)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$VTT`))
+  ggplot(df,aes(x=df$lh.insula, y=df$VTT))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs VTT", x="Cortical Thickness - Left insula (mm) ", y="Viewpoint transformation")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+
+```{r, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+file_path<-"D:/lizzzz/thickness2.csv"
+df<-read.csv(file_path)
+
+lm_model<-lm(df$rh.temporalpol~df$Assembling.objects)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Assembling.objects`))
+  ggplot(df,aes(x=df$rh.temporalpol, y=df$Assembling.objects))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs VTT", x="Cortical Thickness - Left insula (mm) ", y="Viewpoint transformation")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+
+```
+
+
+```{r, warning=FALSE}
+n = sum(!is.na(df$lh.inferiortemporal))
+ggplot(df, aes(x=df$lh.inferiortemporal, fill=..count..)) +geom_histogram(color="black" ,binwidth = 0.2, boundry = 0, alpha = 0.7) + scale_fill_viridis_c() + theme_minimal() + labs(title = "Histogram of the Cortical Thickness (Left Inferiortemporal)", subtitle = paste("n =", n), x = "Cortical Thickness (mm)", y = "Number of Participants") + theme(plot.title = element_text(hjust = 0.9), plot.subtitle = element_text(hjust = 0.55))
+```
+
+
+```{r, warning=FALSE}
+n = sum(!is.na(df$rh.inferiortemporal))
+ggplot(df, aes(x=df$rh.inferiortemporal, fill=..count..)) +geom_histogram(color="black" ,binwidth = 0.2, boundry = 0, alpha = 0.7) + scale_fill_viridis_c() + theme_minimal() + labs(title = "Histogram of the Cortical Thickness (Right Inferiortemporal)", subtitle = paste("n =", n), x = "Cortical Thickness (mm)", y = "Number of Participants") + theme(plot.title = element_text(hjust = 0.9), plot.subtitle = element_text(hjust = 0.55))
+```
+
+
+```{r, warning=FALSE}
+n = sum(!is.na(df$rh.entorhinal))
+ggplot(df, aes(x=df$rh.entorhinal, fill=..count..)) +geom_histogram(color="black" ,binwidth = 0.2, boundry = 0, alpha = 0.7) + scale_fill_viridis_c() + theme_minimal() + labs(title = "Histogram of the Cortical Thickness (Right Entorhinal)", subtitle = paste("n =", n), x = "Cortical Thickness (mm)", y = "Number of Participants") + theme(plot.title = element_text(hjust = 0.9), plot.subtitle = element_text(hjust = 0.55))
+```
+
+
+```{r, warning=FALSE}
+n = sum(!is.na(df$lh.entorhinal))
+ggplot(df, aes(x=df$lh.entorhinal, fill=..count..)) +geom_histogram(color="black" ,binwidth = 0.2, boundry = 0, alpha = 0.7) + scale_fill_viridis_c() + theme_minimal() + labs(title = "Histogram of the Cortical Thickness (Left Entorhinal)", subtitle = paste("n =", n), x = "Cortical Thickness (mm)", y = "Number of Participants") + theme(plot.title = element_text(hjust = 0.9), plot.subtitle = element_text(hjust = 0.55))
+```
+
+
+```{r, warning=FALSE}
