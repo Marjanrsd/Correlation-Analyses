@@ -1,0 +1,402 @@
+---
+title: "ants_CT"
+output: html_document
+date: "2024-04-22"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r, warning=FALSE}
+#library(ggseg) 
+#library(ggseg3d) 
+library(ggplot2)
+library(dplyr)
+library(viridisLite)
+#library(fslr)
+#library(sf)
+#library(ggsegSchaefer)
+library(wesanderson)
+library(psych)
+library(ggthemes)
+library(viridis)
+
+file_path<-"D:/liz/Third Year Talk/avg_CT_ants2.csv"
+df<-read.csv(file_path)
+#View(df)
+
+```
+
+
+```{r, warning=FALSE}
+lm_model<-lm(df$LH_DorsAttn_PrCv~df$MRT)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.2f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$MRT`))
+  ggplot(df,aes(x=df$LH_DorsAttn_PrCv, y=df$MRT))+ geom_point()+geom_smooth(method="lm", se=TRUE)+labs(title="Cortical Thickness vs Road map", x="Cortical Thickness - Right inferiortemporal (mm) ", y="Road Map")+theme_bw()+theme(panel.grid = element_blank(), plot.title=element_text(hjust = 0.5, vjust=2))+geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(aspect.ratio = 1)
+```
+```{r, warning=FALSE}
+lm_model<-lm(df$LH_DorsAttn_PrCv~df$Assembling.objects, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.4f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$Assembling.objects`))
+ggplot(df, aes(x=LH_DorsAttn_PrCv, y=Assembling.objects)) + geom_point() + geom_smooth(method="lm", se=TRUE) +labs(title="Left Visual", x="Cortical Thickness", y="Performance") + theme_minimal() + geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(axis.title = element_text(size = 17))+theme(plot.title = element_text(size=20))+theme(plot.title = element_text(hjust=0.5))+scale_color_manual(values = wes_palette("GrandBudapest1"))
+```
+```{r}
+```{r}
+```{r}
+
+```
+
+```
+
+```
+
+
+```{r, warning=FALSE}
+# Left Hem
+library(psych)
+file_path<-"D:/lizzzz/avg_CT_ants.csv"
+df<-read.csv(file_path)
+pairs.panels(df[, c(3, 43:49)],lm=TRUE, stars = TRUE, hist.col = "green", col="purple")
+```
+
+
+```{r, warning=FALSE}
+pairs.panels(df[, c(6, 43:49)],lm=TRUE, stars = TRUE, hist.col = "pink", col="red")
+```
+
+
+```{r, warning=FALSE}
+pairs.panels(df[, c(7, 43:49)],lm=TRUE, stars = TRUE, hist.col = "yellow", col="orange")
+```
+
+
+```{r, warning=FALSE}
+pairs.panels(df[, c(10, 43:49)],lm=TRUE, stars = TRUE, hist.col = "cyan", col="skyblue")
+```
+
+
+```{r, warning=FALSE}
+pairs.panels(df[, c(12, 43:49)],lm=TRUE, stars = TRUE, hist.col = "lavender", col="darkgreen")
+```
+
+
+```{r, warning=FALSE}
+pairs.panels(df[, c(13, 43:49)],lm=TRUE, stars = TRUE, hist.col = "gold", col="coral")
+```
+
+
+```{r, warning=FALSE}
+pairs.panels(df[, c(14, 43:49)],lm=TRUE, stars = TRUE, hist.col = "darkseagreen", col="peachpuff")
+```
+
+
+```{r, warning=FALSE}
+pairs.panels(df[, c(19, 43:49)],lm=TRUE, stars = TRUE, hist.col = "darkseagreen", col="lightsalmon")
+```
+
+
+```{r, warning=FALSE}
+pairs.panels(df[, c(20, 43:49)],lm=TRUE, stars = TRUE, hist.col = "mediumorchid", col="mediumpurple")
+```
+
+
+```{r, warning=FALSE}
+pairs.panels(df[, c(22, 43:49)],lm=TRUE, stars = TRUE, hist.col = "darkcyan", col="yellowgreen")
+```
+
+
+```{r, warning=FALSE}
+pairs.panels(df[, c(23, 43:49)],lm=TRUE, stars = TRUE, hist.col = "darkcyan", col="yellowgreen")
+```
+
+
+```{r, warning=FALSE}
+# Right Hem
+pairs.panels(df[, c(24, 43:49)],lm=TRUE, stars = TRUE, hist.col = "pink", col="blueviolet")
+```
+
+
+```{r, warning=FALSE}
+pairs.panels(df[, c(25, 43:49)],lm=TRUE, stars = TRUE, hist.col = "firebrick", col="salmon")
+```
+
+
+```{r, warning=FALSE}
+pairs.panels(df[, c(31, 43:49)],lm=TRUE, stars = TRUE, hist.col = "firebrick", col="salmon")
+```
+
+
+```{r, warning=FALSE}
+pairs.panels(df[, c(35, 43:49)],lm=TRUE, stars = TRUE, hist.col = "firebrick", col="salmon")
+```
+
+
+```{r, warning=FALSE}
+pairs.panels(df[, c(38, 43:49)],lm=TRUE, stars = TRUE, hist.col = "firebrick", col="salmon")
+```
+
+
+```{r, warning=FALSE}
+pairs.panels(df[, c(41, 43:49)],lm=TRUE, stars = TRUE, hist.col = "firebrick", col="salmon")
+```
+
+
+```{r, warning=FALSE}
+# correct for multiple comparisons - LH_SomMot
+library(qvalue)
+library(Hmisc)
+file_path<-"D:/lizzzz/Multiple Comparisons/Vis.csv"
+df<-read.csv(file_path)
+#View(df)
+pval <- rcorr(as.matrix(df[,-1]),type="pearson")
+pvalues <- pval$P[1,1:8]
+print(pvalues)
+qobj <- qvalue(p = pvalues)
+print(qobj)
+
+```
+
+
+```{r, warning=FALSE}
+# correct for multiple comparisons - LH_Limbic_OFC
+library(qvalue)
+library(Hmisc)
+file_path<-"D:/lizzzz/Multiple Comparisons/Book5.csv"
+df<-read.csv(file_path)
+#View(df)
+pval <- rcorr(as.matrix(df[,-1]),type="pearson")
+pvalues <- pval$P[1, 1:8]
+print(pvalues)
+#qobj <- qvalue(p = pvalues)
+#print(qobj)
+
+```
+
+
+```{r, warning=FALSE}
+# correct for multiple comparisons - LH_Cont_Par
+library(qvalue)
+library(Hmisc)
+file_path<-"D:/lizzzz/Multiple Comparisons/Book6.csv"
+df<-read.csv(file_path)
+#View(df)
+pval <- rcorr(as.matrix(df[,-1]),type="pearson")
+pvalues <- pval$P[1, 1:8]
+print(pvalues)
+#qobj <- qvalue(p = pvalues)
+#print(qobj)
+
+```
+
+
+```{r, warning=FALSE}
+# correct for multiple comparisons - all variables
+library(qvalue)
+library(Hmisc)
+file_path<-"D:/lizzzz/Multiple Comparisons/avg_CT_ants.csv"
+df<-read.csv(file_path)
+#View(df)
+pval <- rcorr(as.matrix(df[,-1]),type="pearson")
+pvalues <- pval$P
+print(pvalues)
+qobj <- qvalue(p = pvalues)
+print(qobj)
+
+
+```
+
+
+```{r, warning=FALSE}
+# correct for multiple comparisons - all variables except stress/anxiety
+library(qvalue)
+library(Hmisc)
+file_path<-"D:/lizzzz/Multiple Comparisons/avg_CT_ants2.csv"
+df<-read.csv(file_path)
+View(df)
+pval <- rcorr(as.matrix(df[,-1]),type="pearson")
+pvalues <- pval$P
+#print(pvalues)
+qobj <- qvalue(p = pvalues)
+print(qobj)
+write.csv(qobj$qvalues, file = paste0(file_path, "qvalues.csv"))
+
+```
+
+
+```{r, warning=FALSE}
+#correct for multiple comparisons - all variables except stress/anxiety
+#partial correlation- control for the last column
+library(qvalue)
+library(Hmisc)
+library(ppcor)
+file_path<-"D:/liz/Third Year Talk/partial.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+#View(df)
+#Extract p-values
+partial_corr_control_sex<-sapply(1:(ncol(df)-1), function(x) sapply(1:(ncol(df)-1), function(y) {
+  if (x == y) 1
+  else pcor.test(df[,x], df[,y], df[,ncol(df)])$p.value
+}))
+#print(partial_corr_control_sex)
+#col_names<-colnames(df[1, -c(1, ncol(df))])
+#colnames(partial_corr_control_sex) <- col_names
+qobj <- qvalue(p = partial_corr_control_sex)
+#print(qobj)
+write.csv(qobj$qvalues, file = paste0(file_path, "control4.csv"))
+```
+
+```{r, warning=FALSE}
+#partial correlation- control for the last 2 columns
+library(qvalue)
+library(Hmisc)
+library(ppcor)
+file_path<-"D:/liz/Third Year Talk/partial.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+#View(df)
+#Extract p-values
+partial_corr_control_sex<-sapply(1:(ncol(df)-2), function(x) sapply(1:(ncol(df)-2), function(y) {
+  if (x == y) 1
+  else pcor.test(df[,x], df[,y], df[,(ncol(df)-1):ncol(df)])$p.value
+}))
+#print(partial_corr_control_sex)
+#col_names<-colnames(df[1, -c(1, ncol(df))])
+#colnames(partial_corr_control_sex) <- col_names
+qobj <- qvalue(p = partial_corr_control_sex)
+#print(qobj)
+write.csv(qobj$qvalues, file = paste0(file_path, "control4.csv"))
+```
+
+```{r, warning=FALSE}
+library(qvalue)
+library(Hmisc)
+file_path<-"D:/liz/Third Year Talk/avg_CT_ants2.csv"
+df<-read.csv(file_path)
+View(df)
+pval <- rcorr(as.matrix(df[,-1]),type="pearson")
+pvalues <- pval$P
+#print(pvalues)
+qobj <- qvalue(p = pvalues)
+print(qobj)
+write.csv(qobj$qvalues, file = paste0(file_path, "qvalues.csv"))
+```
+
+
+```{r, warning=FALSE}
+file_path<-"D:/liz/Third Year Talk/avg_CT_ants2.csv"
+df<-read.csv(file_path)
+lm_model<-lm(df$LH_Limbic_OFC~df$MRT, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.3f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$MRT`))
+ggplot(df, aes(x=LH_Limbic_OFC, y=MRT)) + geom_point() + geom_smooth(method="lm", se=TRUE) +labs(x="Cortical Thickness(mm)", y="Mental Rotation (accuracy)") + geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1, vjust=3, size=4)+theme(plot.title = element_text(size=20))+ theme(axis.title = element_text(size = 17)) + theme_classic()+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+lm_model<-lm(df$RH_Default_PFC~df$VTT, data=df, na.action=na.exclude)
+summary_model<-summary(lm_model)
+pvalue<-sprintf("%.3f",summary_model$coefficients[2,4])
+r<-round(sqrt(summary_model$r.squared),2)
+n=sum(!is.na(lm_model$model$`df$VTT`))
+ggplot(df, aes(x=RH_Default_PFC, y=VTT)) + geom_point() + geom_smooth(method="lm", se=TRUE) +labs(title="RH_Default_PFC", x="Cortical Thickness(mm)", y="Viewpoint Transformation (error)") + theme_minimal() + geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.2, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=2.5, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.15, vjust=.9, size=4)+theme(axis.title = element_text(size = 15))+theme(plot.title = element_text(size=20))+theme(plot.title = element_text(hjust=0.5))+theme(aspect.ratio = 1)
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
