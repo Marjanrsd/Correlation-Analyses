@@ -1,0 +1,466 @@
+---
+title: "ROI"
+output: html_document
+date: "2024-04-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r, warning=FALSE}
+library(ggseg) 
+library(ggseg3d) 
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(RColorBrewer)
+library(viridisLite)
+library(fslr)
+library(sf)
+library(ggsegSchaefer)
+atlas_data <- readNIfTI("D:/liz/ants/Schaefer2018_400Parcels_7Networks_order_FSLMNI152_1mm.nii.gz")
+ggseg(position = "stacked") + theme_light() + labs(title = "dk", subtitle = "dark theme")
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r , warning=FALSE}
+ggseg(mapping = aes(fill = region), colour = "black") + scale_fill_brain("dk") + theme(legend.justification = c(1, 0),
+ legend.position = "bottom", legend.text = element_text(size= 7)) +guides(fill = guide_legend(ncol = 3))
+```
+```{r}
+ggseg3d(atlas = schaefer7_400_3d, surface = "inflated") %>% 
+  pan_camera("right lateral")
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+ggplot() +
+  geom_brain(atlas = dk, position = position_brain(hemi ~ side))
+```
+
+
+```{r}
+library(dplyr)
+        
+someData = tibble(
+  region = c("isthmus cingulate", "precuneus",
+           "precentral","superior parietal"), 
+  p = sample(seq(0,.5,.001), 4)
+)
+```
+
+
+```{r}
+ggplot(someData) +
+  geom_brain(atlas = dk, 
+             position = position_brain(hemi ~ side),
+             aes(fill = p)) +
+  scale_fill_viridis_c(option = "cividis", direction = -1) +
+  theme_void() +
+  labs(title = "My awesome title", 
+       subtitle = "of a brain atlas plot",
+       caption = "I'm pretty happy about this!")
+```
+
+
+```{r}
+someData <- tibble(
+  region = rep(c("transverse temporal", "insula",
+           "precentral","superior parietal"), 2), 
+  p = sample(seq(0,.5,.001), 8),
+  groups = c(rep("g1", 4), rep("g2", 4))
+)
+```
+
+
+```{r}
+someData %>%
+  group_by(groups) %>%
+  ggplot() +
+  geom_brain(atlas = dk, 
+             position = position_brain(hemi ~ side),
+             aes(fill = p)) +
+  facet_wrap(~groups) +
+  ggtitle("correct facetting")
+```
+
+
+```{r}
+data <- data.frame(
+  region = brain_regions(dk)[1:3],
+  reg_col = brain_regions(dk)[1:3]
+)
+
+ggplot(data) +
+  geom_brain(atlas = dk,
+             aes(fill = reg_col)) +
+  scale_fill_brain2(dk$palette[data$region] )
+```
+
+
+```{r}
+library(ggsegSchaefer)
+library(ggseg)
+data(schaefer400_7)
+data <- data.frame(
+  region = brain_regions(schaefer7_400)[1:30],
+  reg_col = brain_regions(schaefer7_400)[1:30]
+)
+
+# Plot the brain visualization
+ggplot(data) +
+  geom_brain(atlas = schaefer7_400,
+             aes(fill = reg_col)) +
+  scale_fill_brain2(schaefer7_400$palette[data$region])+ 
+  theme(
+    axis.text = element_blank(),  # Hide axis text
+    axis.title = element_blank(),  # Hide axis titles
+    legend.position = "bottom",  # Position legend at the bottom
+    legend.box = "horizontal",  # Set legend box type to horizontal
+    legend.direction = "horizontal",  # Set legend direction to horizontal
+    legend.key.size = unit(0.1, "cm"),  # Adjust size of legend key
+    legend.margin = margin(1, 1, 1, 1, "cm"),  # Adjust margin of legend
+    legend.title = element_blank(),  # Hide legend title
+    plot.margin = margin(1, 5, 1, 1, "cm")  # Adjust plot margins
+  )
+
+
+```
+
+
+```{r}
+ggseg(someData, atlas = dk, 
+      colour = "white",
+      size = .1, 
+      position = "stacked",
+      mapping = aes(fill = p))
+```
+
+
+```{r}
+library(ggsegSchaefer)
+library(ggseg)
+data(schaefer400_7)
+region_names <- c("7Networks_LH_Vis_1",	"7Networks_LH_Vis_2" ,	"7Networks_LH_Vis_3",	"7Networks_LH_Vis_4",	"7Networks_LH_Vis_5",	"7Networks_LH_Vis_6",	"7Networks_LH_Vis_7",	"7Networks_LH_Vis_8",	"7Networks_LH_Vis_9",	"7Networks_LH_Vis_10",	"7Networks_LH_Vis_11",	"7Networks_LH_Vis_12",	"7Networks_LH_Vis_13",	"7Networks_LH_Vis_14" ,	"7Networks_LH_Vis_15",	"7Networks_LH_Vis_16",	"7Networks_LH_Vis_17",	"7Networks_LH_Vis_18",	"7Networks_LH_Vis_19",	"7Networks_LH_Vis_20",	"7Networks_LH_Vis_21",	"7Networks_LH_Vis_22",	"7Networks_LH_Vis_23",	"7Networks_LH_Vis_24",	"7Networks_LH_Vis_25",	"7Networks_LH_Vis_26",	"7Networks_LH_Vis_27",	"7Networks_LH_Vis_28",	"7Networks_LH_Vis_29",	"7Networks_LH_Vis_30",	"7Networks_LH_Vis_31")
+data <- data.frame(
+  region = region_names,
+  reg_col = region_names
+)
+
+# Plot the brain visualization
+ggplot(data) +
+  geom_brain(atlas = schaefer7_400,
+             aes(fill = reg_col, color = "white")) +
+  scale_fill_brain2(schaefer7_400$palette[data$region])+ scale_color_identity(guide = FALSE)+
+  theme(
+    axis.text = element_blank(),  # Hide axis text
+    axis.title = element_blank(),  # Hide axis titles
+    legend.position = "bottom",  # Position legend at the bottom
+    legend.box = "horizontal",  # Set legend box type to horizontal
+    legend.direction = "horizontal",  # Set legend direction to horizontal
+    legend.key.size = unit(0.1, "cm"),  # Adjust size of legend key
+    legend.margin = margin(1, 1, 1, 1, "cm"),  # Adjust margin of legend
+    legend.title = element_blank(),  # Hide legend title
+    plot.margin = margin(1, 5, 1, 1, "cm")  # Adjust plot margins
+  )
+```
+
+
+```{r, warning=FALSE}
+
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
