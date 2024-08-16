@@ -303,16 +303,3 @@ r<-round(sqrt(summary_model$r.squared),2)
 n=sum(!is.na(lm_model$model$`df$VTT`))
 ggplot(df, aes(x=RH_Default_PFC, y=VTT)) + geom_point() + geom_smooth(method="lm", se=TRUE) +labs(title="RH_Default_PFC", x="Cortical Thickness(mm)", y="Viewpoint Transformation (error)") + theme_minimal() + geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.2, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=2.5, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.15, vjust=.9, size=4)+theme(axis.title = element_text(size = 15))+theme(plot.title = element_text(size=20))+theme(plot.title = element_text(hjust=0.5))+theme(aspect.ratio = 1)
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
