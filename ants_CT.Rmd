@@ -34,7 +34,6 @@ df<-read.csv(file_path)
 
 ```
 
-
 ```{r, warning=FALSE}
 lm_model<-lm(df$LH_DorsAttn_PrCv~df$MRT)
 summary_model<-summary(lm_model)
@@ -51,16 +50,6 @@ r<-round(sqrt(summary_model$r.squared),2)
 n=sum(!is.na(lm_model$model$`df$Assembling.objects`))
 ggplot(df, aes(x=LH_DorsAttn_PrCv, y=Assembling.objects)) + geom_point() + geom_smooth(method="lm", se=TRUE) +labs(title="Left Visual", x="Cortical Thickness", y="Performance") + theme_minimal() + geom_text(aes(label=paste("n =",n)), x=Inf, y=Inf, hjust=1.4, vjust=4.5, size=4) + geom_text(aes(label=paste("p =", pvalue)), x=Inf, y=Inf, hjust=1.1,vjust=3, size=4) + geom_text(aes(label=paste("r =", r)), x=Inf, y=Inf, hjust=1.2, vjust=1.5, size=4)+theme(axis.title = element_text(size = 17))+theme(plot.title = element_text(size=20))+theme(plot.title = element_text(hjust=0.5))+scale_color_manual(values = wes_palette("GrandBudapest1"))
 ```
-```{r}
-```{r}
-```{r}
-
-```
-
-```
-
-```
-
 
 ```{r, warning=FALSE}
 # Left Hem
@@ -316,87 +305,14 @@ ggplot(df, aes(x=RH_Default_PFC, y=VTT)) + geom_point() + geom_smooth(method="lm
 ```
 
 
-```{r, warning=FALSE}
-```
 
 
-```{r, warning=FALSE}
-```
 
 
-```{r, warning=FALSE}
-```
 
 
-```{r, warning=FALSE}
-```
 
 
-```{r, warning=FALSE}
-```
 
-
-```{r, warning=FALSE}
-```
-
-
-```{r, warning=FALSE}
-```
-
-
-```{r, warning=FALSE}
-```
-
-
-```{r, warning=FALSE}
-```
-
-
-```{r, warning=FALSE}
-```
-
-
-```{r, warning=FALSE}
-```
-
-
-```{r, warning=FALSE}
-```
-
-
-```{r, warning=FALSE}
-```
-
-
-```{r, warning=FALSE}
-```
-
-
-```{r, warning=FALSE}
-```
-
-
-```{r, warning=FALSE}
-```
-
-
-```{r, warning=FALSE}
-```
-
-
-```{r, warning=FALSE}
-```
-
-
-```{r, warning=FALSE}
-```
-
-
-```{r, warning=FALSE}
-```
-
-
-```{r, warning=FALSE}
-```
 
 
