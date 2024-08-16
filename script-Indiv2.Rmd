@@ -2840,6 +2840,3 @@ ggplot(df, aes(x=df$rh.entorhinal, fill=..count..)) +geom_histogram(color="black
 n = sum(!is.na(df$lh.entorhinal))
 ggplot(df, aes(x=df$lh.entorhinal, fill=..count..)) +geom_histogram(color="black" ,binwidth = 0.2, boundry = 0, alpha = 0.7) + scale_fill_viridis_c() + theme_minimal() + labs(title = "Histogram of the Cortical Thickness (Left Entorhinal)", subtitle = paste("n =", n), x = "Cortical Thickness (mm)", y = "Number of Participants") + theme(plot.title = element_text(hjust = 0.9), plot.subtitle = element_text(hjust = 0.55))
 ```
-
-
-```{r, warning=FALSE}
