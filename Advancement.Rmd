@@ -1,0 +1,422 @@
+---
+title: "Advancement"
+output: html_document
+date: "2024-10-20"
+---
+
+## R Markdown
+
+```{r warning=FALSE}
+file_path<-"D:/liz/Advancement/complete_data.csv"
+df<-read.csv(file_path)
+library(psych)
+pairs.panels(df[, c(4:9)],lm=TRUE, stars = TRUE, hist.col = "green", col="purple", cex.labels = 1.2)
+```
+```{r}
+
+# Create the pairs panel with Spearman correlations
+pairs.panels(df[, c(4:9)],
+             lm = TRUE,  # Set lm to FALSE to avoid linear model fitting
+             stars = TRUE,
+             hist.col = "darkgrey",
+             col = "darkred",
+             cex.labels = 1.2,
+             panel = function(x, y) {
+               r <- cor(x, y, method = "spearman")
+               text(0.5, 0.5, round(r, 2), cex = 2, col = "red")
+             })
+```
+
+
+```{r}
+# Calculate variance for a specific column
+std_MRT <- sd(df$MRT, na.rm = TRUE)
+mean_MRT <- mean(df$MRT, na.rm = TRUE)
+
+# Print the variance
+cat("Mental Rotation SD:", std_MRT, "\n")
+cat("Mental Rotation Mean:", mean_MRT, "\n")
+
+
+std_PFT <- sd(df$PFT, na.rm = TRUE)
+mean_PFT <- mean(df$PFT, na.rm = TRUE)
+
+# Print the variance
+cat("Paper Folding SD:", std_PFT, "\n")
+cat("Paper Folding Mean:", mean_PFT, "\n")
+
+
+std_CBT <- sd(df$CBT, na.rm = TRUE)
+mean_CBT <- mean(df$CBT, na.rm = TRUE)
+
+# Print the variance
+cat("CBT SD:", std_CBT, "\n")
+cat("CBT Mean:", mean_CBT, "\n")
+
+std_RMT <- sd(df$RMT, na.rm = TRUE)
+mean_RMT <- mean(df$RMT, na.rm = TRUE)
+
+# Print the variance
+cat("RMT SD:", std_RMT, "\n")
+cat("RMT Mean:", mean_RMT, "\n")
+
+std_SOT <- sd(df$SOT, na.rm = TRUE)
+mean_SOT <- mean(df$SOT, na.rm = TRUE)
+
+# Print the variance
+cat("SOT SD:", std_SOT, "\n")
+cat("SOT Mean:", mean_SOT, "\n")
+
+std_IVTT <- sd(df$IVTT, na.rm = TRUE)
+mean_IVTT <- mean(df$IVTT, na.rm = TRUE)
+
+# Print the variance
+cat("IVTT SD:", std_IVTT, "\n")
+cat("IVTT Mean:", mean_IVTT, "\n")
+
+```
+```{r}
+library(e1071)
+file_path<-"D:/liz/Advancement/complete_data.csv"
+df<-read.csv(file_path)
+columns <- c("MRT", "PFT", "CBT", "RMT", "SOT", "IVTT")
+for (col in columns){
+  file_path<-"D:/liz/Advancement/complete_data.csv"
+  df<-read.csv(file_path)
+  df <- df[!is.na(df[[col]]), ]
+  skewness_val <- skewness (df[[col]])
+  print (paste("skewness for", col, ":", skewness_val))
+  kurtosis_val <- kurtosis(df[[col]])
+  print(paste("Kurtosis for",col,  ":", kurtosis_val))
+  num_data_points <- sum(!is.na(df[[col]]))
+  print(paste("N for" , col, ":", num_data_points))
+  max_value <- max(df[[col]], na.rm = TRUE)
+  print(paste("Maximum value for", col, ":", max_value))
+  min_value <- min(df[[col]], na.rm = TRUE)
+  print(paste("Minimum value for", col, ":", min_value))
+}
+```
+```{r}
+library(psych)
+file_path <- "D:/liz/Advancement/complete_data.csv"
+df <- read.csv(file_path)
+results <- describe(df$CBT)
+print(results)
+```
+
+```{r}
+# Specify the task columns
+task_columns <- c("MRT", "PFT", "CBT", "RMT", "SOT", "IVTT")  
+
+# Initialize a list to store the results
+t_test_results <- list()
+
+# Loop through each task column and perform the t-test
+for (task in task_columns) {
+  t_test <- t.test(df[[task]] ~ df$Sex)
+  t_test_results[[task]] <- t_test
+}
+
+# Print the results
+for (task in task_columns) {
+  cat("T-test results for", task, ":\n")
+  print(t_test_results[[task]])
+  cat("\n")
+}
+
+```
+
+
+```{r}
+file_path <- "D:/liz/Advancement/complete_data.csv"
+df <- read.csv(file_path)
+df<-df[!is.na(df$MRT), ]
+# Perform ggbetweenstats with ICV as a covariate
+result <- ggbetweenstats(
+  data = df,
+  x = Sex,
+  y = MRT,
+  ggplot.component = list(
+    theme(
+      text = element_text(size = 15),
+      plot.title = element_text(size = 15),    # Adjust the font size of the header
+      axis.title = element_text(size = 15),      # Adjust the font size of the axis titles
+      axis.text = element_text(size = 15),
+      legend.position = "none"  # Remove the legend if it's related to g hedges
+    )
+  )
+)
+
+# Print the result
+print(result)
+
+```
+```{r}
+leveneTest(MRT ~ Sex, data = df)
+
+var_males <- var(df$MRT[df$Sex == 'M'])
+
+# Calculate variance for females
+var_females <- var(df$MRT[df$Sex == 'F'])
+
+# Print the results
+cat("Variance for Males:", var_males, "\n")
+cat("Variance for Females:", var_females, "\n")
+```
+
+
+```{r}
+file_path <- "D:/liz/Advancement/complete_data.csv"
+df <- read.csv(file_path)
+df<-df[!is.na(df$RMT), ]
+View(df)
+# Perform ggbetweenstats with ICV as a covariate
+result <- ggbetweenstats(
+  data = df,
+  x = Sex,
+  y = RMT,
+  ggplot.component = list(
+    theme(
+      text = element_text(size = 15),
+      plot.title = element_text(size = 15),   
+      axis.title = element_text(size = 15),     
+      axis.text = element_text(size = 15),
+      legend.position = "none"  
+    )
+  )
+)
+
+# Print the result
+print(result)
+```
+
+```{r}
+# test for variance equality
+library(car)
+leveneTest(RMT ~ Sex, data = df)
+
+var_males <- var(df$RMT[df$Sex == 'M'])
+
+# Calculate variance for females
+var_females <- var(df$RMT[df$Sex == 'F'])
+
+# Print the results
+cat("Variance for Males:", var_males, "\n")
+cat("Variance for Females:", var_females, "\n")
+
+```
+
+
+```{r}
+file_path <- "D:/liz/Advancement/complete_data.csv"
+df <- read.csv(file_path)
+df<-df[!is.na(df$SOT), ]
+# Perform ggbetweenstats with ICV as a covariate
+result <- ggbetweenstats(
+  data = df,
+  x = Sex,
+  y = SOT,
+  ggplot.component = list(
+    theme(
+      text = element_text(size = 15),
+      plot.title = element_text(size = 15),    # Adjust the font size of the header
+      axis.title = element_text(size = 15),      # Adjust the font size of the axis titles
+      axis.text = element_text(size = 15),
+      legend.position = "none"  # Remove the legend if it's related to g hedges
+    )
+  )
+)
+
+# Print the result
+print(result)
+```
+
+```{r}
+leveneTest(SOT ~ Sex, data = df)
+
+var_males <- var(df$SOT[df$Sex == 'M'])
+
+# Calculate variance for females
+var_females <- var(df$SOT[df$Sex == 'F'])
+
+# Print the results
+cat("Variance for Males:", var_males, "\n")
+cat("Variance for Females:", var_females, "\n")
+```
+
+
+```{r}
+file_path <- "D:/liz/Advancement/complete_data.csv"
+df <- read.csv(file_path)
+df<-df[!is.na(df$IVTT), ]
+# Perform ggbetweenstats with ICV as a covariate
+result <- ggbetweenstats(
+  data = df,
+  x = Sex,
+  y = IVTT,
+  ggplot.component = list(
+    theme(
+      text = element_text(size = 15),
+      plot.title = element_text(size = 15),    # Adjust the font size of the header
+      axis.title = element_text(size = 15),      # Adjust the font size of the axis titles
+      axis.text = element_text(size = 15),
+      legend.position = "none"  # Remove the legend if it's related to g hedges
+    )
+  )
+)
+
+# Print the result
+print(result)
+```
+
+
+```{r}
+leveneTest(IVTT ~ Sex, data = df)
+
+var_males <- var(df$IVTT[df$Sex == 'M'])
+
+# Calculate variance for females
+var_females <- var(df$IVTT[df$Sex == 'F'])
+
+# Print the results
+cat("Variance for Males:", var_males, "\n")
+cat("Variance for Females:", var_females, "\n")
+```
+
+## Test Outliers (winzorizing data)
+```{r}
+file_path <- "D:/liz/Advancement/complete_data.csv"
+df <- read.csv(file_path)
+
+# Define columns to winsorize
+columns_to_winsorize <- c( "MRT", "PFT","CBT", "SOT", "IVTT","RMT" )
+
+# Loop through each column
+for (col in columns_to_winsorize) {
+  # Calculate mean and standard deviation for the current column
+  mean_col <- mean(df[[col]], na.rm = TRUE)
+  sd_col <- sd(df[[col]], na.rm = TRUE)
+  threshold <- 3 * sd_col
+  
+  # Identify outliers (exclude NAs)
+  outliers <- !is.na(df[[col]]) & abs(df[[col]] - mean_col) > threshold
+  
+  # Create a new column for the winsorized version
+  df[[paste0("winsorized_", col)]] <- df[[col]]  # Copy original values
+  
+  # Winsorize the outliers in the new column
+  df[[paste0("winsorized_", col)]][outliers] <- ifelse(df[[col]][outliers] < mean_col, 
+                                                         mean_col - threshold, 
+                                                         mean_col + threshold)
+}
+
+# Optionally, you can set NAs for winsorized columns to NA if the original was NA
+for (col in columns_to_winsorize) {
+  df[[paste0("winsorized_", col)]][is.na(df[[col]])] <- NA
+}
+
+# Print results
+cat("Data with Winsorized Columns:\n")
+print(df[c("RMT", "winsorized_RMT", "MRT", "winsorized_MRT", "SOT", "winsorized_SOT")])
+print(df)
+
+# Check the number of non-missing values for each winsorized column
+cat("Non-missing counts:\n")
+cat("RMT:", sum(!is.na(df$winsorized_RMT)), "\n")
+cat("MRT:", sum(!is.na(df$winsorized_MRT)), "\n")
+cat("SOT:", sum(!is.na(df$winsorized_SOT)), "\n")
+cat("SOT:", sum(!is.na(df$PFT)), "\n")
+  
+
+
+
+```
+
+
+```{r}
+# Histogram for Original Data
+hist(df$winsorized_IVTT, main = "Original MRT Data", xlab = "MRT", col = "lightblue", border = "black", cex.main = 1.5, cex.lab = 1.5, cex.axis = 1.5)
+
+hist(df$IVTT, main = "Original MRT Data", xlab = "MRT", col = "lightblue", border = "black", cex.main = 1.5, cex.lab = 1.5, cex.axis = 1.5)
+
+```
+
+
+```{r}
+library(psych)
+
+columns <- c("winsorized_RMT", "winsorized_MRT", "winsorized_PFT", "winsorized_SOT", "winsorized_IVTT", "winsorized_CBT")
+results_list <- list()
+
+for (col in columns) {
+  results <- describe(df[[col]])
+  results_df <- as.data.frame(results)
+  results_df$Variable <- col  # Add the column name
+  results_df$n <- sum(!is.na(df[[col]]))  # Add the count of non-missing values
+  results_list[[col]] <- results_df  # Store in the list
+}
+
+# Combine all results into one data frame
+final_results <- do.call(rbind, results_list)
+
+# Print final results
+print(final_results)
+```
+
+
+```{r}
+# Create the pairs panel with Spearman correlations
+pairs.panels(df[, c(16:21)],
+             lm = TRUE,  # Set lm to FALSE to avoid linear model fitting
+             stars = TRUE,
+             hist.col = "darkgrey",
+             col = "darkred",
+             cex.labels = 1.2,
+             panel = function(x, y) {
+               r <- cor(x, y, method = "spearman")
+               text(1, 1, round(r, 2), cex = 3, col = "red")
+             })
+```
+
+
+```{r}
+columns_to_log_transform <- c("winsorized_SOT", "winsorized_IVTT")
+
+for (col in columns_to_log_transform) {
+  # Apply log transformation
+  df[[paste0("log_", col)]] <- log(df[[col]])
+}
+
+# Print the updated data frame to check the new columns
+print(df)
+```
+
+
+```{r}
+# save it to a csv file
+file_path <- "D:/liz/Advancement/modified_data.csv"
+
+# Write the data frame to a CSV file
+write.csv(df, file = file_path, row.names = FALSE)
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
