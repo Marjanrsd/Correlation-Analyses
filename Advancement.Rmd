@@ -1,5 +1,5 @@
 ---
-title: "Advancement"
+title: "Advancement-behavioral"
 output: html_document
 date: "2024-10-20"
 ---
@@ -128,21 +128,21 @@ for (task in task_columns) {
 
 
 ```{r}
-file_path <- "D:/liz/Advancement/complete_data.csv"
+file_path <- "D:/liz/Advancement/modified_data.csv"
 df <- read.csv(file_path)
-df<-df[!is.na(df$MRT), ]
+df<-df[!is.na(df$winsorized_MRT), ]
 # Perform ggbetweenstats with ICV as a covariate
 result <- ggbetweenstats(
   data = df,
   x = Sex,
-  y = MRT,
+  y = winsorized_MRT,
   ggplot.component = list(
     theme(
-      text = element_text(size = 15),
-      plot.title = element_text(size = 15),    # Adjust the font size of the header
-      axis.title = element_text(size = 15),      # Adjust the font size of the axis titles
-      axis.text = element_text(size = 15),
-      legend.position = "none"  # Remove the legend if it's related to g hedges
+      text = element_text(size = 20),
+      plot.title = element_text(size = 20),    # Adjust the font size of the header
+      axis.title = element_text(size = 20),      # Adjust the font size of the axis titles
+      axis.text = element_text(size = 20),
+      legend.position = "none"  
     )
   )
 )
@@ -166,21 +166,21 @@ cat("Variance for Females:", var_females, "\n")
 
 
 ```{r}
-file_path <- "D:/liz/Advancement/complete_data.csv"
+file_path <- "D:/liz/Advancement/modified_data.csv"
 df <- read.csv(file_path)
-df<-df[!is.na(df$RMT), ]
-View(df)
+df<-df[!is.na(df$winsorized_RMT), ]
+#View(df)
 # Perform ggbetweenstats with ICV as a covariate
 result <- ggbetweenstats(
   data = df,
   x = Sex,
-  y = RMT,
+  y = winsorized_RMT,
   ggplot.component = list(
     theme(
-      text = element_text(size = 15),
-      plot.title = element_text(size = 15),   
-      axis.title = element_text(size = 15),     
-      axis.text = element_text(size = 15),
+      text = element_text(size = 20),
+      plot.title = element_text(size = 20),   
+      axis.title = element_text(size = 20),     
+      axis.text = element_text(size = 20),
       legend.position = "none"  
     )
   )
@@ -208,20 +208,20 @@ cat("Variance for Females:", var_females, "\n")
 
 
 ```{r}
-file_path <- "D:/liz/Advancement/complete_data.csv"
+file_path <- "D:/liz/Advancement/modified_data.csv"
 df <- read.csv(file_path)
-df<-df[!is.na(df$SOT), ]
+df<-df[!is.na(df$log_winsorized_SOT), ]
 # Perform ggbetweenstats with ICV as a covariate
 result <- ggbetweenstats(
   data = df,
   x = Sex,
-  y = SOT,
+  y = log_winsorized_SOT,
   ggplot.component = list(
     theme(
-      text = element_text(size = 15),
-      plot.title = element_text(size = 15),    # Adjust the font size of the header
-      axis.title = element_text(size = 15),      # Adjust the font size of the axis titles
-      axis.text = element_text(size = 15),
+      text = element_text(size = 20),
+      plot.title = element_text(size = 20),    # Adjust the font size of the header
+      axis.title = element_text(size = 20),      # Adjust the font size of the axis titles
+      axis.text = element_text(size = 20),
       legend.position = "none"  # Remove the legend if it's related to g hedges
     )
   )
@@ -246,20 +246,20 @@ cat("Variance for Females:", var_females, "\n")
 
 
 ```{r}
-file_path <- "D:/liz/Advancement/complete_data.csv"
+file_path <- "D:/liz/Advancement/modified_data.csv"
 df <- read.csv(file_path)
-df<-df[!is.na(df$IVTT), ]
+df<-df[!is.na(df$log_winsorized_IVTT), ]
 # Perform ggbetweenstats with ICV as a covariate
 result <- ggbetweenstats(
   data = df,
   x = Sex,
-  y = IVTT,
+  y = log_winsorized_IVTT,
   ggplot.component = list(
     theme(
-      text = element_text(size = 15),
-      plot.title = element_text(size = 15),    # Adjust the font size of the header
-      axis.title = element_text(size = 15),      # Adjust the font size of the axis titles
-      axis.text = element_text(size = 15),
+      text = element_text(size = 20),
+      plot.title = element_text(size = 20),    # Adjust the font size of the header
+      axis.title = element_text(size = 20),      # Adjust the font size of the axis titles
+      axis.text = element_text(size = 20),
       legend.position = "none"  # Remove the legend if it's related to g hedges
     )
   )
@@ -400,23 +400,80 @@ file_path <- "D:/liz/Advancement/modified_data.csv"
 write.csv(df, file = file_path, row.names = FALSE)
 ```
 
+## prepare data for CFA
+```{r}
+file_path <- "D:/liz/Advancement/CFA-Winsorized.csv"
+df <- read.csv(file_path)
+#df<-df[!is.na(df$log_winsorized_SOT), ]
+df$w_invesred_SOT <- -df$log_winsorized_SOT
+df$w_inversed_IVTT <- -df$log_winsorized_IVTT
+write.csv(df, file = file_path, row.names = FALSE)
+```
+
+## prepare data for CFA
+```{r}
+file_path <- "D:/liz/Advancement/CFA-Winsorized-corsi.csv"
+df <- read.csv(file_path)
+#df<-df[!is.na(df$log_winsorized_SOT), ]
+df$w_invesred_SOT <- -df$log_winsorized_SOT
+df$w_inversed_IVTT <- -df$log_winsorized_IVTT
+write.csv(df, file = file_path, row.names = FALSE)
+```
+
+
+## partial corr and multiple comparisons - neuroimaging
 
 ```{r}
+file_path<-"D:/liz/Advancement/ANTs/partial.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+df$Sex <- ifelse(df$Sex == "M", 1, 0) 
+partial_corr_control_sex<-sapply(1:(ncol(df)-3), function(x) sapply(1:(ncol(df)-3), function(y) {
+  if (x == y) 1
+  else pcor.test(df[,x], df[,y], df[,(ncol(df)-2):ncol(df)])$p.value
+}))
+column_names <- colnames(df)
+colnames(partial_corr_control_sex) <- column_names[1:(ncol(df) - 3)]
+rownames(partial_corr_control_sex) <- column_names[1:(ncol(df) - 3)]
+
+write.csv(partial_corr_control_sex, file = paste0(file_path, "pvalue.csv"))
+
 ```
 
 
 ```{r}
+library(Hmisc)
+library(ppcor)
+qobj <- qvalue(p = partial_corr_control_sex)
+final_results <- qobj$qvalues
+write.csv(final_results, file = paste0(file_path, "final_results.csv"))
+
 ```
 
 
 ```{r}
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+library(Hmisc)
+library(ppcor)
+df<-read.csv(file_path)
+df <- na.omit(df)
+correlation_matrix <- cor(df, method = "pearson")  # Change to "spearman" if needed
+#print(correlation_matrix)
+correlation_results <- rcorr(as.matrix(df), type = "pearson")  # or "spearman"
+
+# Accessing the correlation coefficients and p-values
+correlation_matrix <- correlation_results$r  # r values
+p_value_matrix <- correlation_results$P      # p values
+
+# Get the q-values and associated thresholds
+qobj <- qvalue(p = p_value_matrix)
+print(qobj)
 ```
 
-
-```{r}
 ```
-
-
+do the same for Freesurfer
 ```{r}
+
+
 ```
 
