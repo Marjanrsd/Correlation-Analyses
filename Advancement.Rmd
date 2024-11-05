@@ -6,14 +6,10 @@ date: "2024-10-20"
 
 ## R Markdown
 
-```{r warning=FALSE}
+```{r}
+library(psych)
 file_path<-"D:/liz/Advancement/complete_data.csv"
 df<-read.csv(file_path)
-library(psych)
-pairs.panels(df[, c(4:9)],lm=TRUE, stars = TRUE, hist.col = "green", col="purple", cex.labels = 1.2)
-```
-```{r}
-
 # Create the pairs panel with Spearman correlations
 pairs.panels(df[, c(4:9)],
              lm = TRUE,  # Set lm to FALSE to avoid linear model fitting
@@ -131,7 +127,6 @@ for (task in task_columns) {
 file_path <- "D:/liz/Advancement/modified_data.csv"
 df <- read.csv(file_path)
 df<-df[!is.na(df$winsorized_MRT), ]
-# Perform ggbetweenstats with ICV as a covariate
 result <- ggbetweenstats(
   data = df,
   x = Sex,
@@ -421,7 +416,8 @@ write.csv(df, file = file_path, row.names = FALSE)
 ```
 
 
-## partial corr and multiple comparisons - neuroimaging
+## partial corr and multiple comparisons - neuroimaging -ANTs
+# control for age, sex, and ICV
 
 ```{r}
 file_path<-"D:/liz/Advancement/ANTs/partial.csv"
@@ -440,6 +436,7 @@ write.csv(partial_corr_control_sex, file = paste0(file_path, "pvalue.csv"))
 
 ```
 
+# correct for multiple comparisons
 
 ```{r}
 library(Hmisc)
@@ -450,30 +447,325 @@ write.csv(final_results, file = paste0(file_path, "final_results.csv"))
 
 ```
 
+## partial corr and multiple comparisons - neuroimaging -Freesurfer
 
 ```{r}
-file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+file_path<-"D:/liz/Advancement/FS/partial.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+df$Sex <- ifelse(df$Sex == "M", 1, 0) 
+partial_corr_control_sex<-sapply(1:(ncol(df)-3), function(x) sapply(1:(ncol(df)-3), function(y) {
+  if (x == y) 1
+  else pcor.test(df[,x], df[,y], df[,(ncol(df)-2):ncol(df)])$p.value
+}))
+column_names <- colnames(df)
+colnames(partial_corr_control_sex) <- column_names[1:(ncol(df) - 3)]
+rownames(partial_corr_control_sex) <- column_names[1:(ncol(df) - 3)]
+
+write.csv(partial_corr_control_sex, file = paste0(file_path, "_pvalue.csv"))
+```
+
+# correct for multiple comparisons
+
+```{r}
 library(Hmisc)
 library(ppcor)
+qobj <- qvalue(p = partial_corr_control_sex)
+final_results <- qobj$qvalues
+write.csv(final_results, file = paste0(file_path, "_final_results.csv"))
+```
+
+## Now do simple correlations for significant results - Freesurfer
+
+```{r, warning=FALSE}
+library(ggstatsplot)
+file_path<-"D:/liz/Advancement/FS/modified_data.csv"
 df<-read.csv(file_path)
-df <- na.omit(df)
-correlation_matrix <- cor(df, method = "pearson")  # Change to "spearman" if needed
-#print(correlation_matrix)
-correlation_results <- rcorr(as.matrix(df), type = "pearson")  # or "spearman"
-
-# Accessing the correlation coefficients and p-values
-correlation_matrix <- correlation_results$r  # r values
-p_value_matrix <- correlation_results$P      # p values
-
-# Get the q-values and associated thresholds
-qobj <- qvalue(p = p_value_matrix)
-print(qobj)
+df<-na.omit(df)
+sum(is.na(df$lh_superiortemporal))
+sum(is.na(df$winsorized_RMT))
+cor.test(df$winsorized_RMT, df$lh.superiortemporal, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "lh.superiortemporal", 
+  y = "winsorized_RMT", 
+  type = "nonparametric",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
 ```
+```{r, warning=FALSE}
+library(ggstatsplot)
+file_path<-"D:/liz/Advancement/FS/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
 
+cor.test(df$lh.superiortemporal, df$winsorized_IVTT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "lh.superiortemporal", 
+  y = "winsorized_IVTT", 
+  type = "nonparametric",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
 ```
-do the same for Freesurfer
+## Now do simple correlations for significant results - Freesurfer
 ```{r}
+library(ggstatsplot)
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+cor.test(df$LH_SalVentAttn_PFCl, df$winsorized_MRT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "LH_SalVentAttn_PFCl", 
+  y = "winsorized_MRT", 
+  type = "nonparametric",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
 
+```
+```{r}
+library(ggstatsplot)
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+cor.test(df$LH_Limbic_OFC, df$winsorized_MRT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "LH_Limbic_OFC", 
+  y = "winsorized_MRT", 
+  type = "nonparametric",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
+```
 
+```{r}
+library(ggstatsplot)
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+cor.test(df$LH_Default_pCunPCC, df$winsorized_MRT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "LH_Default_pCunPCC", 
+  y = "winsorized_MRT", 
+  type = "nonparametric",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
+```
+```{r}
+library(ggstatsplot)
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+cor.test(df$RH_Default_PFC, df$winsorized_MRT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "RH_Default_PFC", 
+  y = "winsorized_MRT", 
+  type = "nonparametric",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
+```
+
+```{r}
+library(ggstatsplot)
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+cor.test(df$RH_Default_pCunPCC, df$winsorized_MRT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "RH_Default_pCunPCC", 
+  y = "winsorized_MRT", 
+  type = "nonparametric",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
+
+```
+
+```{r}
+library(ggstatsplot)
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+cor.test(df$LH_Cont_OFC, df$winsorized_PFT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "LH_Cont_OFC", 
+  y = "winsorized_PFT", 
+  type = "nonparametric",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
+```
+```{r}
+library(ggstatsplot)
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+cor.test(df$LH_Cont_PFCmp, df$winsorized_PFT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "LH_Cont_PFCmp", 
+  y = "winsorized_PFT", 
+  type = "nonparametric",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
+
+```
+```{r}
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+cor.test(df$LH_Default_pCunPCC, df$winsorized_PFT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "LH_Default_pCunPCC", 
+  y = "winsorized_PFT", 
+  type = "nonparametric",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
+```
+```{r}
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+cor.test(df$RH_Default_PFC, df$winsorized_PFT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "RH_Default_PFC", 
+  y = "winsorized_PFT", 
+  type = "nonparametric",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
+```
+```{r}
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+cor.test(df$RH_Default_pCunPCC, df$winsorized_CBT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "RH_Default_pCunPCC", 
+  y = "winsorized_CBT", 
+  type = "nonparametric",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
+```
+```{r}
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+cor.test(df$RH_Default_pCunPCC, df$winsorized_SOT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "RH_Default_pCunPCC", 
+  y = "winsorized_SOT", 
+  type = "nonparametric",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
+```
+```{r}
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+cor.test(df$LH_Cont_OFC, df$winsorized_IVTT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "LH_Cont_OFC", 
+  y = "winsorized_IVTT", 
+  type = "nonparametric",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
+```
+## sex stratified analysis
+```{r}
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+df$Sex <- ifelse(df$Sex == "M", "Males", "Females") 
+df %>% 
+  ggplot(aes(x = winsorized_MRT, y = RH_Default_PFC, colour = factor(Sex))) +
+  geom_point() +
+  geom_smooth(method = 'lm', colour = 'black') +
+  facet_wrap(~ Sex) +
+  labs(colour = 'Sex') + 
+  stat_cor(method = "spearman", label.x = -3.5, label.y = 2.6, colour = 'black')
+```
+```{r}
+males <- df[df$Sex=="Males", ]
+females <- df[df$Sex=="Females", ]
+
+cor(males$RH_Default_PFC, males$winsorized_MRT, method = "spearman")
+cor(females$RH_Default_PFC, females$winsorized_MRT, method = "spearman")
+```
+```{r}
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+df$Sex <- ifelse(df$Sex == "M", "Males", "Females") 
+df %>% 
+  ggplot(aes(x = winsorized_MRT, y = LH_Limbic_OFC, colour = factor(Sex))) +
+  geom_point() +
+  geom_smooth(method = 'lm', colour = 'black') +
+  facet_wrap(~ Sex) +
+  labs(colour = 'Sex') + 
+  stat_cor(method = "spearman", label.x = -3.5, label.y = 3.5, colour = 'black')
+
+```
+
+```{r}
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+df$Sex <- ifelse(df$Sex == "M", "Males", "Females") 
+df %>% 
+  ggplot(aes(x = winsorized_MRT, y = LH_Default_pCunPCC, colour = factor(Sex))) +
+  geom_point() +
+  geom_smooth(method = 'lm', colour = 'black') +
+  facet_wrap(~ Sex) +
+  labs(colour = 'Sex') + 
+  stat_cor(method = "spearman", label.x = -3.5, label.y = 3.3, colour = 'black')
+```
+```{r}
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+df$Sex <- ifelse(df$Sex == "M", "Males", "Females") 
+df %>% 
+  ggplot(aes(x = winsorized_MRT, y = RH_Default_pCunPCC, colour = factor(Sex))) +
+  geom_point() +
+  geom_smooth(method = 'lm', colour = 'black') +
+  facet_wrap(~ Sex) +
+  labs(colour = 'Sex') + 
+  stat_cor(method = "spearman", label.x = -3.5, label.y = 3.3, colour = 'black')
+```
+```{r}
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+file_path<-"D:/liz/Advancement/ANTs/modified_data.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+df$Sex <- ifelse(df$Sex == "M", "Males", "Females") 
+df %>% 
+  ggplot(aes(x = winsorized_PFT, y = LH_Cont_OFC, colour = factor(Sex))) +
+  geom_point() +
+  geom_smooth(method = 'lm', colour = 'black') +
+  facet_wrap(~ Sex) +
+  labs(colour = 'Sex') + 
+  stat_cor(method = "spearman", label.x = -3.5, label.y = 3.3, colour = 'black')
 ```
 
