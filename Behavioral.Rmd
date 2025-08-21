@@ -1,0 +1,437 @@
+---
+title: "Defense"
+output: html_document
+date: "2025-08-19"
+---
+
+# Make corr plot
+
+```{r}
+library(psych)
+library(ggstats)
+library(psych)
+
+file_path<-"E:/liz/Defense/Behavioral/Behavioral.csv"
+df<-read.csv(file_path)
+vars <- df[, c(4:8)]
+# Get N for each pair (and r, p) in one place
+ct <- psych::corr.test(vars, method = "spearman", use = "pairwise", adjust = "none")
+# matrix of sample sizes used for each correlation
+ct$n
+# Spearman rho matrix
+round(ct$r, 2)  
+# p-values
+ct$p  
+
+# Plot: Spearman + significance stars in the upper triangle (only for visualization)
+pairs.panels(
+  vars,
+  method = "spearman",   # make the plot use Spearman too
+  lm = TRUE,
+  stars = TRUE,          # adds *, **, *** by p < .05/.01/.001
+  hist.col = "darkgrey",
+  col = "darkred",
+  cex.labels = 1.2
+)
+
+
+```
+
+# Test for Normality (Shapiro–Wilk test)
+
+```{r, warning=FALSE}
+file_path<-"E:/liz/Defense/Behavioral/Behavioral.csv"
+df<-read.csv(file_path)
+
+vars <- c("MRT","PFT","SOT","iVTT","RMT") 
+
+sw <- t(sapply(vars, function(v){
+  x <- na.omit(df[[v]])  # remove missing values before the test
+  out <- shapiro.test(x)
+  c(n = length(x), W = unname(out$statistic), p = out$p.value)
+}))
+
+# Convert results into a nice data frame
+sw <- as.data.frame(sw)
+sw
+
+
+```
+
+# Q-Q plot - test for normality
+
+```{r}
+vars <- c("MRT","PFT","SOT","iVTT","RMT")
+
+# Histograms
+par(mfrow=c(2,3))  # layout: 2 rows, 3 columns
+for (v in vars) {
+  hist(df[[v]], main=paste("Histogram of", v), xlab=v, col="lightblue", border="white")
+}
+
+# Q-Q plots
+par(mfrow=c(2,3))
+for (v in vars) {
+  qqnorm(df[[v]], main=paste("Q-Q Plot of", v))
+  qqline(df[[v]], col="red")
+}
+
+```
+
+
+# extract mean and sd for each task
+```{r}
+
+vars <- c("MRT", "PFT", "SOT", "iVTT", "RMT")
+
+# Compute descriptive statistics
+summary_table <- sapply(vars, function(v){
+  x <- na.omit(df[[v]])
+  c(
+    n    = length(x),
+    mean = mean(x),
+    sd   = sd(x),
+    min  = min(x),
+    max  = max(x)
+  )
+})
+
+# Transpose to make rows = tasks, columns = stats
+summary_table <- t(summary_table)
+
+# Convert to a data frame for nicer formatting
+summary_table <- as.data.frame(summary_table)
+
+summary_table
+
+```
+
+# skew and kurtosis
+```{r}
+library(psych)
+file_path<-"E:/liz/Defense/Behavioral/Behavioral.csv"
+df<-read.csv(file_path)
+# Pick your task columns (use raw scores; reverse only if you want the sign flipped)
+vars <- c("MRT","PFT","SOT","iVTT","RMT")  # change to your actual column names
+
+desc <- describe(df[, vars])  # handles NAs by default
+desc_out <- desc[, c("n","mean","sd","skew","kurtosis")]
+print(desc_out)
+```
+
+# Perform CFA
+```{r, warning=FALSE}
+library(lavaan)
+# Reverse code error measures so that higher = better performance
+# Example: If SOT and iVTT are error scores (lower = better), we flip them
+df$SOT_rev  <- -df$SOT
+df$iVTT_rev <- -df$iVTT
+
+# Then use the reversed variables in the CFA
+m1 <- '
+spatial_abilities =~ MRT + PFT + SOT_rev + iVTT_rev + RMT
+'
+m2 <- '
+object_based =~ MRT + PFT
+perspective_taking =~ SOT_rev + iVTT_rev + RMT
+object_based ~~ perspective_taking
+'
+
+fit1 <- cfa(m1, data = df, estimator = "MLR", missing = "fiml", std.lv = TRUE)
+fit2 <- cfa(m2, data = df, estimator = "MLR", missing = "fiml", std.lv = TRUE)
+
+summary(fit2, fit.measures = TRUE, standardized = TRUE)
+
+
+```
+
+# for one factor
+```{r}
+summary(fit1, fit.measures = TRUE, standardized = TRUE)
+
+```
+
+
+# visualization for two factor model
+```{r}
+# install.packages(c("lavaanPlot", "lavaanExtra", "DiagrammeRsvg", "rsvg"))
+library(lavaanPlot)
+library(lavaanExtra)
+library(DiagrammeRsvg)
+library(rsvg)
+
+# Labels for nicer node text in the figure
+labs <- list(
+  object_based        = "Object-based",
+  perspective_taking  = "Perspective-Taking",
+  MRT      = "Mental Rotation (MRT)",
+  PFT      = "Paper Folding (PFT)",
+  SOT_rev  = "Spatial Orientation (SOT)",
+  iVTT_rev = "Viewpoint Transformation (iVTT)",
+  RMT      = "Road Map Test (RMT)"
+)
+
+lavaanExtra::nice_lavaanPlot(
+  fit2,
+  labels = labs,
+  coefs = TRUE, stand = TRUE, covs = TRUE,
+  stars = c("latent","covs","regress"), sig = 0.05,
+  node_options = list(shape = "oval", fontname = "Helvetica"),
+  graph_options = c(rankdir = "LR")  # use c(), not list()
+)
+
+# OR 2) If you assign to g, explicitly print it:
+g <- lavaanExtra::nice_lavaanPlot(
+  fit2,
+  labels = labs,
+  coefs = TRUE, stand = TRUE, covs = TRUE,
+  stars = c("latent","covs","regress"), sig = 0.05,
+  node_options = list(shape = "oval", fontname = "Helvetica"),
+  graph_options = c(rankdir = "LR")
+)
+g            # or: print(g)
+
+
+
+```
+
+
+# visualization for one factor model
+```{r}
+library(lavaanPlot)
+library(lavaanExtra)
+library(DiagrammeRsvg)
+library(rsvg)
+
+# Labels for nicer node text in the figure
+labs <- list(
+  spatial_abilities   = "Visuospatial-abilities",
+  MRT      = "Mental Rotation (MRT)",
+  PFT      = "Paper Folding (PFT)",
+  SOT_rev  = "Spatial Orientation (SOT)",
+  iVTT_rev = "Viewpoint Transformation (iVTT)",
+  RMT      = "Road Map Test (RMT)"
+)
+
+lavaanExtra::nice_lavaanPlot(
+  fit1,
+  labels = labs,
+  coefs = TRUE, stand = TRUE, covs = TRUE,
+  stars = c("latent","covs","regress"), sig = 0.05,
+  node_options = list(shape = "oval", fontname = "Helvetica"),
+  graph_options = c(rankdir = "LR")  # use c(), not list()
+)
+
+# OR 2) If you assign to g, explicitly print it:
+g <- lavaanExtra::nice_lavaanPlot(
+  fit1,
+  labels = labs,
+  coefs = TRUE, stand = TRUE, covs = TRUE,
+  stars = c("latent","covs","regress"), sig = 0.05,
+  node_options = list(shape = "oval", fontname = "Helvetica"),
+  graph_options = c(rankdir = "LR")
+)
+g            # or: print(g)
+
+```
+
+
+# check if the two latent variables are distinguishable
+```{r}
+# Unconstrained two-factor (what you already fit)
+fit2 <- cfa(m2, data = df, estimator = "MLR", missing = "fiml", std.lv = TRUE)
+
+# Constrain the latent correlation to 1 (factors perfectly correlated)
+m2_corr1 <- '
+  object_based =~ MRT + PFT
+  perspective_taking =~ SOT_rev + iVTT_rev + RMT
+  object_based ~~ 1*perspective_taking
+'
+fit2_corr1 <- cfa(m2_corr1, data = df, estimator = "MLR", missing = "fiml", std.lv = TRUE)
+
+# Robust Satorra–Bentler χ² difference test (nested)
+lavTestLRT(fit2_corr1, fit2, method = "satorra.bentler.2001")
+# or: anova(fit2_corr1, fit2)
+
+```
+
+
+# winsorize data, get log transform for SOT and iVTT, and redo CFA
+# winsorize data
+```{r}
+file_path <- "E:/liz/Defense/Behavioral/Behavioral.csv"
+df <- read.csv(file_path)
+
+# Define columns to winsorize
+columns_to_winsorize <- c( "MRT", "PFT", "SOT", "iVTT","RMT" )
+
+# Loop through each column
+for (col in columns_to_winsorize) {
+  # Calculate mean and standard deviation for the current column
+  mean_col <- mean(df[[col]], na.rm = TRUE)
+  sd_col <- sd(df[[col]], na.rm = TRUE)
+  threshold <- 3 * sd_col
+  
+  # Identify outliers (exclude NAs)
+  outliers <- !is.na(df[[col]]) & abs(df[[col]] - mean_col) > threshold
+  
+  # Create a new column for the winsorized version
+  df[[paste0("winsorized_", col)]] <- df[[col]]  # Copy original values
+  
+  # Winsorize the outliers in the new column
+  df[[paste0("winsorized_", col)]][outliers] <- ifelse(df[[col]][outliers] < mean_col, 
+                                                         mean_col - threshold, 
+                                                         mean_col + threshold)
+}
+
+# Optionally, you can set NAs for winsorized columns to NA if the original was NA
+for (col in columns_to_winsorize) {
+  df[[paste0("winsorized_", col)]][is.na(df[[col]])] <- NA
+}
+
+# Print results
+print(df)
+cols <- c("MRT","PFT","SOT","iVTT","RMT")
+sapply(cols, function(c) sum(df[[paste0("winsorized_",c)]] != df[[c]], na.rm=TRUE))
+
+hist(df$winsorized_iVTT)
+hist(df$iVTT)
+hist(df$winsorized_MRT)
+hist(df$MRT)
+hist(df$winsorized_SOT)
+hist(df$SOT)
+hist(df$winsorized_RMT)
+hist(df$RMT)
+```
+
+# redo corr plot
+```{r}
+vars <- df[, c(9:13)]
+# Get N for each pair (and r, p) in one place
+ct <- psych::corr.test(vars, method = "spearman", use = "pairwise", adjust = "none")
+# matrix of sample sizes used for each correlation
+ct$n
+# Spearman rho matrix
+round(ct$r, 2)  
+# p-values
+ct$p  
+
+# Plot: Spearman + significance stars in the upper triangle (only for visualization)
+pairs.panels(
+  vars,
+  method = "spearman",   # make the plot use Spearman too
+  lm = TRUE,
+  stars = TRUE,          # adds *, **, *** by p < .05/.01/.001
+  hist.col = "darkgrey",
+  col = "darkred",
+  cex.labels = 1.2
+)
+```
+
+
+# redo CFA
+```{r}
+# --- Build transformed variables ---
+df$SOT_rev_log  <- -log1p(df$winsorized_SOT)   # log1p handles zeros safely
+df$iVTT_rev_log <- -log1p(df$winsorized_iVTT)
+
+# Keep the others unchanged (or z-score for presentation only)
+# MRT is already z; using a z-scored indicator is fine for CFA.
+
+# --- Models using transformed errors ---
+m1_log <- '
+  spatial =~ winsorized_MRT + winsorized_PFT + SOT_rev_log + iVTT_rev_log + winsorized_RMT
+'
+m2_log <- '
+  object_based =~ winsorized_MRT + winsorized_PFT
+  perspective_taking =~ SOT_rev_log + iVTT_rev_log + winsorized_RMT
+  object_based ~~ perspective_taking
+'
+
+fit1_log <- cfa(m1_log, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
+fit2_log <- cfa(m2_log, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
+
+# Compare to your original fits
+summary(fit2_log, fit.measures = TRUE, standardized = TRUE)
+
+```
+
+```{r}
+summary(fit1_log, fit.measures = TRUE, standardized = TRUE)
+```
+
+
+
+```{r}
+# Unconstrained two-factor (what you already fit)
+fit2_log <- cfa(m2_log, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
+
+# Constrain the latent correlation to 1 (factors perfectly correlated)
+m2_corr1 <- '
+  object_based =~ winsorized_MRT + winsorized_PFT
+  perspective_taking =~ SOT_rev_log + iVTT_rev_log + winsorized_RMT
+  object_based ~~ 1*perspective_taking
+'
+fit2_corr1 <- cfa(m2_corr1, data = df, estimator = "MLR", missing = "fiml", std.lv = TRUE)
+
+# Robust Satorra–Bentler χ² difference test (nested)
+lavTestLRT(fit2_corr1, fit2_log, method = "satorra.bentler.2001")
+# or: anova(fit2_corr1, fit2)
+
+```
+
+
+
+
+```{r}
+# --- Build transformed variables ---
+df$SOT_rev <- -df$winsorized_SOT  # log1p handles zeros safely
+df$iVTT_rev <- -df$winsorized_iVTT
+
+# Keep the others unchanged (or z-score for presentation only)
+# MRT is already z; using a z-scored indicator is fine for CFA.
+
+# --- Models using transformed errors ---
+m1 <- '
+  spatial =~ winsorized_MRT + winsorized_PFT + SOT_rev + iVTT_rev + winsorized_RMT
+'
+m2 <- '
+  object_based =~ winsorized_MRT + winsorized_PFT
+  perspective_taking =~ SOT_rev + iVTT_rev + winsorized_RMT
+  object_based ~~ perspective_taking
+'
+
+fit1 <- cfa(m1, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
+fit2 <- cfa(m2, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
+
+# Compare to your original fits
+summary(fit2 , fit.measures = TRUE, standardized = TRUE)
+
+```
+
+
+```{r}
+summary(fit1 , fit.measures = TRUE, standardized = TRUE)
+
+```
+
+
+```{r}
+# Unconstrained two-factor (what you already fit)
+fit2 <- cfa(m2, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
+
+# Constrain the latent correlation to 1 (factors perfectly correlated)
+m2_corr1 <- '
+  object_based =~ winsorized_MRT + winsorized_PFT
+  perspective_taking =~ SOT_rev + iVTT_rev + winsorized_RMT
+  object_based ~~ 1*perspective_taking
+'
+fit2_corr1 <- cfa(m2_corr1, data = df, estimator = "MLR", missing = "fiml", std.lv = TRUE)
+
+# Robust Satorra–Bentler χ² difference test (nested)
+lavTestLRT(fit2_corr1, fit2, method = "satorra.bentler.2001")
+# or: anova(fit2_corr1, fit2)
+```
+
+
+
