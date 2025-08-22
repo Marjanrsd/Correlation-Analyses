@@ -5,7 +5,6 @@ date: "2025-08-19"
 ---
 
 # Make corr plot
-
 ```{r}
 library(psych)
 library(ggstats)
@@ -38,7 +37,6 @@ pairs.panels(
 ```
 
 # Test for Normality (Shapiro–Wilk test)
-
 ```{r, warning=FALSE}
 file_path<-"E:/liz/Defense/Behavioral/Behavioral.csv"
 df<-read.csv(file_path)
@@ -55,11 +53,9 @@ sw <- t(sapply(vars, function(v){
 sw <- as.data.frame(sw)
 sw
 
-
 ```
 
 # Q-Q plot - test for normality
-
 ```{r}
 vars <- c("MRT","PFT","SOT","iVTT","RMT")
 
@@ -112,7 +108,8 @@ library(psych)
 file_path<-"E:/liz/Defense/Behavioral/Behavioral.csv"
 df<-read.csv(file_path)
 # Pick your task columns (use raw scores; reverse only if you want the sign flipped)
-vars <- c("MRT","PFT","SOT","iVTT","RMT")  # change to your actual column names
+#vars <- c("MRT","PFT","SOT","iVTT","RMT")  # change to your actual column names
+vars <- c("MRT","PFT","SOT","iVTT","RMT")
 
 desc <- describe(df[, vars])  # handles NAs by default
 desc_out <- desc[, c("n","mean","sd","skew","kurtosis")]
@@ -150,7 +147,6 @@ summary(fit2, fit.measures = TRUE, standardized = TRUE)
 summary(fit1, fit.measures = TRUE, standardized = TRUE)
 
 ```
-
 
 # visualization for two factor model
 ```{r}
@@ -302,7 +298,32 @@ hist(df$winsorized_SOT)
 hist(df$SOT)
 hist(df$winsorized_RMT)
 hist(df$RMT)
+sum(!is.na(df$winsorized_MRT))
+sum(!is.na(df$winsorized_SOT))
 ```
+
+# check normality on winsorized data
+```{r}
+library(psych)
+# Pick your task columns (use raw scores; reverse only if you want the sign flipped)
+vars <- c("winsorized_SOT","winsorized_iVTT")
+desc <- describe(df[, vars])  # handles NAs by default
+desc_out <- desc[, c("n","mean","sd","skew","kurtosis")]
+print(desc_out)
+
+# shapito test
+sw <- t(sapply(vars, function(v){
+  x <- na.omit(df[[v]])  # remove missing values before the test
+  out <- shapiro.test(x)
+  c(n = length(x), W = unname(out$statistic), p = out$p.value)
+}))
+
+# Convert results into a nice data frame
+sw <- as.data.frame(sw)
+sw
+
+```
+
 
 # redo corr plot
 ```{r}
@@ -329,7 +350,7 @@ pairs.panels(
 ```
 
 
-# redo CFA
+# redo CFA with winsorizes data and log transform sot and ivtt
 ```{r}
 # --- Build transformed variables ---
 df$SOT_rev_log  <- -log1p(df$winsorized_SOT)   # log1p handles zeros safely
@@ -356,12 +377,12 @@ summary(fit2_log, fit.measures = TRUE, standardized = TRUE)
 
 ```
 
+# For one factor
 ```{r}
 summary(fit1_log, fit.measures = TRUE, standardized = TRUE)
 ```
 
-
-
+# Check if factors are distigushable
 ```{r}
 # Unconstrained two-factor (what you already fit)
 fit2_log <- cfa(m2_log, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
@@ -382,7 +403,7 @@ lavTestLRT(fit2_corr1, fit2_log, method = "satorra.bentler.2001")
 
 
 
-
+# redo CFA with winsorized data
 ```{r}
 # --- Build transformed variables ---
 df$SOT_rev <- -df$winsorized_SOT  # log1p handles zeros safely
@@ -409,13 +430,13 @@ summary(fit2 , fit.measures = TRUE, standardized = TRUE)
 
 ```
 
-
+# For one factor
 ```{r}
 summary(fit1 , fit.measures = TRUE, standardized = TRUE)
 
 ```
 
-
+# check if the two factors are distingushable
 ```{r}
 # Unconstrained two-factor (what you already fit)
 fit2 <- cfa(m2, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
@@ -433,5 +454,167 @@ lavTestLRT(fit2_corr1, fit2, method = "satorra.bentler.2001")
 # or: anova(fit2_corr1, fit2)
 ```
 
+# Sex difference
+# MRT
+```{r}
 
+library(ggplot2)
+library(ggstatsplot)
+library(ggstats)
+
+df_mrt <-df[!is.na(df$winsorized_MRT), ]
+result <- ggbetweenstats(
+  data = df_mrt,
+  x = Sex,
+  y = winsorized_MRT,
+  type = "parametric",   # explicit Welch’s t-test
+  ggplot.component = list(
+    theme(
+      text = element_text(size = 12),
+      plot.title = element_text(size = 12),    # Adjust the font size of the header
+      axis.title = element_text(size = 12),      # Adjust the font size of the axis titles
+      axis.text = element_text(size = 12),
+      legend.position = "none"  
+    )
+    
+  )
+)
+
+print(result)
+sum(!is.na(df$sinsorized_MRT))
+
+```
+
+
+# sex differences
+# iVTT
+```{r}
+library(ggplot2)
+library(ggstatsplot)
+library(ggstats)
+
+df_iVTT <- df[!is.na(df$winsorized_iVTT), ]
+df_iVTT$iVTT_log <- log(df_iVTT$winsorized_iVTT)
+
+result <- ggbetweenstats(
+  data = df_iVTT,
+  x = Sex,
+  y = iVTT_log,
+  type = "parametric",   # explicit Welch’s t-test
+  ggplot.component = list(
+    theme(
+      text = element_text(size = 12),
+      plot.title = element_text(size = 12),    # Adjust the font size of the header
+      axis.title = element_text(size = 12),      # Adjust the font size of the axis titles
+      axis.text = element_text(size = 12),
+      legend.position = "none"  
+    )
+  )
+)
+
+print(result)
+```
+
+# CHECK NORMALITY
+```{r}
+vars <- c("iVTT_log") 
+
+sw <- t(sapply(vars, function(v){
+  x <- na.omit(df[[v]])  # remove missing values before the test
+  out <- shapiro.test(x)
+  c(n = length(x), W = unname(out$statistic), p = out$p.value)
+}))
+
+# Convert results into a nice data frame
+sw <- as.data.frame(sw)
+sw
+hist(df$iVTT_log)
+```
+
+# Sex difference
+# SOT
+```{r}
+library(ggplot2)
+library(ggstatsplot)
+library(ggstats)
+
+df_SOT <- df[!is.na(df$winsorized_SOT), ]
+df_SOT$SOT_log <- log(df_SOT$winsorized_SOT)
+print(sum(!is.na(df$SOT_log)))
+
+
+result <- ggbetweenstats(
+  data = df_SOT,
+  x = Sex,
+  y = SOT_log,
+  type = "parametric",   # explicit Welch’s t-test
+  ggplot.component = list(
+    theme(
+      text = element_text(size = 12),
+      plot.title = element_text(size = 12),    # Adjust the font size of the header
+      axis.title = element_text(size = 12),      # Adjust the font size of the axis titles
+      axis.text = element_text(size = 12),
+      legend.position = "none"  
+    )
+  )
+)
+
+print(result)
+
+
+```
+
+# Sex difference
+# PFT
+```{r}
+library(ggplot2)
+library(ggstatsplot)
+library(ggstats)
+
+df_PFT <- df[!is.na(df$winsorized_PFT), ]
+result <- ggbetweenstats(
+  data = df_PFT,
+  x = Sex,
+  y = winsorized_PFT,
+  type = "parametric",   # explicit Welch’s t-test
+  ggplot.component = list(
+    theme(
+      text = element_text(size = 12),
+      plot.title = element_text(size = 12),    # Adjust the font size of the header
+      axis.title = element_text(size = 12),      # Adjust the font size of the axis titles
+      axis.text = element_text(size = 12),
+      legend.position = "none"  
+    )
+    
+  )
+)
+
+print(result)
+```
+
+# sex difference
+# RMT
+```{r}
+df_RMT <- df[!is.na(df$winsorized_RMT), ]
+
+result <- ggbetweenstats(
+  data = df_RMT,
+  x = Sex,
+  y = winsorized_RMT,
+  type = "parametric",   # explicit Welch’s t-test
+  ggplot.component = list(
+    theme(
+      text = element_text(size = 12),
+      plot.title = element_text(size = 12),    # Adjust the font size of the header
+      axis.title = element_text(size = 12),      # Adjust the font size of the axis titles
+      axis.text = element_text(size = 12),
+      legend.position = "none"  
+    )
+    
+  )
+)
+
+print(result)
+
+```
 
