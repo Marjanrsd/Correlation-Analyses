@@ -4,702 +4,6 @@ output: html_document
 date: "2025-08-22"
 ---
 
-
-# ANTS - ALL
-```{r}
-library(ppcor)
-
-# ----- PARTIAL CORRELATION CONTROLLING FOR AGE, SEX, ICV -----
-
-file_path <- "E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized.csv"
-df <- read.csv(file_path)
-df <- df[, !(names(df) %in% "ID")]
-df<-na.omit(df)
-df$Sex <- ifelse(df$Sex == "M", 1, 0)
-
-# Define index groups
-regions <- 1:40
-tasks <- 41:45
-conditioning_vars <- c(46, 47, 48)
-
-# Create empty p-value matrix
-all_pvals <- matrix(NA, nrow = 45, ncol = 45)
-colnames(all_pvals) <- colnames(df)[1:45]
-rownames(all_pvals) <- colnames(df)[1:45]
-
-
-# Fill Region–Task p-values (both upper and lower triangle)
-for (i in regions) {
-  for (j in tasks) {
-    result <- pcor.test(
-      x = df[[i]],
-      y = df[[j]],
-      z = df[, conditioning_vars],
-      method = "spearman"
-    )
-    all_pvals[i, j] <- result$p.value
-    all_pvals[j, i] <- result$p.value  # symmetric
-  }
-}
-
-# Fill Task–Task p-values
-for (i in tasks) {
-  for (j in tasks) {
-    if (i != j) {
-      result <- pcor.test(
-        x = df[[i]],
-        y = df[[j]],
-        z = df[, conditioning_vars],
-        method = "spearman"
-      )
-      all_pvals[i, j] <- result$p.value
-    } else {
-      all_pvals[i, j] <- NA  # no self-correlation  
-    }
-  }
-}
-
-write.csv(all_pvals, "E:/liz/Defense/Neuroimaging/ants//BH_raw_pvals.csv", row.names = TRUE)
-
-
-# ----- MULTIPLE COMPARISONS CORRECTION -----
-
-# Extract unique Region–Task p-values (i in regions, j in tasks)
-region_task_pvals <- c()
-region_task_labels <- c()
-for (i in regions) {
-  for (j in tasks) {
-    pval <- all_pvals[i, j]
-    if (!is.na(pval)) {
-      region_task_pvals <- c(region_task_pvals, pval)
-      region_task_labels <- c(region_task_labels,
-                              paste0(rownames(all_pvals)[i], " vs ", colnames(all_pvals)[j]))
-    }
-  }
-}
-
-# Extract unique Task–Task p-values (upper triangle only)
-task_task_pvals <- c()
-task_task_labels <- c()
-for (i in tasks) {
-  for (j in tasks) {
-    if (i < j) {
-      pval <- all_pvals[i, j]
-      if (!is.na(pval)) {
-        task_task_pvals <- c(task_task_pvals, pval)
-        task_task_labels <- c(task_task_labels,
-                              paste0(rownames(all_pvals)[i], " vs ", colnames(all_pvals)[j]))
-      }
-    }
-  }
-}
-
-# Combine all unique p-values and labels
-all_unique_pvals <- c(region_task_pvals, task_task_pvals)
-all_labels <- c(region_task_labels, task_task_labels)
-
-# Apply FDR correction
-fdr_corrected_pvals <- p.adjust(all_unique_pvals, method = "BH")
-
-# Save results to a data frame
-correction_results <- data.frame(
-  Comparison = all_labels,
-  Raw_p = all_unique_pvals,
-  FDR_p = fdr_corrected_pvals
-)
-
-# Write to CSV
-write.csv(correction_results, "E:/liz/Defense/Neuroimaging/ants/BH_corrected_results.csv", row.names = FALSE)
-```
-
-
-```{r}
-for (i in regions) {
-  for (j in tasks) {
-
-  }
-}
-
-df [, conditioning_vars]
-
-data <- data.frame(a = 1:3, b = 4:6, c = 7:9)
-all_pvals <- matrix(NA, nrow = 3, ncol = 3)
-
-all_pvals[1, 2] = 2
-print(all_pvals)
-
-```
-
-
-# ANTS - Males Females
-
-```{r, warning=FALSE}
-library(ppcor)
-
-
-# ----- PARTIAL CORRELATION CONTROLLING FOR AGE, SEX, ICV -----
-
-file_path <- "E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized.csv"
-df <- read.csv(file_path)
-df <- df[, !(names(df) %in% "ID")]
-df$Sex <- ifelse(df$Sex == "M", 1, 0)
-df <- na.omit(df)
-
-# Index groups
-regions <- 1:40
-tasks <- 41:45
-conditioning_vars <- c(46, 47, 48)
-
-# Split data by sex
-df_male <- df[df$Sex == 1, ]
-df_female <- df[df$Sex == 0, ]
-
-# Function to compute partial p-value matrix
-compute_pvals <- function(df) {
-  all_pvals <- matrix(NA, nrow = 45, ncol = 45)
-  colnames(all_pvals) <- colnames(df)[1:45]
-  rownames(all_pvals) <- colnames(df)[1:45]
-
-  # Region–Task
-  for (i in regions) {
-    for (j in tasks) {
-      result <- pcor.test(
-        x = df[[i]],
-        y = df[[j]],
-        z = df[, conditioning_vars],
-        method = "spearman"
-      )
-      all_pvals[i, j] <- result$p.value
-      all_pvals[j, i] <- result$p.value
-    }
-  }
-
-  # Task–Task
-  for (i in tasks) {
-    for (j in tasks) {
-      if (i != j) {
-        result <- pcor.test(
-          x = df[[i]],
-          y = df[[j]],
-          z = df[, conditioning_vars],
-          method = "spearman"
-        )
-        all_pvals[i, j] <- result$p.value
-      } else {
-        all_pvals[i, j] <- NA
-      }
-    }
-  }
-
-  return(all_pvals)
-}
-
-# Function to extract unique p-values and apply FDR correction
-correct_pvals <- function(pval_matrix, sex_label) {
-  comparison_labels <- c()
-  raw_pvals <- c()
-
-  # Region–Task
-  for (i in regions) {
-    for (j in tasks) {
-      pval <- pval_matrix[i, j]
-      if (!is.na(pval)) {
-        label <- paste0(rownames(pval_matrix)[i], " vs ", colnames(pval_matrix)[j])
-        comparison_labels <- c(comparison_labels, label)
-        raw_pvals <- c(raw_pvals, pval)
-      }
-    }
-  }
-
-  # Task–Task (upper triangle)
-  for (i in tasks) {
-    for (j in tasks) {
-      if (i < j) {
-        pval <- pval_matrix[i, j]
-        if (!is.na(pval)) {
-          label <- paste0(rownames(pval_matrix)[i], " vs ", colnames(pval_matrix)[j])
-          comparison_labels <- c(comparison_labels, label)
-          raw_pvals <- c(raw_pvals, pval)
-        }
-      }
-    }
-  }
-
-  fdr_corrected <- p.adjust(raw_pvals, method = "BH")
-
-  result_df <- data.frame(
-    Comparison = comparison_labels,
-    Raw_p = raw_pvals,
-    FDR_p = fdr_corrected
-  )
-
-  write.csv(result_df,
-            paste0("E:/liz/Defense/Neuroimaging/ants/BH_corrected_results_", sex_label, ".csv"),
-            row.names = FALSE)
-
-  return(result_df)
-}
-
-# Run for males
-pvals_male <- compute_pvals(df_male)
-corrected_male <- correct_pvals(pvals_male, "male")
-
-# Run for females
-pvals_female <- compute_pvals(df_female)
-corrected_female <- correct_pvals(pvals_female, "female")
-
-```
-
-
-
-# FS - ALL
-```{r}
-library(ppcor)
-
-# Load and clean data
-file_path <- "E:/liz/Defense/Neuroimaging/fs_CT_all_winsorized.csv"
-df <- read.csv(file_path)
-df <- df[, !(names(df) %in% "ID")]
-df<-na.omit(df)
-df$Sex <- ifelse(df$Sex == "M", 1, 0)
-
-# Define index groups
-regions <- 1:66
-tasks <- 67:71
-conditioning_vars <- c(72, 73, 74)
-
-# Create empty p-value matrix
-all_pvals <- matrix(NA, nrow = 71, ncol = 71)
-colnames(all_pvals) <- colnames(df)[1:71]
-rownames(all_pvals) <- colnames(df)[1:71]
-
-# Fill Region–Task p-values (both upper and lower triangle)
-for (i in regions) {
-  for (j in tasks) {
-    result <- pcor.test(
-      x = df[[i]],
-      y = df[[j]],
-      z = df[, conditioning_vars],
-      method = "spearman"
-    )
-    all_pvals[i, j] <- result$p.value
-    all_pvals[j, i] <- result$p.value  # symmetric
-  }
-}
-
-# Fill Task–Task p-values
-for (i in tasks) {
-  for (j in tasks) {
-    if (i != j) {
-      result <- pcor.test(
-        x = df[[i]],
-        y = df[[j]],
-        z = df[, conditioning_vars],
-        method = "spearman"
-      )
-      all_pvals[i, j] <- result$p.value
-    } else {
-      all_pvals[i, j] <- NA  # no self-correlation  
-    }
-  }
-}
-
-write.csv(all_pvals, "E:/liz/Defense/Neuroimaging/freesurfer/BH_raw_results.csv", row.names = TRUE)
-
-# ----- MULTIPLE COMPARISONS CORRECTION -----
-
-# Extract unique Region–Task p-values (i in regions, j in tasks)
-region_task_pvals <- c()
-region_task_labels <- c()
-for (i in regions) {
-  for (j in tasks) {
-    pval <- all_pvals[i, j]
-    if (!is.na(pval)) {
-      region_task_pvals <- c(region_task_pvals, pval)
-      region_task_labels <- c(region_task_labels,
-                              paste0(rownames(all_pvals)[i], " vs ", colnames(all_pvals)[j]))
-    }
-  }
-}
-
-# Extract unique Task–Task p-values (upper triangle only)
-task_task_pvals <- c()
-task_task_labels <- c()
-for (i in tasks) {
-  for (j in tasks) {
-    if (i < j) {
-      pval <- all_pvals[i, j]
-      if (!is.na(pval)) {
-        task_task_pvals <- c(task_task_pvals, pval)
-        task_task_labels <- c(task_task_labels,
-                              paste0(rownames(all_pvals)[i], " vs ", colnames(all_pvals)[j]))
-      }
-    }
-  }
-}
-
-# Combine all unique p-values and labels
-all_unique_pvals <- c(region_task_pvals, task_task_pvals)
-all_labels <- c(region_task_labels, task_task_labels)
-
-# Apply FDR correction
-fdr_corrected_pvals <- p.adjust(all_unique_pvals, method = "BH")
-
-# Save results to a data frame
-correction_results <- data.frame(
-  Comparison = all_labels,
-  Raw_p = all_unique_pvals,
-  FDR_p = fdr_corrected_pvals
-)
-
-# Write to CSV
-write.csv(correction_results, "E:/liz/Defense/Neuroimaging/freesurfer/BH_corrected_results.csv", row.names = FALSE)
-
-
-```
-
-
-# FS - males and females
-```{r, warning=FALSE}
-library(ppcor)
-
-# Load and clean data
-file_path <- "E:/liz/Defense/Neuroimaging/fs_CT_all_winsorized.csv"
-df <- read.csv(file_path)
-df <- df[, !(names(df) %in% "ID")]
-df$Sex <- ifelse(df$Sex == "M", 1, 0)
-df <- na.omit(df)
-
-# Index groups
-regions <- 1:66
-tasks <- 67:71
-conditioning_vars <- c(72, 73, 74)
-
-# Split data by sex
-df_male <- df[df$Sex == 1, ]
-df_female <- df[df$Sex == 0, ]
-
-# Function to compute partial p-value matrix
-compute_pvals <- function(df) {
-  all_pvals <- matrix(NA, nrow = 71, ncol = 71)
-  colnames(all_pvals) <- colnames(df)[1:71]
-  rownames(all_pvals) <- colnames(df)[1:71]
-
-  # Region–Task
-  for (i in regions) {
-    for (j in tasks) {
-      result <- pcor.test(
-        x = df[[i]],
-        y = df[[j]],
-        z = df[, conditioning_vars],
-        method = "spearman"
-      )
-      all_pvals[i, j] <- result$p.value
-      all_pvals[j, i] <- result$p.value
-    }
-  }
-
-  # Task–Task
-  for (i in tasks) {
-    for (j in tasks) {
-      if (i != j) {
-        result <- pcor.test(
-          x = df[[i]],
-          y = df[[j]],
-          z = df[, conditioning_vars],
-          method = "spearman"
-        )
-        all_pvals[i, j] <- result$p.value
-      } else {
-        all_pvals[i, j] <- NA
-      }
-    }
-  }
-
-  return(all_pvals)
-}
-
-# Function to extract unique p-values and apply FDR correction
-correct_pvals <- function(pval_matrix, sex_label) {
-  comparison_labels <- c()
-  raw_pvals <- c()
-
-  # Region–Task
-  for (i in regions) {
-    for (j in tasks) {
-      pval <- pval_matrix[i, j]
-      if (!is.na(pval)) {
-        label <- paste0(rownames(pval_matrix)[i], " vs ", colnames(pval_matrix)[j])
-        comparison_labels <- c(comparison_labels, label)
-        raw_pvals <- c(raw_pvals, pval)
-      }
-    }
-  }
-
-  # Task–Task (upper triangle)
-  for (i in tasks) {
-    for (j in tasks) {
-      if (i < j) {
-        pval <- pval_matrix[i, j]
-        if (!is.na(pval)) {
-          label <- paste0(rownames(pval_matrix)[i], " vs ", colnames(pval_matrix)[j])
-          comparison_labels <- c(comparison_labels, label)
-          raw_pvals <- c(raw_pvals, pval)
-        }
-      }
-    }
-  }
-
-  fdr_corrected <- p.adjust(raw_pvals, method = "BH")
-
-  result_df <- data.frame(
-    Comparison = comparison_labels,
-    Raw_p = raw_pvals,
-    FDR_p = fdr_corrected
-  )
-
-  write.csv(result_df,
-            paste0("E:/liz/Defense/Neuroimaging/freesurfer/BH_corrected_results_", sex_label, ".csv"),
-            row.names = FALSE)
-
-  return(result_df)
-}
-
-# Run for males
-pvals_male <- compute_pvals(df_male)
-corrected_male <- correct_pvals(pvals_male, "male")
-
-# Run for females
-pvals_female <- compute_pvals(df_female)
-corrected_female <- correct_pvals(pvals_female, "female")
-
-
-```
-
-
-# FS - ROI
-```{r, warning=FALSE}
-library(ppcor)
-
-# Load and clean data
-file_path <- "E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized.csv"
-df <- read.csv(file_path)
-df <- df[, !(names(df) %in% "ID")]
-df<-na.omit(df)
-df$Sex <- ifelse(df$Sex == "M", 1, 0)
-
-# Define index groups
-regions <- 1:16
-tasks <- 17:21
-conditioning_vars <- c(22, 23, 24)
-
-# Create empty p-value matrix
-all_pvals <- matrix(NA, nrow = 21, ncol = 21)
-colnames(all_pvals) <- colnames(df)[1:21]
-rownames(all_pvals) <- colnames(df)[1:21]
-
-# Fill Region–Task p-values (both upper and lower triangle)
-for (i in regions) {
-  for (j in tasks) {
-    result <- pcor.test(
-      x = df[[i]],
-      y = df[[j]],
-      z = df[, conditioning_vars],
-      method = "spearman"
-    )
-    all_pvals[i, j] <- result$p.value
-    all_pvals[j, i] <- result$p.value  # symmetric
-  }
-}
-
-# Fill Task–Task p-values
-for (i in tasks) {
-  for (j in tasks) {
-    if (i != j) {
-      result <- pcor.test(
-        x = df[[i]],
-        y = df[[j]],
-        z = df[, conditioning_vars],
-        method = "spearman"
-      )
-      all_pvals[i, j] <- result$p.value
-    } else {
-      all_pvals[i, j] <- NA  # no self-correlation  
-    }
-  }
-}
-
-write.csv(all_pvals, "E:/liz/Defense/Neuroimaging/freesurfer/ROI_BH_raw_results.csv", row.names = TRUE)
-
-# ----- MULTIPLE COMPARISONS CORRECTION -----
-
-# Extract unique Region–Task p-values (i in regions, j in tasks)
-region_task_pvals <- c()
-region_task_labels <- c()
-for (i in regions) {
-  for (j in tasks) {
-    pval <- all_pvals[i, j]
-    if (!is.na(pval)) {
-      region_task_pvals <- c(region_task_pvals, pval)
-      region_task_labels <- c(region_task_labels,
-                              paste0(rownames(all_pvals)[i], " vs ", colnames(all_pvals)[j]))
-    }
-  }
-}
-
-# Extract unique Task–Task p-values (upper triangle only)
-task_task_pvals <- c()
-task_task_labels <- c()
-for (i in tasks) {
-  for (j in tasks) {
-    if (i < j) {
-      pval <- all_pvals[i, j]
-      if (!is.na(pval)) {
-        task_task_pvals <- c(task_task_pvals, pval)
-        task_task_labels <- c(task_task_labels,
-                              paste0(rownames(all_pvals)[i], " vs ", colnames(all_pvals)[j]))
-      }
-    }
-  }
-}
-
-# Combine all unique p-values and labels
-all_unique_pvals <- c(region_task_pvals, task_task_pvals)
-all_labels <- c(region_task_labels, task_task_labels)
-
-# Apply FDR correction
-fdr_corrected_pvals <- p.adjust(all_unique_pvals, method = "BH")
-
-# Save results to a data frame
-correction_results <- data.frame(
-  Comparison = all_labels,
-  Raw_p = all_unique_pvals,
-  FDR_p = fdr_corrected_pvals
-)
-
-# Write to CSV
-write.csv(correction_results, "E:/liz/Defense/Neuroimaging/freesurfer/ROI_BH_corrected_results.csv", row.names = FALSE)
-```
-
-
-
-# FS-ROI- males females
-```{r, warning=FALSE}
-library(ppcor)
-
-# Load and clean data
-file_path <- "E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized.csv"
-df <- read.csv(file_path)
-df <- df[, !(names(df) %in% "ID")]
-df$Sex <- ifelse(df$Sex == "M", 1, 0)
-df <- na.omit(df)
-
-# Index groups
-regions <- 1:16
-tasks <- 17:21
-conditioning_vars <- c(22, 23, 24)
-
-# Split data by sex
-df_male <- df[df$Sex == 1, ]
-df_female <- df[df$Sex == 0, ]
-
-# Function to compute partial p-value matrix
-compute_pvals <- function(df) {
-  all_pvals <- matrix(NA, nrow = 21, ncol = 21)
-  colnames(all_pvals) <- colnames(df)[1:21]
-  rownames(all_pvals) <- colnames(df)[1:21]
-
-  # Region–Task
-  for (i in regions) {
-    for (j in tasks) {
-      result <- pcor.test(
-        x = df[[i]],
-        y = df[[j]],
-        z = df[, conditioning_vars],
-        method = "spearman"
-      )
-      all_pvals[i, j] <- result$p.value
-      all_pvals[j, i] <- result$p.value
-    }
-  }
-
-  # Task–Task
-  for (i in tasks) {
-    for (j in tasks) {
-      if (i != j) {
-        result <- pcor.test(
-          x = df[[i]],
-          y = df[[j]],
-          z = df[, conditioning_vars],
-          method = "spearman"
-        )
-        all_pvals[i, j] <- result$p.value
-      } else {
-        all_pvals[i, j] <- NA
-      }
-    }
-  }
-
-  return(all_pvals)
-}
-
-# Function to extract unique p-values and apply FDR correction
-correct_pvals <- function(pval_matrix, sex_label) {
-  comparison_labels <- c()
-  raw_pvals <- c()
-
-  # Region–Task
-  for (i in regions) {
-    for (j in tasks) {
-      pval <- pval_matrix[i, j]
-      if (!is.na(pval)) {
-        label <- paste0(rownames(pval_matrix)[i], " vs ", colnames(pval_matrix)[j])
-        comparison_labels <- c(comparison_labels, label)
-        raw_pvals <- c(raw_pvals, pval)
-      }
-    }
-  }
-
-  # Task–Task (upper triangle)
-  for (i in tasks) {
-    for (j in tasks) {
-      if (i < j) {
-        pval <- pval_matrix[i, j]
-        if (!is.na(pval)) {
-          label <- paste0(rownames(pval_matrix)[i], " vs ", colnames(pval_matrix)[j])
-          comparison_labels <- c(comparison_labels, label)
-          raw_pvals <- c(raw_pvals, pval)
-        }
-      }
-    }
-  }
-
-  fdr_corrected <- p.adjust(raw_pvals, method = "BH")
-
-  result_df <- data.frame(
-    Comparison = comparison_labels,
-    Raw_p = raw_pvals,
-    FDR_p = fdr_corrected
-  )
-
-  write.csv(result_df,
-            paste0("E:/liz/Defense/Neuroimaging/freesurfer/ROI_BH_corrected_results_", sex_label, ".csv"),
-            row.names = FALSE)
-
-  return(result_df)
-}
-
-# Run for males
-pvals_male <- compute_pvals(df_male)
-corrected_male <- correct_pvals(pvals_male, "male")
-
-# Run for females
-pvals_female <- compute_pvals(df_female)
-corrected_female <- correct_pvals(pvals_female, "female")
-
-```
-
-
 ```{r}
 file_path <- "E:/liz/Defense/Behavioral/Behavioral.csv"
 df <- read.csv(file_path)
@@ -713,7 +17,6 @@ ggplot(df, aes(x = PFT, y = MRT)) +
     y = "MRT"
   ) +
   theme_minimal()
-
 
 ```
 
@@ -837,240 +140,6 @@ ggplot(df, aes(x =RH_Default_PFC , y = MRT)) +
 
 
 
-```{r}
-file_path <- "E:/liz/Defense/Neuroimaging/ants_Ct_40.csv"
-df <- read.csv(file_path)
-
-# Basic scatter plot for RMT vs iVTT
-ggplot(df, aes(x =RH_Default_pCunPCC , y = MRT)) +
-  geom_point(color = "blue", size = 2, alpha = 0.7) +
-  labs(
-    title = "Scatter Plot of RMT vs iVTT",
-    x = "RH_Default_pCunPCC",
-    y = "MRT"
-  ) +
-  theme_minimal()
-```
-
-
-```{r}
-file_path <- "E:/liz/Defense/Neuroimaging/ants_Ct_40.csv"
-df <- read.csv(file_path)
-
-# Basic scatter plot for RMT vs iVTT
-ggplot(df, aes(x =LH_Default_pCunPCC , y = RMT)) +
-  geom_point(color = "blue", size = 2, alpha = 0.7) +
-  labs(
-    title = "Scatter Plot of RMT vs iVTT",
-    x = "RH_Default_pCunPCC",
-    y = "PFT"
-  ) +
-  theme_minimal()
-```
-
-
-```{r}
-file_path <- "E:/liz/Defense/Neuroimaging/ants_Ct_40.csv"
-df <- read.csv(file_path)
-
-# Basic scatter plot for RMT vs iVTT
-ggplot(df, aes(x =LH_Cont_PFCmp , y = PFT)) +
-  geom_point(color = "blue", size = 2, alpha = 0.7) +
-  labs(
-    title = "Scatter Plot of RMT vs iVTT",
-    x = "RH_Default_pCunPCC",
-    y = "PFT"
-  ) +
-  theme_minimal()
-
-```
-
-
-```{r}
-file_path <- "E:/liz/Defense/Neuroimaging/ants_Ct_40.csv"
-df <- read.csv(file_path)
-
-# Basic scatter plot for RMT vs iVTT
-ggplot(df, aes(x =LH_Default_PFC , y = MRT)) +
-  geom_point(color = "blue", size = 2, alpha = 0.7) +
-  labs(
-    title = "Scatter Plot of RMT vs iVTT",
-    x = "RH_Default_pCunPCC",
-    y = "PFT"
-  ) +
-  theme_minimal()
-```
-
-
-```{r}
-file_path <- "E:/liz/Defense/Neuroimaging/ants_Ct_40.csv"
-df <- read.csv(file_path)
-
-# Basic scatter plot for RMT vs iVTT
-ggplot(df, aes(x =RH_Cont_pCun , y = MRT)) +
-  geom_point(color = "blue", size = 2, alpha = 0.7) +
-  labs(
-    title = "Scatter Plot of RMT vs iVTT",
-    x = "RH_Cont_pCun",
-    y = "MRT"
-  ) +
-  theme_minimal()
-
-```
-
-
-```{r}
-file_path <- "E:/liz/Defense/Neuroimaging/ants_Ct_40.csv"
-df <- read.csv(file_path)
-
-# Basic scatter plot for RMT vs iVTT
-ggplot(df, aes(x =RH_DorsAttn_PrCv , y = PFT)) +
-  geom_point(color = "blue", size = 2, alpha = 0.7) +
-  labs(
-    title = "Scatter Plot of RMT vs iVTT",
-    x = "RH_DorsAttn_PrCv",
-    y = "PFT"
-  ) +
-  theme_minimal()
-```
-
-```{r}
-file_path <- "E:/liz/Defense/Neuroimaging/ants_Ct_40.csv"
-df <- read.csv(file_path)
-
-# Basic scatter plot for RMT vs iVTT
-ggplot(df, aes(x =LH_DorsAttn_PrCv , y = MRT)) +
-  geom_point(color = "blue", size = 2, alpha = 0.7) +
-  labs(
-    title = "Scatter Plot of RMT vs iVTT",
-    x = "RH_DorsAttn_PrCv",
-    y = "MRT"
-  ) +
-  theme_minimal()
-
-```
-
-```{r}
-library(ggstatsplot)
-library(ggplot2)
-
-file_path <- "E:/liz/Defense/Neuroimaging/ants_Ct_40.csv"
-df <- read.csv(file_path)
-
-# Scatter plot with regression line
-ggplot(df, aes(x = LH_DorsAttn_PrCv, y = MRT)) +
-  geom_point(color = "blue", size = 2, alpha = 0.7) +
-  geom_smooth(method = "lm", color = "red", se = TRUE) +  # regression line
-  labs(
-    title = "Scatter Plot of LH_DorsAttn_PrCv vs MRT",
-    x = "LH_DorsAttn_PrCv",
-    y = "MRT"
-  ) +
-  theme_minimal()
-```
-
-
-```{r}
-
-library(ggstatsplot)
-library(ggplot2)
-
-file_path <- "E:/liz/Defense/Neuroimaging/ants_Ct_40.csv"
-df <- read.csv(file_path)
-
-# Scatter plot with regression line
-ggplot(df, aes(x = RH_Default_pCunPCC, y = MRT)) +
-  geom_point(color = "blue", size = 2, alpha = 0.7) +
-  geom_smooth(method = "lm", color = "red", se = TRUE) +  # regression line
-  labs(
-    title = "Scatter Plot of RH_Default_pCunPCC vs MRT",
-    x = "RH_Default_pCunPCC",
-    y = "MRT"
-  ) +
-  theme_minimal()
-```
-```{r}
-library(ggstatsplot)
-file_path<-"E:/liz/Defense/Neuroimaging/ants_Ct_40.csv"
-df<-read.csv(file_path)
-df<-na.omit(df)
-# limbic and control
-cor.test(df$RH_Default_pCunPCC, df$MRT, method = "spearman")
-ggscatterstats(
-  data = df, 
-  x = "RH_Default_pCunPCC", 
-  y = "MRT", 
-  type = "nonparametric",
-  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
-)
-```
-```{r}
-library(ggstatsplot)
-file_path<-"E:/liz/Defense/Neuroimaging/ants_Ct_40.csv"
-df<-read.csv(file_path)
-df<-na.omit(df)
-# limbic and control
-cor.test(df$LH_DorsAttn_PrCv, df$MRT, method = "spearman")
-ggscatterstats(
-  data = df, 
-  x = "LH_DorsAttn_PrCv", 
-  y = "MRT", 
-  type = "nonparametric",
-  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
-)
-```
-
-```{r}
-library(ppcor)
-
-file_path <- "E:/liz/Advancement/GMV/modified_data_hippo_subfields.csv"
-df <- read.csv(file_path)
-df <- df[, -1] # remove ID
-df <- na.omit(df)
-df$Sex <- ifelse(df$Sex == "M", 1, 0) 
-
-# Compute partial correlation p-values
-partial_corr_control_sex <- sapply(1:(ncol(df)-3), function(x) 
-  sapply(1:(ncol(df)-3), function(y) {
-    if (x == y) NA
-    else pcor.test(df[,x], df[,y], df[,(ncol(df)-2):ncol(df)], method="spearman")$p.value
-  })
-)
-
-# Add row/col names
-column_names <- colnames(df)[1:(ncol(df) - 3)]
-colnames(partial_corr_control_sex) <- column_names
-rownames(partial_corr_control_sex) <- column_names
-
-# ----- MULTIPLE COMPARISONS CORRECTION -----
-
-# Extract upper triangle (unique tests)
-ut <- upper.tri(partial_corr_control_sex)
-pvals <- partial_corr_control_sex[ut]
-
-# Correct with Benjamini–Hochberg
-pvals_fdr <- p.adjust(pvals, method = "BH")
-
-# Rebuild full symmetric matrix of adjusted p-values
-adj_mat <- matrix(NA, nrow = ncol(partial_corr_control_sex), 
-                  ncol = ncol(partial_corr_control_sex),
-                  dimnames = dimnames(partial_corr_control_sex))
-adj_mat[ut] <- pvals_fdr
-adj_mat[lower.tri(adj_mat)] <- t(adj_mat)[lower.tri(adj_mat)]
-diag(adj_mat) <- NA
-
-# Save both raw and corrected p-values
-write.csv(partial_corr_control_sex, "E:/liz/Defense/Neuroimaging/rrrrrrrrpartialcorr_pvals.csv", row.names = TRUE)
-write.csv(adj_mat, "E:/liz/Defense/Neuroimaging/rrrrrrrrrrrrrr_pvals.csv", row.names = TRUE)
-
-
-
-```
-
-
-
-
-
 ## plot significant results
 ```{r}
 library(ggstatsplot)
@@ -1085,26 +154,1720 @@ ggscatterstats(
   y = "winsorized_MRT", 
   type = "nonparametric",
   marginal.type = "density",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1, axis.text.x = element_text(size = 16),  # <- bigger x-axis numbers
+      axis.text.y = element_text(size = 16)))  
+)
+```
+
+
+```{r}
+file_path <- "E:/liz/Defense/Neuroimaging/ants_Ct_40_winsorized.csv"
+df <- read.csv(file_path) |> na.omit()
+df$Sex <- ifelse(df$Sex == "M", "Males", "Females")
+
+df %>%
+  ggplot(aes(x = LH_DorsAttn_PrCv_mean, y = winsorized_MRT, colour = factor(Sex))) +
+  geom_point() +
+  geom_smooth(method = "lm", colour = "black") +
+  facet_wrap(~ Sex) +
+  labs(colour = "Sex") +
+  stat_cor(
+    method = "spearman",
+    label.stat = c("rho", "p"),  # show rho and p
+    colour = "black",
+    parse = FALSE,
+    label.x.npc = "left",        # relative position: "left", "center", "right"
+    label.y.npc = "top",         # relative position: "bottom", "center", "top"
+    size = 2                     # make text larger
+  ) +
+  theme_classic(base_size = 14) +
+  theme(strip.background = element_rect(fill = "white"))
+table(df$Sex)
+
+```
+
+
+```{r}
+library(ggstatsplot)
+file_path<-"E:/liz/Defense/Neuroimaging/ants_Ct_40_winsorized.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+# limbic and control
+cor.test(df$RH_Default_PFC, df$winsorized_MRT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "RH_Default_PFC", 
+  y = "winsorized_MRT", 
+  type = "nonparametric",
+  marginal.type = "density",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
+
+```
+
+
+
+
+```{r}
+library(ggstatsplot)
+file_path<-"E:/liz/Defense/Neuroimaging/ants_Ct_40_winsorized.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+# limbic and control
+cor.test(df$LH_SalVentAttn_FrOperIns_mean, df$winsorized_MRT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "LH_SalVentAttn_FrOperIns_mean", 
+  y = "winsorized_MRT", 
+  type = "nonparametric",
+  marginal.type = "density",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
+```
+
+
+```{r}
+file_path <- "E:/liz/Defense/Neuroimaging/ants_Ct_40_winsorized.csv"
+df <- read.csv(file_path) |> na.omit()
+df$Sex <- ifelse(df$Sex == "M", "Males", "Females")
+
+df %>%
+  ggplot(aes(x = LH_SalVentAttn_FrOperIns_mean, y = winsorized_MRT, colour = factor(Sex))) +
+  geom_point() +
+  geom_smooth(method = "lm", colour = "black") +
+  facet_wrap(~ Sex) +
+  labs(colour = "Sex") +
+  stat_cor(
+    method = "spearman",
+    label.stat = c("rho", "p"),  # show rho and p
+    colour = "black",
+    parse = FALSE,
+    label.x.npc = "left",        # relative position: "left", "center", "right"
+    label.y.npc = "top",         # relative position: "bottom", "center", "top"
+    size = 2                     # make text larger
+  ) +
+  theme_classic(base_size = 14) +
+  theme(strip.background = element_rect(fill = "white"))
+table(df$Sex)
+```
+
+```{r}
+library(ggstatsplot)
+file_path<-"E:/liz/Defense/Neuroimaging/ants_Ct_40_winsorized.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+# limbic and control
+cor.test(df$RH_Default_pCunPCC_mean, df$winsorized_MRT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "RH_Default_pCunPCC_mean", 
+  y = "winsorized_MRT", 
+  type = "nonparametric",
+  marginal.type = "density",
   ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
 )
 ```
 
 ```{r}
-library(ggplot2)
-library(ggpubr)
-library(dplyr)
+file_path <- "E:/liz/Defense/Neuroimaging/ants_Ct_40_winsorized.csv"
+df <- read.csv(file_path) |> na.omit()
+df$Sex <- ifelse(df$Sex == "M", "Males", "Females")
+
+df %>%
+  ggplot(aes(x = RH_Default_pCunPCC_mean, y = winsorized_MRT, colour = factor(Sex))) +
+  geom_point() +
+  geom_smooth(method = "lm", colour = "black") +
+  facet_wrap(~ Sex) +
+  labs(colour = "Sex") +
+  stat_cor(
+    method = "spearman",
+    label.stat = c("rho", "p"),  # show rho and p
+    colour = "black",
+    parse = FALSE,
+    label.x.npc = "left",        # relative position: "left", "center", "right"
+    label.y.npc = "top",         # relative position: "bottom", "center", "top"
+    size = 2                     # make text larger
+  ) +
+  theme_classic(base_size = 14) +
+  theme(strip.background = element_rect(fill = "white"))
+```
+
+```{r}
+# Load CSV
+df <- read.csv("E:/liz/Defense/ants_nodes.csv")
+
+# Make sure columns are named properly
+colnames(df) <- c("id", "label", "x", "y", "z")
+
+# Add BrainNet-required columns
+df$size <- 3      # size of node (adjust if needed)
+df$color <- 1     # color index (same color for all)
+
+# Reorder for BrainNet: x y z size color label
+node <- df[, c("x", "y", "z", "size", "color", "label")]
+
+# Save as .node (tab separated, no headers)
+write.table(node,
+            "E:/liz/Defense/visual_nodes.node",
+            quote = FALSE, sep = "\t",
+            row.names = FALSE, col.names = FALSE)
+
+```
+
+
+```{r}
+library(ggstatsplot)
 file_path<-"E:/liz/Defense/Neuroimaging/ants_Ct_40_winsorized.csv"
 df<-read.csv(file_path)
 df<-na.omit(df)
-df$Sex <- ifelse(df$Sex == "M", "Males", "Females") 
-df %>% 
-  ggplot(aes(x = LH_DorsAttn_PrCv, y = winsorized_MRT, colour = factor(Sex))) +
-  geom_point(alpha = 0.8, size = 1.8) +
-  geom_smooth(method = 'lm', colour = 'black') +
+# limbic and control
+cor.test(df$RH_Default_PFCv_mean, df$winsorized_MRT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "RH_Default_PFCv_mean", 
+  y = "winsorized_MRT", 
+  type = "nonparametric",
+  marginal.type = "density",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
+```
+
+```{r}
+file_path <- "E:/liz/Defense/Neuroimaging/ants_Ct_40_winsorized.csv"
+df <- read.csv(file_path) |> na.omit()
+df$Sex <- ifelse(df$Sex == "M", "Males", "Females")
+
+df %>%
+  ggplot(aes(x = RH_Default_PFCv_mean, y = winsorized_MRT, colour = factor(Sex))) +
+  geom_point() +
+  geom_smooth(method = "lm", colour = "black") +
   facet_wrap(~ Sex) +
-  labs(colour = 'Sex') + 
-  stat_cor(method = "spearman", label.x = 2.5, label.y = 2, colour = 'black')+
-  theme_classic(base_size = 12) +                           # <- white background
-  theme(strip.background = element_rect(fill = "white"))    # <- white strip labels
+  labs(colour = "Sex") +
+  stat_cor(
+    method = "spearman",
+    label.stat = c("rho", "p"),  # show rho and p
+    colour = "black",
+    parse = FALSE,
+    label.x.npc = "left",        # relative position: "left", "center", "right"
+    label.y.npc = "top",         # relative position: "bottom", "center", "top"
+    size = 2                     # make text larger
+  ) +
+  theme_classic(base_size = 14) +
+  theme(strip.background = element_rect(fill = "white"))
+table(df$Sex)
+```
+
+```{r}
+file_path <- "E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized.csv"
+df <- read.csv(file_path) |> na.omit()
+df$Sex <- ifelse(df$Sex == "M", "Males", "Females")
+
+df %>%
+  ggplot(aes(x = lh.precuneus, y = winsorized_MRT, colour = factor(Sex))) +
+  geom_point() +
+  geom_smooth(method = "lm", colour = "black") +
+  facet_wrap(~ Sex) +
+  labs(colour = "Sex") +
+  stat_cor(
+    method = "spearman",
+    label.stat = c("rho", "p"),  # show rho and p
+    colour = "black",
+    parse = FALSE,
+    label.x.npc = "left",        # relative position: "left", "center", "right"
+    label.y.npc = "top",         # relative position: "bottom", "center", "top"
+    size = 2                     # make text larger
+  ) +
+  theme_classic(base_size = 14) +
+  theme(strip.background = element_rect(fill = "white"))
+table(df$Sex)
+```
+
+```{r}
+library(ggstatsplot)
+file_path<-"E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized.csv"
+df<-read.csv(file_path)
+df<-na.omit(df)
+
+# limbic and control
+cor.test(df$lh.precuneus, df$winsorized_MRT, method = "spearman")
+ggscatterstats(
+  data = df, 
+  x = "lh.precuneus", 
+  y = "winsorized_MRT", 
+  type = "nonparametric",
+  marginal.type = "density",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
+)
+```
+
+```{r}
+file_path <- "E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized.csv"
+df <- read.csv(file_path) |> na.omit()
+df$Sex <- ifelse(df$Sex == "M", "Males", "Females")
+
+df %>%
+  ggplot(aes(x = lh.isthmuscingulate, y = winsorized_iVTT, colour = factor(Sex))) +
+  geom_point() +
+  geom_smooth(method = "lm", colour = "black") +
+  facet_wrap(~ Sex) +
+  labs(colour = "Sex") +
+  stat_cor(
+    method = "spearman",
+    label.stat = c("rho", "p"),  # show rho and p
+    colour = "black",
+    parse = FALSE,
+    label.x.npc = "left",        # relative position: "left", "center", "right"
+    label.y.npc = "top",         # relative position: "bottom", "center", "top"
+    size = 2                     # make text larger
+  ) +
+  theme_classic(base_size = 14) +
+  theme(strip.background = element_rect(fill = "white"))
+table(df$Sex)
+```
+
+```{r}
+library(ggstatsplot)
+
+file_path <- "E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized.csv"
+df <- read.csv(file_path)
+df <- na.omit(df)
+
+# Keep only females (adjust value if it's coded differently, e.g. "Female" or 0/1)
+#df <- subset(df, Sex == "F")
+
+# correlation
+cor.test(df$lh.precuneus, df$MRT, method = "spearman")
+
+# plot
+ggscatterstats(
+  data = df, 
+  x = "lh.precuneus", 
+  y = "MRT", 
+  type = "nonparametric",
+  marginal.type = "density",
+  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # square plot
+)
+
+```
+
+
+
+
+                  ################ corr between CT and GMV and tasks #################
+                  
+## Main scripts for partial correlations and multiple comparison correction
+# GMV - ROI - pairwise N
+```{r}
+library(ppcor)
+
+# --- Load data ---
+df_all   <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_roi.csv")  # regions + tasks (same subjects/order)
+df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_roi_tasks.csv")  # tasks only     (same subjects/order)
+df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_roi_cov.csv")  # Age, Sex, Volume (ICV)
+
+# --- Remove ID column if it exists ---
+df_all   <- df_all[ , !(names(df_all)   %in% "ID")]
+df_tasks <- df_tasks[ , !(names(df_tasks) %in% "ID")]
+df_cov   <- df_cov[ , !(names(df_cov)   %in% "ID")]
+
+df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
+
+
+# --- Define groups ---
+region_cols <- c("LCA2.3","LDG","RCA2.3","RDG")  
+
+task_cols   <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
+                 "winsorized_iVTT","winsorized_RMT")
+cov_cols    <- c("Age","Sex","Volume")          
+
+# quick checks (fail fast if something is misspelled)
+stopifnot(all(region_cols %in% names(df_all)))
+stopifnot(all(task_cols   %in% names(df_tasks)))
+stopifnot(all(cov_cols    %in% names(df_cov)))
+
+# --- Containers for results ---
+labs  <- c()
+pvec  <- c()
+rho   <- c()
+Ns    <- c()
+
+# --- TASK–TASK (within df_tasks) ---
+for (i in 1:(length(task_cols)-1)) {
+  for (j in (i+1):length(task_cols)) {
+
+    x <- df_tasks[[task_cols[i]]]
+    y <- df_tasks[[task_cols[j]]]
+    Z <- df_cov[, cov_cols, drop = FALSE]
+
+    idx <- complete.cases(x, y, Z)
+    res <- pcor.test(x[idx], y[idx], Z[idx, , drop = FALSE], method = "spearman")
+    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   sum(idx))
+    
+  }
+}
+
+# --- TASK–REGION (tasks from df_tasks, regions from df_all) ---
+for (t in task_cols) {
+  for (r in region_cols) {
+
+    x <- df_tasks[[t]]      # task
+    y <- df_all[[r]]        # region
+    Z <- df_cov[, cov_cols, drop = FALSE]
+
+    idx <- complete.cases(x, y, Z)
+    res <- pcor.test(x[idx], y[idx], Z[idx, , drop = FALSE], method = "spearman")
+    labs <- c(labs, paste0(t, " vs ", r))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   sum(idx))
+    
+  }
+}
+
+# --- Multiple-comparisons correction (one family across all tests) ---
+fdr_p <- p.adjust(pvec, method = "BH")
+
+results <- data.frame(
+  Comparison = labs,
+  Rho        = rho,
+  N          = Ns,
+  Raw_p      = pvec,
+  FDR_p      = fdr_p,
+  stringsAsFactors = FALSE
+)
+
+write.csv(results, "E:/liz/Defense/Neuroimaging/GMV/ROI_BH_results.csv", row.names = FALSE)
+
+```
+
+
+
+# GMV - all - pairwise N
+```{r}
+library(ppcor)
+
+# --- Load data ---
+df_all   <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields.csv")  # regions + tasks (same subjects/order)
+df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_tasks.csv")  # tasks only     (same subjects/order)
+df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_cov.csv")  # Age, Sex, Volume (ICV)
+
+# --- Remove ID column if it exists ---
+df_all   <- df_all[ , !(names(df_all)   %in% "ID")]
+df_tasks <- df_tasks[ , !(names(df_tasks) %in% "ID")]
+df_cov   <- df_cov[ , !(names(df_cov)   %in% "ID")]
+
+df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
+
+
+# --- Define groups ---
+region_cols <- c("LHC","LCA1","LCA2.3","LDG","LSUB", "LERC","LPRC", "LPHC",
+                 "RHC", "RCA1", "RCA2.3", "RDG", "RSUB", "RERC", 
+                 "RPRC", "RPHC", "TotHC")  
+
+task_cols   <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
+                 "winsorized_iVTT","winsorized_RMT")
+
+cov_cols    <- c("Age","Sex","Volume")           
+
+# quick checks (fail fast if something is misspelled)
+stopifnot(all(region_cols %in% names(df_all)))
+stopifnot(all(task_cols   %in% names(df_tasks)))
+stopifnot(all(cov_cols    %in% names(df_cov)))
+
+# --- Containers for results ---
+labs  <- c()
+pvec  <- c()
+rho   <- c()
+Ns    <- c()
+
+# --- TASK–TASK (within df_tasks) ---
+for (i in 1:(length(task_cols)-1)) {
+  for (j in (i+1):length(task_cols)) {
+
+    x <- df_tasks[[task_cols[i]]]
+    y <- df_tasks[[task_cols[j]]]
+    Z <- df_cov[, cov_cols, drop = FALSE]
+
+    idx <- complete.cases(x, y, Z)
+    res <- pcor.test(x[idx], y[idx], Z[idx, , drop = FALSE], method = "spearman")
+    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   sum(idx))
+    
+  }
+}
+
+# --- TASK–REGION (tasks from df_tasks, regions from df_all) ---
+for (t in task_cols) {
+  for (r in region_cols) {
+
+    x <- df_tasks[[t]]      # task
+    y <- df_all[[r]]        # region
+    Z <- df_cov[, cov_cols, drop = FALSE]
+
+    idx <- complete.cases(x, y, Z)
+    res <- pcor.test(x[idx], y[idx], Z[idx, , drop = FALSE], method = "spearman")
+    labs <- c(labs, paste0(t, " vs ", r))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   sum(idx))
+    
+  }
+}
+
+# --- Multiple-comparisons correction (one family across all tests) ---
+fdr_p <- p.adjust(pvec, method = "BH")
+
+results <- data.frame(
+  Comparison = labs,
+  Rho        = rho,
+  N          = Ns,
+  Raw_p      = pvec,
+  FDR_p      = fdr_p,
+  stringsAsFactors = FALSE
+)
+
+write.csv(results, "E:/liz/Defense/Neuroimaging/GMV/BH_results.csv", row.names = FALSE)
+
+
+```
+
+
+
+# Freesurfer - all - fixed N
+```{r}
+library(ppcor)
+
+# --- Load data ---
+df_all   <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_all_winsorized.csv")  # regions + tasks (same subjects/order)
+df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_all_winsorized_tasks.csv")  # tasks only     (same subjects/order)
+df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_all_winsorized_cov.csv")  # Age, Sex, Volume (ICV)
+
+# --- Remove ID column if it exists ---
+df_all   <- df_all[,  !(names(df_all)   %in% "ID")]
+df_tasks <- df_tasks[,!(names(df_tasks) %in% "ID")]
+df_cov   <- df_cov[,  !(names(df_cov)   %in% "ID")]
+
+# Recode Sex
+df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
+
+# --- Define groups (use exact column names) ---
+region_cols <- c("rh.caudalanteriorcingulate","rh.caudalmiddlefrontal","rh.cuneus",
+  "rh.entorhinal","rh.fusiform","rh.inferiorparietal","rh.inferiortemporal",
+  "rh.isthmuscingulate","rh.lateraloccipital","rh.lateralorbitofrontal",
+  "rh.lingual","rh.medialorbitofrontal","rh.middletemporal",
+  "rh.parahippocampal","rh.paracentral","rh.parsopercularis","rh.parsorbitalis",
+  "rh.parstriangularis","rh.pericalcarine","rh.postcentral",
+  "rh.posteriorcingulate","rh.precentral","rh.precuneus",
+  "rh.rostralanteriorcingulate","rh.rostralmiddlefrontal","rh.superiorfrontal",
+  "rh.superiorparietal","rh.superiortemporal","rh.supramarginal",
+  "rh.frontalpole","rh.temporalpole","rh.transversetemporal","rh.insula",
+  "lh.caudalanteriorcingulate","lh.caudalmiddlefrontal","lh.cuneus",
+  "lh.entorhinal","lh.fusiform","lh.inferiorparietal","lh.inferiortemporal",
+  "lh.isthmuscingulate","lh.lateraloccipital","lh.lateralorbitofrontal",
+  "lh.lingual","lh.medialorbitofrontal","lh.middletemporal",
+  "lh.parahippocampal","lh.paracentral","lh.parsopercularis","lh.parsorbitalis",
+  "lh.parstriangularis","lh.pericalcarine","lh.postcentral",
+  "lh.posteriorcingulate","lh.precentral","lh.precuneus",
+  "lh.rostralanteriorcingulate","lh.rostralmiddlefrontal","lh.superiorfrontal",
+  "lh.superiorparietal","lh.superiortemporal","lh.supramarginal",
+  "lh.frontalpole","lh.temporalpole","lh.transversetemporal","lh.insula")
+
+task_cols   <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
+                 "winsorized_iVTT","winsorized_RMT")
+
+cov_cols    <- c("Age","Sex","Volume")
+
+# Quick checks
+stopifnot(all(region_cols %in% names(df_all)))
+stopifnot(all(task_cols   %in% names(df_tasks)))
+stopifnot(all(cov_cols    %in% names(df_cov)))
+
+# ===== FIXED-N LISTWISE DELETION ACROSS ALL VARS =====
+mask <- complete.cases(
+  df_all[,   region_cols, drop = FALSE],
+  df_tasks[, task_cols,   drop = FALSE],
+  df_cov[,   cov_cols,    drop = FALSE]
+)
+
+df_all   <- df_all[mask, ]
+df_tasks <- df_tasks[mask, ]
+df_cov   <- df_cov[mask, ]
+N_global <- nrow(df_cov)   # same for all tests
+
+# --- Containers for results ---
+labs <- c(); pvec <- c(); rho <- c(); Ns <- c()
+
+# --- TASK–TASK (unique pairs, fixed N) ---
+for (i in 1:(length(task_cols)-1)) {
+  for (j in (i+1):length(task_cols)) {
+    x <- df_tasks[[task_cols[i]]]
+    y <- df_tasks[[task_cols[j]]]
+    Z <- df_cov[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global)
+  }
+}
+
+# --- TASK–REGION (all pairs, fixed N) ---
+for (t in task_cols) {
+  for (r in region_cols) {
+    x <- df_tasks[[t]]
+    y <- df_all[[r]]
+    Z <- df_cov[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(t, " vs ", r))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global)
+  }
+}
+
+# --- Multiple-comparisons correction (one family across all tests) ---
+fdr_p <- p.adjust(pvec, method = "BH")
+
+results <- data.frame(
+  Comparison = labs,
+  Rho        = rho,
+  N          = Ns,
+  Raw_p      = pvec,
+  FDR_p      = fdr_p,
+  stringsAsFactors = FALSE
+)
+
+write.csv(results, "E:/liz/Defense/Neuroimaging/freesurfer/BH_results.csv", row.names = FALSE)
+```
+
+
+# Freesurfer - ROI - fixed N
+```{r}
+library(ppcor)
+
+# --- Load data ---
+df_all   <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized.csv")  # regions + tasks (same subjects/order)
+df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized_tasks.csv")  # tasks only     (same subjects/order)
+df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized_cov.csv")  # Age, Sex, Volume (ICV)
+# --- Remove ID column if it exists ---
+df_all   <- df_all[,  !(names(df_all)   %in% "ID")]
+df_tasks <- df_tasks[,!(names(df_tasks) %in% "ID")]
+df_cov   <- df_cov[,  !(names(df_cov)   %in% "ID")]
+
+# Recode Sex
+df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
+
+# --- Define groups (use exact column names) ---
+region_cols <- c("rh.supramarginal","rh.precuneus","rh.precentral","rh.nferiorparietal",
+  "rh.isthmuscingulate","rh.superiorparietal","rh.superiortemporal",
+  "rh.posteriorcingulate","lh.supramarginal","lh.precuneus","lh.precentral",
+  "lh.nferiorparietal","lh.isthmuscingulate","lh.superiorparietal",
+  "lh.superiortemporal","lh.posteriorcingulate")
+
+task_cols   <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
+                 "winsorized_iVTT","winsorized_RMT")
+
+cov_cols    <- c("Age","Sex","Volume")
+
+# Quick checks
+stopifnot(all(region_cols %in% names(df_all)))
+stopifnot(all(task_cols   %in% names(df_tasks)))
+stopifnot(all(cov_cols    %in% names(df_cov)))
+
+# ===== FIXED-N LISTWISE DELETION ACROSS ALL VARS =====
+mask <- complete.cases(
+  df_all[,   region_cols, drop = FALSE],
+  df_tasks[, task_cols,   drop = FALSE],
+  df_cov[,   cov_cols,    drop = FALSE]
+)
+
+df_all   <- df_all[mask, ]
+df_tasks <- df_tasks[mask, ]
+df_cov   <- df_cov[mask, ]
+N_global <- nrow(df_cov)   # same for all tests
+
+# --- Containers for results ---
+labs <- c(); pvec <- c(); rho <- c(); Ns <- c()
+
+# --- TASK–TASK (unique pairs, fixed N) ---
+for (i in 1:(length(task_cols)-1)) {
+  for (j in (i+1):length(task_cols)) {
+    x <- df_tasks[[task_cols[i]]]
+    y <- df_tasks[[task_cols[j]]]
+    Z <- df_cov[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global)
+  }
+}
+
+# --- TASK–REGION (all pairs, fixed N) ---
+for (t in task_cols) {
+  for (r in region_cols) {
+    x <- df_tasks[[t]]
+    y <- df_all[[r]]
+    Z <- df_cov[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(t, " vs ", r))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global)
+  }
+}
+
+# --- Multiple-comparisons correction (one family across all tests) ---
+fdr_p <- p.adjust(pvec, method = "BH")
+
+results <- data.frame(
+  Comparison = labs,
+  Rho        = rho,
+  N          = Ns,
+  Raw_p      = pvec,
+  FDR_p      = fdr_p,
+  stringsAsFactors = FALSE
+)
+
+write.csv(results, "E:/liz/Defense/Neuroimaging/freesurfer/ROI_BH_results.csv", row.names = FALSE)
+```
+
+
+# ANTs - fixed N
+```{r}
+library(ppcor)
+
+# --- Load data ---
+df_all   <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized.csv")          # regions + tasks (same subjects/order)
+df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_tasks.csv")     # tasks only     (same subjects/order)
+df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_cov.csv")       # Age, Sex, Volume (ICV)
+
+# --- Remove ID column if it exists ---
+df_all   <- df_all[,  !(names(df_all)   %in% "ID")]
+df_tasks <- df_tasks[,!(names(df_tasks) %in% "ID")]
+df_cov   <- df_cov[,  !(names(df_cov)   %in% "ID")]
+
+# Recode Sex
+df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
+
+# --- Define groups (use exact column names) ---
+region_cols <- c("RH_Cont_Temp_mean","LH_DorsAttn_PrCv_mean","LH_SalVentAttn_FrOperIns_mean",
+  "LH_Limbic_TempPole_mean","RH_Vis_mean","RH_SalVentAttn_FrOperIns_mean",
+  "LH_Default_pCunPCC_mean","LH_Default_Par_mean","RH_SalVentAttn_Med_mean",
+  "RH_Default_Par_mean","LH_DorsAttn_FEF_mean","RH_Limbic_TempPole_mean",
+  "LH_Limbic_OFC_mean","RH_Cont_Cing_mean","LH_SalVentAttn_ParOper_mean",
+  "RH_DorsAttn_Post_mean","LH_SomMot_mean","RH_DorsAttn_FEF_mean",
+  "RH_Default_pCunPCC_mean","RH_SomMot_mean","LH_DorsAttn_Post_mean",
+  "LH_Cont_Par_mean","LH_Cont_Cing_mean","LH_Vis_mean",
+  "RH_SalVentAttn_TempOccPar_mean","RH_Default_Temp_mean","RH_Default_PFCv_mean",
+  "LH_Default_Temp_mean","RH_Limbic_OFC_mean","RH_Cont_PFCl_mean",
+  "LH_Default_PFC_mean","RH_Default_PFCdPFCm_mean","LH_Cont_pCun_mean",
+  "LH_SalVentAttn_Med_mean","RH_Cont_Par_mean","RH_Cont_PFCmp_mean",
+  "LH_Cont_PFCl_mean","RH_Cont_pCun_mean","LH_Cont_Temp","LH_Cont_PFCmp",
+  "LH_SalVentAttn_PFCl","RH_SalVentAttn_PFCl","LH_Cont_OFC")
+
+task_cols   <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
+                 "winsorized_iVTT","winsorized_RMT")
+
+cov_cols    <- c("Age","Sex","Volume")
+
+# Quick checks
+stopifnot(all(region_cols %in% names(df_all)))
+stopifnot(all(task_cols   %in% names(df_tasks)))
+stopifnot(all(cov_cols    %in% names(df_cov)))
+
+# ===== FIXED-N LISTWISE DELETION ACROSS ALL VARS =====
+mask <- complete.cases(
+  df_all[,   region_cols, drop = FALSE],
+  df_tasks[, task_cols,   drop = FALSE],
+  df_cov[,   cov_cols,    drop = FALSE]
+)
+
+df_all   <- df_all[mask, ]
+df_tasks <- df_tasks[mask, ]
+df_cov   <- df_cov[mask, ]
+N_global <- nrow(df_cov)   # same for all tests
+
+# --- Containers for results ---
+labs <- c(); pvec <- c(); rho <- c(); Ns <- c()
+
+# --- TASK–TASK (unique pairs, fixed N) ---
+for (i in 1:(length(task_cols)-1)) {
+  for (j in (i+1):length(task_cols)) {
+    x <- df_tasks[[task_cols[i]]]
+    y <- df_tasks[[task_cols[j]]]
+    Z <- df_cov[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global)
+  }
+}
+
+# --- TASK–REGION (all pairs, fixed N) ---
+for (t in task_cols) {
+  for (r in region_cols) {
+    x <- df_tasks[[t]]
+    y <- df_all[[r]]
+    Z <- df_cov[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(t, " vs ", r))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global)
+  }
+}
+
+# --- Multiple-comparisons correction (one family across all tests) ---
+fdr_p <- p.adjust(pvec, method = "BH")
+
+results <- data.frame(
+  Comparison = labs,
+  Rho        = rho,
+  N          = Ns,
+  Raw_p      = pvec,
+  FDR_p      = fdr_p,
+  stringsAsFactors = FALSE
+)
+
+write.csv(results, "E:/liz/Defense/Neuroimaging/ants/BH_results.csv", row.names = FALSE)
+
+```
+
+# ANTs -fixed N - Males
+```{r}
+library(ppcor)
+
+# --- Load data ---
+df_all   <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized.csv")          # regions + tasks (same subjects/order)
+df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_tasks.csv")     # tasks only     (same subjects/order)
+df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_cov.csv")       # Age, Sex
+
+# --- Remove ID column if it exists ---
+df_all   <- df_all[,  !(names(df_all)   %in% "ID")]
+df_tasks <- df_tasks[,!(names(df_tasks) %in% "ID")]
+df_cov   <- df_cov[,  !(names(df_cov)   %in% "ID")]
+
+# Recode Sex
+df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
+
+# --- Define groups ---
+region_cols <- c("RH_Cont_Temp_mean","LH_DorsAttn_PrCv_mean","LH_SalVentAttn_FrOperIns_mean",
+  "LH_Limbic_TempPole_mean","RH_Vis_mean","RH_SalVentAttn_FrOperIns_mean",
+  "LH_Default_pCunPCC_mean","LH_Default_Par_mean","RH_SalVentAttn_Med_mean",
+  "RH_Default_Par_mean","LH_DorsAttn_FEF_mean","RH_Limbic_TempPole_mean",
+  "LH_Limbic_OFC_mean","RH_Cont_Cing_mean","LH_SalVentAttn_ParOper_mean",
+  "RH_DorsAttn_Post_mean","LH_SomMot_mean","RH_DorsAttn_FEF_mean",
+  "RH_Default_pCunPCC_mean","RH_SomMot_mean","LH_DorsAttn_Post_mean",
+  "LH_Cont_Par_mean","LH_Cont_Cing_mean","LH_Vis_mean",
+  "RH_SalVentAttn_TempOccPar_mean","RH_Default_Temp_mean","RH_Default_PFCv_mean",
+  "LH_Default_Temp_mean","RH_Limbic_OFC_mean","RH_Cont_PFCl_mean",
+  "LH_Default_PFC_mean","RH_Default_PFCdPFCm_mean","LH_Cont_pCun_mean",
+  "LH_SalVentAttn_Med_mean","RH_Cont_Par_mean","RH_Cont_PFCmp_mean",
+  "LH_Cont_PFCl_mean","RH_Cont_pCun_mean","LH_Cont_Temp","LH_Cont_PFCmp",
+  "LH_SalVentAttn_PFCl","RH_SalVentAttn_PFCl","LH_Cont_OFC")
+
+task_cols <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
+               "winsorized_iVTT","winsorized_RMT")
+
+cov_cols <- c("Age","Volume")   # drop Sex here (since you split by it)
+
+# --- Split dataframes ---
+df_all_m   <- df_all[df_cov$Sex == 1, ]
+df_tasks_m <- df_tasks[df_cov$Sex == 1, ]
+df_cov_m   <- df_cov[df_cov$Sex == 1, ]
+
+mask_m <- complete.cases(df_all_m[,region_cols], df_tasks_m[,task_cols], df_cov_m[,cov_cols])
+df_all_m   <- df_all_m[mask_m, ]
+df_tasks_m <- df_tasks_m[mask_m, ]
+df_cov_m   <- df_cov_m[mask_m, ]
+N_global_m <- nrow(df_cov_m)
+
+# --- Containers for results ---
+labs <- c(); pvec <- c(); rho <- c(); Ns <- c()
+
+# --- TASK–TASK (unique pairs, fixed N) ---
+for (i in 1:(length(task_cols)-1)) {
+  for (j in (i+1):length(task_cols)) {
+    x <- df_tasks_m[[task_cols[i]]]
+    y <- df_tasks_m[[task_cols[j]]]
+    Z <- df_cov_m[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_m)
+  }
+}
+
+# --- TASK–REGION (all pairs, fixed N) ---
+for (t in task_cols) {
+  for (r in region_cols) {
+    x <- df_tasks_m[[t]]
+    y <- df_all_m[[r]]
+    Z <- df_cov_m[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(t, " vs ", r))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_m)
+  }
+}
+
+# --- Multiple-comparisons correction (one family across all tests) ---
+fdr_p <- p.adjust(pvec, method = "BH")
+
+results <- data.frame(
+  Comparison = labs,
+  Rho        = rho,
+  N          = Ns,
+  Raw_p      = pvec,
+  FDR_p      = fdr_p,
+  stringsAsFactors = FALSE
+)
+
+write.csv(results, "E:/liz/Defense/Neuroimaging/ants/Males_BH_results.csv", row.names = FALSE)
+
+```
+
+# ANTs -fixed N - Females
+```{r}
+library(ppcor)
+
+# --- Load data ---
+df_all   <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized.csv")          # regions + tasks (same subjects/order)
+df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_tasks.csv")     # tasks only     (same subjects/order)
+df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_cov.csv")       # Age, Sex
+
+# --- Remove ID column if it exists ---
+df_all   <- df_all[,  !(names(df_all)   %in% "ID")]
+df_tasks <- df_tasks[,!(names(df_tasks) %in% "ID")]
+df_cov   <- df_cov[,  !(names(df_cov)   %in% "ID")]
+
+# Recode Sex
+df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
+
+# --- Define groups ---
+region_cols <- c("RH_Cont_Temp_mean","LH_DorsAttn_PrCv_mean","LH_SalVentAttn_FrOperIns_mean",
+  "LH_Limbic_TempPole_mean","RH_Vis_mean","RH_SalVentAttn_FrOperIns_mean",
+  "LH_Default_pCunPCC_mean","LH_Default_Par_mean","RH_SalVentAttn_Med_mean",
+  "RH_Default_Par_mean","LH_DorsAttn_FEF_mean","RH_Limbic_TempPole_mean",
+  "LH_Limbic_OFC_mean","RH_Cont_Cing_mean","LH_SalVentAttn_ParOper_mean",
+  "RH_DorsAttn_Post_mean","LH_SomMot_mean","RH_DorsAttn_FEF_mean",
+  "RH_Default_pCunPCC_mean","RH_SomMot_mean","LH_DorsAttn_Post_mean",
+  "LH_Cont_Par_mean","LH_Cont_Cing_mean","LH_Vis_mean",
+  "RH_SalVentAttn_TempOccPar_mean","RH_Default_Temp_mean","RH_Default_PFCv_mean",
+  "LH_Default_Temp_mean","RH_Limbic_OFC_mean","RH_Cont_PFCl_mean",
+  "LH_Default_PFC_mean","RH_Default_PFCdPFCm_mean","LH_Cont_pCun_mean",
+  "LH_SalVentAttn_Med_mean","RH_Cont_Par_mean","RH_Cont_PFCmp_mean",
+  "LH_Cont_PFCl_mean","RH_Cont_pCun_mean","LH_Cont_Temp","LH_Cont_PFCmp",
+  "LH_SalVentAttn_PFCl","RH_SalVentAttn_PFCl","LH_Cont_OFC")
+
+task_cols <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
+               "winsorized_iVTT","winsorized_RMT")
+
+cov_cols <- c("Age","Volume")   # drop Sex here (since you split by it)
+
+# --- Split dataframes ---
+df_all_f   <- df_all[df_cov$Sex == 0, ]
+df_tasks_f <- df_tasks[df_cov$Sex == 0, ]
+df_cov_f   <- df_cov[df_cov$Sex == 0, ]
+
+# Example for females:
+mask_f <- complete.cases(df_all_f[,region_cols], df_tasks_f[,task_cols], df_cov_f[,cov_cols])
+df_all_f   <- df_all_f[mask_f, ]
+df_tasks_f <- df_tasks_f[mask_f, ]
+df_cov_f   <- df_cov_f[mask_f, ]
+N_global_f <- nrow(df_cov_f)
+
+# (… run loops again …)
+# Save to "ROI_BH_results_Male.csv"
+# --- Containers for results ---
+labs <- c(); pvec <- c(); rho <- c(); Ns <- c()
+
+# --- TASK–TASK (unique pairs, fixed N) ---
+for (i in 1:(length(task_cols)-1)) {
+  for (j in (i+1):length(task_cols)) {
+    x <- df_tasks_f[[task_cols[i]]]
+    y <- df_tasks_f[[task_cols[j]]]
+    Z <- df_cov_f[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_f)
+  }
+}
+
+# --- TASK–REGION (all pairs, fixed N) ---
+for (t in task_cols) {
+  for (r in region_cols) {
+    x <- df_tasks_f[[t]]
+    y <- df_all_f[[r]]
+    Z <- df_cov_f[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(t, " vs ", r))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_f)
+  }
+}
+
+# --- Multiple-comparisons correction (one family across all tests) ---
+fdr_p <- p.adjust(pvec, method = "BH")
+
+results <- data.frame(
+  Comparison = labs,
+  Rho        = rho,
+  N          = Ns,
+  Raw_p      = pvec,
+  FDR_p      = fdr_p,
+  stringsAsFactors = FALSE
+)
+
+write.csv(results, "E:/liz/Defense/Neuroimaging/ants/Females_BH_results.csv", row.names = FALSE)
+```
+
+
+# Freesurfer - all - Males
+```{r}
+library(ppcor)
+# --- Load data ---
+df_all   <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_all_winsorized.csv")  # regions + tasks (same subjects/order)
+df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_all_winsorized_tasks.csv")  # tasks only     (same subjects/order)
+df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_all_winsorized_cov.csv")  
+
+# --- Remove ID column if it exists ---
+df_all   <- df_all[,  !(names(df_all)   %in% "ID")]
+df_tasks <- df_tasks[,!(names(df_tasks) %in% "ID")]
+df_cov   <- df_cov[,  !(names(df_cov)   %in% "ID")]
+
+# Recode Sex
+df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
+
+# --- Define groups ---
+region_cols <- c("rh.caudalanteriorcingulate","rh.caudalmiddlefrontal","rh.cuneus",
+  "rh.entorhinal","rh.fusiform","rh.inferiorparietal","rh.inferiortemporal",
+  "rh.isthmuscingulate","rh.lateraloccipital","rh.lateralorbitofrontal",
+  "rh.lingual","rh.medialorbitofrontal","rh.middletemporal",
+  "rh.parahippocampal","rh.paracentral","rh.parsopercularis","rh.parsorbitalis",
+  "rh.parstriangularis","rh.pericalcarine","rh.postcentral",
+  "rh.posteriorcingulate","rh.precentral","rh.precuneus",
+  "rh.rostralanteriorcingulate","rh.rostralmiddlefrontal","rh.superiorfrontal",
+  "rh.superiorparietal","rh.superiortemporal","rh.supramarginal",
+  "rh.frontalpole","rh.temporalpole","rh.transversetemporal","rh.insula",
+  "lh.caudalanteriorcingulate","lh.caudalmiddlefrontal","lh.cuneus",
+  "lh.entorhinal","lh.fusiform","lh.inferiorparietal","lh.inferiortemporal",
+  "lh.isthmuscingulate","lh.lateraloccipital","lh.lateralorbitofrontal",
+  "lh.lingual","lh.medialorbitofrontal","lh.middletemporal",
+  "lh.parahippocampal","lh.paracentral","lh.parsopercularis","lh.parsorbitalis",
+  "lh.parstriangularis","lh.pericalcarine","lh.postcentral",
+  "lh.posteriorcingulate","lh.precentral","lh.precuneus",
+  "lh.rostralanteriorcingulate","lh.rostralmiddlefrontal","lh.superiorfrontal",
+  "lh.superiorparietal","lh.superiortemporal","lh.supramarginal",
+  "lh.frontalpole","lh.temporalpole","lh.transversetemporal","lh.insula")
+
+task_cols <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
+               "winsorized_iVTT","winsorized_RMT")
+
+cov_cols <- c("Age","Volume")   # drop Sex here (since you split by it)
+
+# --- Split dataframes ---
+df_all_m   <- df_all[df_cov$Sex == 1, ]
+df_tasks_m <- df_tasks[df_cov$Sex == 1, ]
+df_cov_m   <- df_cov[df_cov$Sex == 1, ]
+
+mask_m <- complete.cases(df_all_m[,region_cols], df_tasks_m[,task_cols], df_cov_m[,cov_cols])
+df_all_m   <- df_all_m[mask_m, ]
+df_tasks_m <- df_tasks_m[mask_m, ]
+df_cov_m   <- df_cov_m[mask_m, ]
+N_global_m <- nrow(df_cov_m)
+
+# --- Containers for results ---
+labs <- c(); pvec <- c(); rho <- c(); Ns <- c()
+
+# --- TASK–TASK (unique pairs, fixed N) ---
+for (i in 1:(length(task_cols)-1)) {
+  for (j in (i+1):length(task_cols)) {
+    x <- df_tasks_m[[task_cols[i]]]
+    y <- df_tasks_m[[task_cols[j]]]
+    Z <- df_cov_m[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_m)
+  }
+}
+
+# --- TASK–REGION (all pairs, fixed N) ---
+for (t in task_cols) {
+  for (r in region_cols) {
+    x <- df_tasks_m[[t]]
+    y <- df_all_m[[r]]
+    Z <- df_cov_m[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(t, " vs ", r))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_m)
+  }
+}
+
+# --- Multiple-comparisons correction (one family across all tests) ---
+fdr_p <- p.adjust(pvec, method = "BH")
+
+results <- data.frame(
+  Comparison = labs,
+  Rho        = rho,
+  N          = Ns,
+  Raw_p      = pvec,
+  FDR_p      = fdr_p,
+  stringsAsFactors = FALSE
+)
+
+write.csv(results, "E:/liz/Defense/Neuroimaging/freesurfer/Males_BH_results.csv", row.names = FALSE)
+
+
+```
+
+
+# Freesurfer - all - Females
+```{r}
+library(ppcor)
+# --- Load data ---
+df_all   <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_all_winsorized.csv")  # regions + tasks (same subjects/order)
+df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_all_winsorized_tasks.csv")  # tasks only     (same subjects/order)
+df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_all_winsorized_cov.csv")  
+
+# --- Remove ID column if it exists ---
+df_all   <- df_all[,  !(names(df_all)   %in% "ID")]
+df_tasks <- df_tasks[,!(names(df_tasks) %in% "ID")]
+df_cov   <- df_cov[,  !(names(df_cov)   %in% "ID")]
+
+# Recode Sex
+df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
+
+# --- Define groups ---
+region_cols <- c("rh.caudalanteriorcingulate","rh.caudalmiddlefrontal","rh.cuneus",
+  "rh.entorhinal","rh.fusiform","rh.inferiorparietal","rh.inferiortemporal",
+  "rh.isthmuscingulate","rh.lateraloccipital","rh.lateralorbitofrontal",
+  "rh.lingual","rh.medialorbitofrontal","rh.middletemporal",
+  "rh.parahippocampal","rh.paracentral","rh.parsopercularis","rh.parsorbitalis",
+  "rh.parstriangularis","rh.pericalcarine","rh.postcentral",
+  "rh.posteriorcingulate","rh.precentral","rh.precuneus",
+  "rh.rostralanteriorcingulate","rh.rostralmiddlefrontal","rh.superiorfrontal",
+  "rh.superiorparietal","rh.superiortemporal","rh.supramarginal",
+  "rh.frontalpole","rh.temporalpole","rh.transversetemporal","rh.insula",
+  "lh.caudalanteriorcingulate","lh.caudalmiddlefrontal","lh.cuneus",
+  "lh.entorhinal","lh.fusiform","lh.inferiorparietal","lh.inferiortemporal",
+  "lh.isthmuscingulate","lh.lateraloccipital","lh.lateralorbitofrontal",
+  "lh.lingual","lh.medialorbitofrontal","lh.middletemporal",
+  "lh.parahippocampal","lh.paracentral","lh.parsopercularis","lh.parsorbitalis",
+  "lh.parstriangularis","lh.pericalcarine","lh.postcentral",
+  "lh.posteriorcingulate","lh.precentral","lh.precuneus",
+  "lh.rostralanteriorcingulate","lh.rostralmiddlefrontal","lh.superiorfrontal",
+  "lh.superiorparietal","lh.superiortemporal","lh.supramarginal",
+  "lh.frontalpole","lh.temporalpole","lh.transversetemporal","lh.insula")
+
+task_cols <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
+               "winsorized_iVTT","winsorized_RMT")
+
+cov_cols <- c("Age","Volume")   # drop Sex here (since you split by it)
+
+# --- Split dataframes ---
+df_all_f   <- df_all[df_cov$Sex == 0, ]
+df_tasks_f <- df_tasks[df_cov$Sex == 0, ]
+df_cov_f   <- df_cov[df_cov$Sex == 0, ]
+
+mask_f <- complete.cases(df_all_f[,region_cols], df_tasks_f[,task_cols], df_cov_f[,cov_cols])
+df_all_f   <- df_all_f[mask_f, ]
+df_tasks_f <- df_tasks_f[mask_f, ]
+df_cov_f   <- df_cov_f[mask_f, ]
+N_global_f <- nrow(df_cov_f)
+
+# --- Containers for results ---
+labs <- c(); pvec <- c(); rho <- c(); Ns <- c()
+
+# --- TASK–TASK (unique pairs, fixed N) ---
+for (i in 1:(length(task_cols)-1)) {
+  for (j in (i+1):length(task_cols)) {
+    x <- df_tasks_f[[task_cols[i]]]
+    y <- df_tasks_f[[task_cols[j]]]
+    Z <- df_cov_f[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_f)
+  }
+}
+
+# --- TASK–REGION (all pairs, fixed N) ---
+for (t in task_cols) {
+  for (r in region_cols) {
+    x <- df_tasks_f[[t]]
+    y <- df_all_f[[r]]
+    Z <- df_cov_f[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(t, " vs ", r))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_f)
+  }
+}
+
+# --- Multiple-comparisons correction (one family across all tests) ---
+fdr_p <- p.adjust(pvec, method = "BH")
+
+results <- data.frame(
+  Comparison = labs,
+  Rho        = rho,
+  N          = Ns,
+  Raw_p      = pvec,
+  FDR_p      = fdr_p,
+  stringsAsFactors = FALSE
+)
+
+write.csv(results, "E:/liz/Defense/Neuroimaging/freesurfer/Females_BH_results.csv", row.names = FALSE)
+
+```
+
+
+# Freesurfer - ROI - Males
+```{r}
+# --- Load data ---
+df_all   <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized.csv")  # regions + tasks (same subjects/order)
+df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized_tasks.csv")  # tasks only     (same subjects/order)
+df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized_cov.csv")  # Age, Sex, Volume (ICV)
+# --- Remove ID column if it exists ---
+df_all   <- df_all[,  !(names(df_all)   %in% "ID")]
+df_tasks <- df_tasks[,!(names(df_tasks) %in% "ID")]
+df_cov   <- df_cov[,  !(names(df_cov)   %in% "ID")]
+
+# Recode Sex
+df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
+
+# --- Define groups ---
+region_cols <- c("rh.supramarginal","rh.precuneus","rh.precentral","rh.nferiorparietal",
+  "rh.isthmuscingulate","rh.superiorparietal","rh.superiortemporal",
+  "rh.posteriorcingulate","lh.supramarginal","lh.precuneus","lh.precentral",
+  "lh.nferiorparietal","lh.isthmuscingulate","lh.superiorparietal",
+  "lh.superiortemporal","lh.posteriorcingulate")
+
+task_cols <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
+               "winsorized_iVTT","winsorized_RMT")
+
+cov_cols <- c("Age","Volume")   # drop Sex here (since you split by it)
+
+# --- Split dataframes ---
+df_all_m   <- df_all[df_cov$Sex == 1, ]
+df_tasks_m <- df_tasks[df_cov$Sex == 1, ]
+df_cov_m   <- df_cov[df_cov$Sex == 1, ]
+
+mask_m <- complete.cases(df_all_m[,region_cols], df_tasks_m[,task_cols], df_cov_m[,cov_cols])
+df_all_m   <- df_all_m[mask_m, ]
+df_tasks_m <- df_tasks_m[mask_m, ]
+df_cov_m   <- df_cov_m[mask_m, ]
+N_global_m <- nrow(df_cov_m)
+
+# --- Containers for results ---
+labs <- c(); pvec <- c(); rho <- c(); Ns <- c()
+
+# --- TASK–TASK (unique pairs, fixed N) ---
+for (i in 1:(length(task_cols)-1)) {
+  for (j in (i+1):length(task_cols)) {
+    x <- df_tasks_m[[task_cols[i]]]
+    y <- df_tasks_m[[task_cols[j]]]
+    Z <- df_cov_m[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_m)
+  }
+}
+
+# --- TASK–REGION (all pairs, fixed N) ---
+for (t in task_cols) {
+  for (r in region_cols) {
+    x <- df_tasks_m[[t]]
+    y <- df_all_m[[r]]
+    Z <- df_cov_m[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(t, " vs ", r))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_m)
+  }
+}
+
+# --- Multiple-comparisons correction (one family across all tests) ---
+fdr_p <- p.adjust(pvec, method = "BH")
+
+results <- data.frame(
+  Comparison = labs,
+  Rho        = rho,
+  N          = Ns,
+  Raw_p      = pvec,
+  FDR_p      = fdr_p,
+  stringsAsFactors = FALSE
+)
+
+write.csv(results, "E:/liz/Defense/Neuroimaging/freesurfer/ROI_Males_BH_results.csv", row.names = FALSE)
+
+```
+
+
+# Freesurfer - ROI - Females
+```{r}
+library(ppcor)
+# --- Load data ---
+df_all   <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized.csv")  # regions + tasks (same subjects/order)
+df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized_tasks.csv")  # tasks only     (same subjects/order)
+df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized_cov.csv")  # Age, Sex, Volume (ICV) 
+
+# --- Remove ID column if it exists ---
+df_all   <- df_all[,  !(names(df_all)   %in% "ID")]
+df_tasks <- df_tasks[,!(names(df_tasks) %in% "ID")]
+df_cov   <- df_cov[,  !(names(df_cov)   %in% "ID")]
+
+# Recode Sex
+df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
+
+# --- Define groups ---
+region_cols <- c("rh.supramarginal","rh.precuneus","rh.precentral","rh.nferiorparietal",
+  "rh.isthmuscingulate","rh.superiorparietal","rh.superiortemporal",
+  "rh.posteriorcingulate","lh.supramarginal","lh.precuneus","lh.precentral",
+  "lh.nferiorparietal","lh.isthmuscingulate","lh.superiorparietal",
+  "lh.superiortemporal","lh.posteriorcingulate")
+
+task_cols <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
+               "winsorized_iVTT","winsorized_RMT")
+
+cov_cols <- c("Age","Volume")   # drop Sex here (since you split by it)
+
+# --- Split dataframes ---
+df_all_f   <- df_all[df_cov$Sex == 0, ]
+df_tasks_f <- df_tasks[df_cov$Sex == 0, ]
+df_cov_f   <- df_cov[df_cov$Sex == 0, ]
+
+mask_f <- complete.cases(df_all_f[,region_cols], df_tasks_f[,task_cols], df_cov_f[,cov_cols])
+df_all_f   <- df_all_f[mask_f, ]
+df_tasks_f <- df_tasks_f[mask_f, ]
+df_cov_f   <- df_cov_f[mask_f, ]
+N_global_f <- nrow(df_cov_f)
+
+# --- Containers for results ---
+labs <- c(); pvec <- c(); rho <- c(); Ns <- c()
+
+# --- TASK–TASK (unique pairs, fixed N) ---
+for (i in 1:(length(task_cols)-1)) {
+  for (j in (i+1):length(task_cols)) {
+    x <- df_tasks_f[[task_cols[i]]]
+    y <- df_tasks_f[[task_cols[j]]]
+    Z <- df_cov_f[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_f)
+  }
+}
+
+# --- TASK–REGION (all pairs, fixed N) ---
+for (t in task_cols) {
+  for (r in region_cols) {
+    x <- df_tasks_f[[t]]
+    y <- df_all_f[[r]]
+    Z <- df_cov_f[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(t, " vs ", r))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_f)
+  }
+}
+
+# --- Multiple-comparisons correction (one family across all tests) ---
+fdr_p <- p.adjust(pvec, method = "BH")
+
+results <- data.frame(
+  Comparison = labs,
+  Rho        = rho,
+  N          = Ns,
+  Raw_p      = pvec,
+  FDR_p      = fdr_p,
+  stringsAsFactors = FALSE
+)
+
+write.csv(results, "E:/liz/Defense/Neuroimaging/freesurfer/ROI_Females_BH_results.csv", row.names = FALSE)
+
+```
+
+
+# GMV - all - Males
+```{r}
+# --- Load data ---
+df_all   <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields.csv")  # regions + tasks (same subjects/order)
+df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_tasks.csv")  # tasks only     (same subjects/order)
+df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_cov.csv")  # Age, Sex, Volume (ICV)
+
+# --- Remove ID column if it exists ---
+df_all   <- df_all[,  !(names(df_all)   %in% "ID")]
+df_tasks <- df_tasks[,!(names(df_tasks) %in% "ID")]
+df_cov   <- df_cov[,  !(names(df_cov)   %in% "ID")]
+
+# Recode Sex
+df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
+
+# --- Define groups ---
+region_cols <- c("LHC","LCA1","LCA2.3","LDG","LSUB", "LERC","LPRC", "LPHC",
+                 "RHC", "RCA1", "RCA2.3", "RDG", "RSUB", "RERC", 
+                 "RPRC", "RPHC", "TotHC") 
+
+task_cols <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
+               "winsorized_iVTT","winsorized_RMT")
+
+cov_cols <- c("Age","Volume")   
+
+# --- Split dataframes ---
+df_all_m   <- df_all[df_cov$Sex == 1, ]
+df_tasks_m <- df_tasks[df_cov$Sex == 1, ]
+df_cov_m   <- df_cov[df_cov$Sex == 1, ]
+
+mask_m <- complete.cases(df_all_m[,region_cols], df_tasks_m[,task_cols], df_cov_m[,cov_cols])
+df_all_m   <- df_all_m[mask_m, ]
+df_tasks_m <- df_tasks_m[mask_m, ]
+df_cov_m   <- df_cov_m[mask_m, ]
+N_global_m <- nrow(df_cov_m)
+
+# --- Containers for results ---
+labs <- c(); pvec <- c(); rho <- c(); Ns <- c()
+
+# --- TASK–TASK (unique pairs, fixed N) ---
+for (i in 1:(length(task_cols)-1)) {
+  for (j in (i+1):length(task_cols)) {
+    x <- df_tasks_m[[task_cols[i]]]
+    y <- df_tasks_m[[task_cols[j]]]
+    Z <- df_cov_m[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_m)
+  }
+}
+
+# --- TASK–REGION (all pairs, fixed N) ---
+for (t in task_cols) {
+  for (r in region_cols) {
+    x <- df_tasks_m[[t]]
+    y <- df_all_m[[r]]
+    Z <- df_cov_m[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(t, " vs ", r))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_m)
+  }
+}
+
+# --- Multiple-comparisons correction (one family across all tests) ---
+fdr_p <- p.adjust(pvec, method = "BH")
+
+results <- data.frame(
+  Comparison = labs,
+  Rho        = rho,
+  N          = Ns,
+  Raw_p      = pvec,
+  FDR_p      = fdr_p,
+  stringsAsFactors = FALSE
+)
+
+write.csv(results, "E:/liz/Defense/Neuroimaging/GMV/Males_BH_results.csv", row.names = FALSE)
+
+```
+
+# GMV - all - Females
+```{r}
+library(ppcor)
+# --- Load data ---
+df_all   <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields.csv")  # regions + tasks (same subjects/order)
+df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_tasks.csv")  # tasks only     (same subjects/order)
+df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_cov.csv")  # Age, Sex, Volume (ICV)
+ 
+
+# --- Remove ID column if it exists ---
+df_all   <- df_all[,  !(names(df_all)   %in% "ID")]
+df_tasks <- df_tasks[,!(names(df_tasks) %in% "ID")]
+df_cov   <- df_cov[,  !(names(df_cov)   %in% "ID")]
+
+# Recode Sex
+df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
+
+# --- Define groups ---
+region_cols <- c("LHC","LCA1","LCA2.3","LDG","LSUB", "LERC","LPRC", "LPHC",
+                 "RHC", "RCA1", "RCA2.3", "RDG", "RSUB", "RERC", 
+                 "RPRC", "RPHC", "TotHC") 
+
+task_cols <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
+               "winsorized_iVTT","winsorized_RMT")
+
+cov_cols <- c("Age","Volume")   # drop Sex here (since you split by it)
+
+# --- Split dataframes ---
+df_all_f   <- df_all[df_cov$Sex == 0, ]
+df_tasks_f <- df_tasks[df_cov$Sex == 0, ]
+df_cov_f   <- df_cov[df_cov$Sex == 0, ]
+
+mask_f <- complete.cases(df_all_f[,region_cols], df_tasks_f[,task_cols], df_cov_f[,cov_cols])
+df_all_f   <- df_all_f[mask_f, ]
+df_tasks_f <- df_tasks_f[mask_f, ]
+df_cov_f   <- df_cov_f[mask_f, ]
+N_global_f <- nrow(df_cov_f)
+
+# --- Containers for results ---
+labs <- c(); pvec <- c(); rho <- c(); Ns <- c()
+
+# --- TASK–TASK (unique pairs, fixed N) ---
+for (i in 1:(length(task_cols)-1)) {
+  for (j in (i+1):length(task_cols)) {
+    x <- df_tasks_f[[task_cols[i]]]
+    y <- df_tasks_f[[task_cols[j]]]
+    Z <- df_cov_f[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_f)
+  }
+}
+
+# --- TASK–REGION (all pairs, fixed N) ---
+for (t in task_cols) {
+  for (r in region_cols) {
+    x <- df_tasks_f[[t]]
+    y <- df_all_f[[r]]
+    Z <- df_cov_f[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(t, " vs ", r))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_f)
+  }
+}
+
+# --- Multiple-comparisons correction (one family across all tests) ---
+fdr_p <- p.adjust(pvec, method = "BH")
+
+results <- data.frame(
+  Comparison = labs,
+  Rho        = rho,
+  N          = Ns,
+  Raw_p      = pvec,
+  FDR_p      = fdr_p,
+  stringsAsFactors = FALSE
+)
+
+write.csv(results, "E:/liz/Defense/Neuroimaging/GMV/ROI_Females_BH_results.csv", row.names = FALSE)
+
+```
+
+
+# GMV - ROI - Males
+```{r}
+# --- Load data ---
+df_all   <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_roi.csv")  # regions + tasks (same subjects/order)
+df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_roi_tasks.csv")  # tasks only     (same subjects/order)
+df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_roi_cov.csv")  # Age, Sex, Volume (ICV)
+
+# --- Remove ID column if it exists ---
+df_all   <- df_all[,  !(names(df_all)   %in% "ID")]
+df_tasks <- df_tasks[,!(names(df_tasks) %in% "ID")]
+df_cov   <- df_cov[,  !(names(df_cov)   %in% "ID")]
+
+# Recode Sex
+df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
+
+# --- Define groups ---
+region_cols <- c("LCA2.3","LDG","RCA2.3","RDG")   
+
+task_cols <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
+               "winsorized_iVTT","winsorized_RMT")
+
+cov_cols <- c("Age","Volume")   
+
+# --- Split dataframes ---
+df_all_m   <- df_all[df_cov$Sex == 1, ]
+df_tasks_m <- df_tasks[df_cov$Sex == 1, ]
+df_cov_m   <- df_cov[df_cov$Sex == 1, ]
+
+mask_m <- complete.cases(df_all_m[,region_cols], df_tasks_m[,task_cols], df_cov_m[,cov_cols])
+df_all_m   <- df_all_m[mask_m, ]
+df_tasks_m <- df_tasks_m[mask_m, ]
+df_cov_m   <- df_cov_m[mask_m, ]
+N_global_m <- nrow(df_cov_m)
+
+# --- Containers for results ---
+labs <- c(); pvec <- c(); rho <- c(); Ns <- c()
+
+# --- TASK–TASK (unique pairs, fixed N) ---
+for (i in 1:(length(task_cols)-1)) {
+  for (j in (i+1):length(task_cols)) {
+    x <- df_tasks_m[[task_cols[i]]]
+    y <- df_tasks_m[[task_cols[j]]]
+    Z <- df_cov_m[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_m)
+  }
+}
+
+# --- TASK–REGION (all pairs, fixed N) ---
+for (t in task_cols) {
+  for (r in region_cols) {
+    x <- df_tasks_m[[t]]
+    y <- df_all_m[[r]]
+    Z <- df_cov_m[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(t, " vs ", r))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_m)
+  }
+}
+
+# --- Multiple-comparisons correction (one family across all tests) ---
+fdr_p <- p.adjust(pvec, method = "BH")
+
+results <- data.frame(
+  Comparison = labs,
+  Rho        = rho,
+  N          = Ns,
+  Raw_p      = pvec,
+  FDR_p      = fdr_p,
+  stringsAsFactors = FALSE
+)
+
+write.csv(results, "E:/liz/Defense/Neuroimaging/GMV/Males_BH_results.csv", row.names = FALSE)
+```
+
+
+# GMV - ROI - Females
+```{r}
+library(ppcor)
+# --- Load data ---
+df_all   <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_roi.csv")  # regions + tasks (same subjects/order)
+df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_roi_tasks.csv")  # tasks only     (same subjects/order)
+df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_roi_cov.csv")  # Age, Sex, Volume (ICV)
+
+
+# --- Remove ID column if it exists ---
+df_all   <- df_all[,  !(names(df_all)   %in% "ID")]
+df_tasks <- df_tasks[,!(names(df_tasks) %in% "ID")]
+df_cov   <- df_cov[,  !(names(df_cov)   %in% "ID")]
+
+# Recode Sex
+df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
+
+# --- Define groups ---
+region_cols <- c("LCA2.3","LDG","RCA2.3","RDG") 
+
+task_cols <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
+               "winsorized_iVTT","winsorized_RMT")
+
+cov_cols <- c("Age","Volume")   # drop Sex here (since you split by it)
+
+# --- Split dataframes ---
+df_all_f   <- df_all[df_cov$Sex == 0, ]
+df_tasks_f <- df_tasks[df_cov$Sex == 0, ]
+df_cov_f   <- df_cov[df_cov$Sex == 0, ]
+
+mask_f <- complete.cases(df_all_f[,region_cols], df_tasks_f[,task_cols], df_cov_f[,cov_cols])
+df_all_f   <- df_all_f[mask_f, ]
+df_tasks_f <- df_tasks_f[mask_f, ]
+df_cov_f   <- df_cov_f[mask_f, ]
+N_global_f <- nrow(df_cov_f)
+
+# --- Containers for results ---
+labs <- c(); pvec <- c(); rho <- c(); Ns <- c()
+
+# --- TASK–TASK (unique pairs, fixed N) ---
+for (i in 1:(length(task_cols)-1)) {
+  for (j in (i+1):length(task_cols)) {
+    x <- df_tasks_f[[task_cols[i]]]
+    y <- df_tasks_f[[task_cols[j]]]
+    Z <- df_cov_f[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_f)
+  }
+}
+
+# --- TASK–REGION (all pairs, fixed N) ---
+for (t in task_cols) {
+  for (r in region_cols) {
+    x <- df_tasks_f[[t]]
+    y <- df_all_f[[r]]
+    Z <- df_cov_f[, cov_cols, drop = FALSE]
+
+    res <- pcor.test(x, y, Z, method = "spearman")
+    labs <- c(labs, paste0(t, " vs ", r))
+    pvec <- c(pvec, res$p.value)
+    rho  <- c(rho,  res$estimate)
+    Ns   <- c(Ns,   N_global_f)
+  }
+}
+
+# --- Multiple-comparisons correction (one family across all tests) ---
+fdr_p <- p.adjust(pvec, method = "BH")
+
+results <- data.frame(
+  Comparison = labs,
+  Rho        = rho,
+  N          = Ns,
+  Raw_p      = pvec,
+  FDR_p      = fdr_p,
+  stringsAsFactors = FALSE
+)
+
+write.csv(results, "E:/liz/Defense/Neuroimaging/GMV/ROI_Females_BH_results.csv", row.names = FALSE)
+
 ```
 
