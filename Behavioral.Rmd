@@ -30,8 +30,6 @@ pairs.panels(
   col = "darkred",
   cex.labels = 1.2
 )
-
-
 ```
 
 # Test for Normality (Shapiro–Wilk test)
@@ -50,7 +48,6 @@ sw <- t(sapply(vars, function(v){
 # Convert results into a nice data frame
 sw <- as.data.frame(sw)
 sw
-
 ```
 
 # Q-Q plot - test for normality
@@ -69,7 +66,6 @@ for (v in vars) {
   qqnorm(df[[v]], main=paste("Q-Q Plot of", v))
   qqline(df[[v]], col="red")
 }
-
 ```
 
 
@@ -97,7 +93,6 @@ summary_table <- t(summary_table)
 summary_table <- as.data.frame(summary_table)
 
 summary_table
-
 ```
 
 # skew and kurtosis
@@ -136,14 +131,11 @@ fit1 <- cfa(m1, data = df, estimator = "MLR", missing = "fiml", std.lv = TRUE)
 fit2 <- cfa(m2, data = df, estimator = "MLR", missing = "fiml", std.lv = TRUE)
 
 summary(fit2, fit.measures = TRUE, standardized = TRUE)
-
-
 ```
 
 # for one factor
 ```{r}
 summary(fit1, fit.measures = TRUE, standardized = TRUE)
-
 ```
 
 # visualization for two factor model
@@ -184,9 +176,6 @@ g <- lavaanExtra::nice_lavaanPlot(
   graph_options = c(rankdir = "LR")
 )
 g            # or: print(g)
-
-
-
 ```
 
 
@@ -226,9 +215,7 @@ g <- lavaanExtra::nice_lavaanPlot(
   graph_options = c(rankdir = "LR")
 )
 g            # or: print(g)
-
 ```
-
 
 # check if the two latent variables are distinguishable
 ```{r}
@@ -246,9 +233,7 @@ fit2_corr1 <- cfa(m2_corr1, data = df, estimator = "MLR", missing = "fiml", std.
 # Robust Satorra–Bentler χ² difference test (nested)
 lavTestLRT(fit2_corr1, fit2, method = "satorra.bentler.2001")
 # or: anova(fit2_corr1, fit2)
-
 ```
-
 
 # winsorize data, get log transform for SOT and iVTT, and redo CFA
 # winsorize data
@@ -319,9 +304,7 @@ sw <- t(sapply(vars, function(v){
 # Convert results into a nice data frame
 sw <- as.data.frame(sw)
 sw
-
 ```
-
 
 # redo corr plot
 ```{r}
@@ -399,8 +382,6 @@ lavTestLRT(fit2_corr1, fit2_log, method = "satorra.bentler.2001")
 
 ```
 
-
-
 # redo CFA with winsorized data
 ```{r}
 # --- Build transformed variables ---
@@ -425,13 +406,11 @@ fit2 <- cfa(m2, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
 
 # Compare to your original fits
 summary(fit2 , fit.measures = TRUE, standardized = TRUE)
-
 ```
 
 # For one factor
 ```{r}
 summary(fit1 , fit.measures = TRUE, standardized = TRUE)
-
 ```
 
 # check if the two factors are distingushable
@@ -480,9 +459,7 @@ result <- ggbetweenstats(
 
 print(result)
 sum(!is.na(df$sinsorized_MRT))
-
 ```
-
 
 # sex differences
 # iVTT
@@ -558,8 +535,6 @@ result <- ggbetweenstats(
 )
 
 print(result)
-
-
 ```
 
 # Sex difference
@@ -613,7 +588,4 @@ result <- ggbetweenstats(
 )
 
 print(result)
-
 ```
-
-
