@@ -254,7 +254,6 @@ for (i in 1:(length(task_cols)-1)) {
     x <- df_tasks_m[[task_cols[i]]]
     y <- df_tasks_m[[task_cols[j]]]
     Z <- df_cov_m[, cov_cols, drop = FALSE]
-
     res <- pcor.test(x, y, Z, method = "spearman")
     labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
     pvec <- c(pvec, res$p.value)
@@ -441,6 +440,7 @@ combo <- (p1 | p2 | p3) + plot_layout(nrow = 1, widths = c(1, 1, 1))
 
 print(combo)
 ggsave("hippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg = "white")
+
 
 
 
