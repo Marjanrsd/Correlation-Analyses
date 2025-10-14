@@ -324,9 +324,6 @@ write.csv(results, "E:/liz/Defense/Neuroimaging/ants/BH_results.csv", row.names 
 
 # ANTS ROI Males
 ```{r}
-library(ppcor)
-
-# --- Load data ---
 df_all   <- read.csv("E:/liz/Defense/Neuroimaging/ants_roi.csv")          # regions + tasks (same subjects/order)
 df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_tasks.csv")     # tasks only     (same subjects/order)
 df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_cov.csv")       # Age, Sex, Volume (ICV)
