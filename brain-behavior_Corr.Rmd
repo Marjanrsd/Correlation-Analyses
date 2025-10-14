@@ -1,4 +1,3 @@
-
 library(ggplot2)
 library(plyr)
 library(dplyr)
@@ -442,6 +441,7 @@ combo <- (p1 | p2 | p3) + plot_layout(nrow = 1, widths = c(1, 1, 1))
 
 print(combo)
 ggsave("hippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg = "white")
+
 
 
 
