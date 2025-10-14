@@ -1,6 +1,4 @@
 ---
-title: "Defense"
-output: html_document
 date: "2025-08-19"
 ---
 
@@ -617,4 +615,5 @@ result <- ggbetweenstats(
 print(result)
 
 ```
+
 
