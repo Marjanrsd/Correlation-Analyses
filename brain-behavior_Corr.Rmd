@@ -104,7 +104,8 @@ print(p)
 ggsave("E:/liz/Defense/Neuroimaging/ct_mrt_by_sex_square.png",
        plot = p, width = 6, height = 6, dpi = 300, bg = "white")
 
-
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
                   # ANTs output - All Regions (do partial correlations between CT and behavior and correct for multiple comparisons)
                    
@@ -446,6 +447,7 @@ combo <- (p1 | p2 | p3) + plot_layout(nrow = 1, widths = c(1, 1, 1))
 
 print(combo)
 ggsave("hippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg = "white")
+
 
 
 
