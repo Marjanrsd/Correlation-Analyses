@@ -418,7 +418,7 @@ results <- data.frame(
 write.csv(results, "E:/liz/Defense/Neuroimaging/ants/ROI_Females_BH_results.csv", row.names = FALSE)
 ```
 
-# Plot hippocampal subfields (do partial corr with GMV and behavior and correct for multiple comparisons)
+# Plot hippocampal subfields (only for visualization)
 # triple plot
 ```{r}
 library(ggplot2)
@@ -475,9 +475,4 @@ combo <- (p1 | p2 | p3) + plot_layout(nrow = 1, widths = c(1, 1, 1))
 
 print(combo)
 ggsave("hippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg = "white")
-
 ```
-
-
-
-
