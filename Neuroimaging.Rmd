@@ -133,10 +133,6 @@ ggsave("E:/liz/Defense/Neuroimaging/ct_mrt_by_sex_square.png",
 # Scatter w/ per-sex + pooled fits
 # Spearman ρ / p / n (Overall, F, M) labeled
 # ============================
-
-library(ggplot2)
-library(dplyr)
-
 # ---- INPUTS ----
 file_path <- "E:/liz/Defense/Neuroimaging/fs_CT_All_winsorized_plot.csv"
 df <- read.csv(file_path) |> na.omit()
@@ -4469,5 +4465,6 @@ results <- data.frame(
 
 write.csv(results, "E:/liz/Defense/Neuroimaging/composite/freesurfer/ROI_Males_BH_results.csv", row.names = FALSE)
 ```
+
 
 
