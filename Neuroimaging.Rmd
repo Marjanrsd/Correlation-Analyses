@@ -1,230 +1,14 @@
----
-title: "Neuroimaging"
-output: html_document
-date: "2025-08-22"
----
-
-
 ```{r, warning=FALSE}
-
 library(ggplot2)
 library(plyr)
 library(dplyr)
 library(tidyr)
 library(psych)
 library(ggstats)
-```
-
-
-```{r}
-file_path <- "E:/liz/Defense/Neuroimaging/hippo_subfields.csv"
-df <- read.csv(file_path) |> na.omit()
-df$Sex <- ifelse(df$Sex == "M", "Males", "Females")
-
-df %>%
-  ggplot(aes(x = LH_DorsAttn_PrCv_mean, y = winsorized_MRT, colour = factor(Sex))) +
-  geom_point() +
-  geom_smooth(method = "lm", colour = "black") +
-  facet_wrap(~ Sex) +
-  labs(colour = "Sex") +
-  stat_cor(
-    method = "spearman",
-    label.stat = c("rho", "p"),  # show rho and p
-    colour = "black",
-    parse = FALSE,
-    label.x.npc = "left",        # relative position: "left", "center", "right"
-    label.y.npc = "top",         # relative position: "bottom", "center", "top"
-    size = 2                     # make text larger
-  ) +
-  theme_classic(base_size = 14) +
-  theme(strip.background = element_rect(fill = "white"))
-table(df$Sex)
-
-```
-
-
-
-```{r}
 library(ggstatsplot)
-file_path<-"E:/liz/Defense/Neuroimaging/GMV_hippo.csv"
-df<-read.csv(file_path)
-df<-na.omit(df)
-# limbic and control
-cor.test(df$Left.Hippocampus, df$winsorized_SOT, method = "spearman")
-ggscatterstats(
-  data = df, 
-  x = "Left.Hippocampus", 
-  y = "winsorized_SOT", 
-  type = "nonparametric",
-  marginal.type = "none",
-  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
-)
-```
-
-```{r}
-library(ggstatsplot)
-file_path<-"E:/liz/Defense/Neuroimaging/GMV_hippo.csv"
-df<-read.csv(file_path)
-df<-na.omit(df)
-# limbic and control
-cor.test(df$Right.Hippocampus, df$winsorized_SOT, method = "spearman")
-ggscatterstats(
-  data = df, 
-  x = "Right.Hippocampus", 
-  y = "winsorized_SOT", 
-  type = "nonparametric",
-  marginal.type = "none",
-  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
-)
-```
-
-
-```{r}
-library(ggstatsplot)
-file_path<-"E:/liz/Defense/Neuroimaging/Total_hipp.csv"
-df<-read.csv(file_path)
-df<-na.omit(df)
-# limbic and control
-cor.test(df$RHC, df$winsorized_SOT, method = "spearman")
-ggscatterstats(
-  data = df, 
-  x = "RHC", 
-  y = "winsorized_SOT", 
-  type = "nonparametric",
-  marginal.type = "none",
-  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
-)
-```
-
-```{r}
-library(ggstatsplot)
-file_path<-"E:/liz/Defense/Neuroimaging/Total_hipp.csv"
-df<-read.csv(file_path)
-df<-na.omit(df)
-# limbic and control
-cor.test(df$Right.Hippocampus, df$winsorized_SOT, method = "spearman")
-ggscatterstats(
-  data = df, 
-  x = "Right.Hippocampus", 
-  y = "winsorized_SOT", 
-  type = "nonparametric",
-  marginal.type = "none",
-  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
-)
-```
-
-```{r}
-library(ggstatsplot)
-file_path<-"E:/liz/Defense/Neuroimaging/Total_hipp.csv"
-df<-read.csv(file_path)
-df<-na.omit(df)
-# limbic and control
-cor.test(df$Left.Hippocampus, df$winsorized_SOT, method = "spearman")
-ggscatterstats(
-  data = df, 
-  x = "Left.Hippocampus", 
-  y = "winsorized_SOT", 
-  type = "nonparametric",
-  marginal.type = "none",
-  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
-)
-```
-
-
-
-```{r}
-library(ggstatsplot)
-file_path<-"E:/liz/Defense/Neuroimaging/Total_hipp.csv"
-df<-read.csv(file_path)
-df<-na.omit(df)
-# limbic and control
-cor.test(df$TotHC, df$Tot, method = "spearman")
-ggscatterstats(
-  data = df, 
-  x = "TotHC", 
-  y = "Tot", 
-  type = "nonparametric",
-  marginal.type = "none",
-  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
-)
-```
-
-```{r}
-library(ggstatsplot)
-file_path<-"E:/liz/Defense/Neuroimaging/Total_hipp.csv"
-df<-read.csv(file_path)
-df<-na.omit(df)
-# limbic and control
-cor.test(df$LHC, df$Left.Hippocampus, method = "spearman")
-ggscatterstats(
-  data = df, 
-  x = "LHC", 
-  y = "Left.Hippocampus", 
-  type = "nonparametric",
-  marginal.type = "none",
-  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
-)
-
-```
-
-```{r}
-library(ggstatsplot)
-file_path<-"E:/liz/Defense/Neuroimaging/Total_hipp.csv"
-df<-read.csv(file_path)
-df<-na.omit(df)
-# limbic and control
-cor.test(df$RHC, df$Right.Hippocampus, method = "spearman")
-ggscatterstats(
-  data = df, 
-  x = "RHC", 
-  y = "Right.Hippocampus", 
-  type = "nonparametric",
-  marginal.type = "none",
-  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
-)
-
-```
-
-```{r}
-library(ggstatsplot)
-file_path<-"E:/liz/Defense/Neuroimaging/Total_hipp.csv"
-df<-read.csv(file_path)
-df<-na.omit(df)
-# limbic and control
-cor.test(df$LHC, df$winsorized_SOT, method = "spearman")
-ggscatterstats(
-  data = df, 
-  x = "LHC", 
-  y = "winsorized_SOT", 
-  type = "nonparametric",
-  marginal.type = "none",
-  ggplot.component = list(ggplot2::theme(aspect.ratio = 1))  # Makes the plot square
-)
-```
-
-```{r}
-file_path <- "E:/liz/Defense/Neuroimaging/fs_CT_All_winsorized_plot.csv"
-df <- read.csv(file_path) |> na.omit()
-df$Sex <- ifelse(df$Sex == "M", "Males", "Females")
-
-df %>%
-  ggplot(aes(x = lh.isthmuscingulate, y = winsorized_MRT, colour = factor(Sex))) +
-  geom_point() +
-  geom_smooth(method = "lm", colour = "black") +
-  facet_wrap(~ Sex) +
-  labs(colour = "Sex") +
-  stat_cor(
-    method = "spearman",
-    label.stat = c("rho", "p"),  # show rho and p
-    colour = "black",
-    parse = FALSE,
-    label.x.npc = "left",        # relative position: "left", "center", "right"
-    label.y.npc = "top",         # relative position: "bottom", "center", "top"
-    size = 2                     # make text larger
-  ) +
-  theme_classic(base_size = 14) +
-  theme(strip.background = element_rect(fill = "white"))
-table(df$Sex)
+library(patchwork)
+library(stringr)
+library(ppcor)
 ```
 
 # Freesurfer Precuneus
@@ -233,9 +17,6 @@ table(df$Sex)
 # Scatter w/ per-sex + pooled fits
 # Spearman ρ / p / n (Overall, F, M) labeled
 # ============================
-
-library(ggplot2)
-library(dplyr)
 
 # ---- INPUTS ----
 file_path <- "E:/liz/Defense/Neuroimaging/fs_CT_All_winsorized_plot.csv"
@@ -343,8 +124,6 @@ print(p)
 # ---- Save (white background avoids 'all black' look in some viewers) ----
 ggsave("E:/liz/Defense/Neuroimaging/ct_mrt_by_sex_square.png",
        plot = p, width = 6, height = 6, dpi = 300, bg = "white")
-
-
 ```
 
 
@@ -464,16 +243,11 @@ ggsave("E:/liz/Defense/Neuroimaging/isthmuscingulate_mrt_by_sex_square.png",
        plot = p, width = 6, height = 6, dpi = 300, bg = "white")
 ```
 
-
-
 ```{r}
 # ============================
 # Scatter w/ per-sex + pooled fits
 # Spearman ρ / p / n (Overall, F, M) labeled
 # ============================
-
-library(ggplot2)
-library(dplyr)
 
 # ---- INPUTS ----
 file_path <- "E:/liz/Defense/Neuroimaging/fs_CT_All_winsorized_plot.csv"
@@ -582,10 +356,6 @@ print(p)
 ggsave("E:/liz/Defense/Neuroimaging/lingual_mrt_by_sex_square.png",
        plot = p, width = 6, height = 6, dpi = 300, bg = "white")
 ```
-
-
-
-
 
 # ANTs prcv
 ```{r}
@@ -703,17 +473,12 @@ ggsave("E:/liz/Defense/Neuroimaging/prcv_mrt_by_sex_square.png",
        plot = p, width = 6, height = 6, dpi = 300, bg = "white")
 ```
 
-
-
 # ANTS VENTRAL PFC
 ```{r}
 # ============================
 # Scatter w/ per-sex + pooled fits
 # Spearman ρ / p / n (Overall, F, M) labeled
 # ============================
-
-library(ggplot2)
-library(dplyr)
 
 # ---- INPUTS ----
 file_path <- "E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_plot.csv"
@@ -828,10 +593,6 @@ ggsave("E:/liz/Defense/Neuroimaging/pfcv_mrt_by_sex_square.png",
 # Scatter w/ per-sex + pooled fits
 # Spearman ρ / p / n (Overall, F, M) labeled
 # ============================
-
-library(ggplot2)
-library(dplyr)
-
 # ---- INPUTS ----
 file_path <- "E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_plot.csv"
 df <- read.csv(file_path) |> na.omit()
@@ -938,9 +699,7 @@ ggsave("E:/liz/Defense/Neuroimaging/pcunpcc_mrt_by_sex_square.png",
        plot = p, width = 6, height = 6, dpi = 300, bg = "white")
 ```
 
-
 ```{r}
-library(ggstatsplot)
 file_path<-"E:/liz/Defense/Neuroimaging/Total_hipp.csv"
 df<-read.csv(file_path)
 df<-na.omit(df)
@@ -1075,20 +834,10 @@ combo <- (p1 | p2 | p3) + plot_layout(nrow = 1, widths = c(1, 1, 1))
 
 print(combo)
 ggsave("hippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg = "white")
-
 ```
 
-
 ```{r}
-library(ggplot2)
-library(dplyr)
 # install.packages("patchwork")  # run once
-library(patchwork)
-
-library(ggplot2)
-library(dplyr)
-library(patchwork)
-
 make_panel <- function(df, x, y, title, col = "darkgreen") {
   keep <- complete.cases(df[[x]], df[[y]])
   ct   <- suppressWarnings(cor.test(df[[x]][keep], df[[y]][keep], method = "spearman"))
@@ -1142,9 +891,6 @@ ggsave("totalhippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg 
 ```
 
 ```{r, warning=FALSE}
-library(psych)
-library(dplyr)
-
 file_path <- "E:/liz/Defense/Neuroimaging/hippo_subfields.csv"
 df <- read.csv(file_path)
 
@@ -1188,21 +934,10 @@ corrplot(rho,
          cl.pos = "r", cl.cex = 0.7)
 
 dev.off()
-
-
-
 ```
- 
- 
+
 ## make new plot
-
 ```{r}
-library(ggplot2)
-library(dplyr)
-library(dplyr)
-library(ggplot2)
-library(stringr)
-
 # Load your results CSV
 results <- read.csv("E:/liz/Defense/Neuroimaging/GMV/BH_results.csv")
 
@@ -1262,10 +997,7 @@ p <- ggplot(results_roi, aes(x = Rho, y = ROI, fill = Task)) +
 print(p)
 
 ggsave("Hippo_Tasks_Barplot.tiff", p, width = 7, height = 12, dpi = 600)
-
-
 ```
-
 
 ```{r}
 library(ggstatsplot)
@@ -1378,8 +1110,6 @@ table(df$Sex)
 ```
 
 ```{r}
-library(ggstatsplot)
-
 file_path <- "E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized.csv"
 df <- read.csv(file_path)
 df <- na.omit(df)
@@ -1409,12 +1139,6 @@ ggscatterstats(
 # Forest PLot - GMV (all)
 
 ```{r}
-library(ggplot2)
-library(dplyr)
-library(dplyr)
-library(ggplot2)
-library(stringr)
-
 # Load your results CSV
 results <- read.csv("E:/liz/Defense/Neuroimaging/GMV/BH_results.csv")
 
@@ -1478,12 +1202,6 @@ ggsave("Hippo_Tasks_Barplot.tiff", p, width = 7, height = 12, dpi = 600)
 
 # Forest PLot - GMV (ROI)
 ```{r}
-library(ggplot2)
-library(dplyr)
-library(dplyr)
-library(ggplot2)
-library(stringr)
-
 # Load your results CSV
 results <- read.csv("E:/liz/Defense/Neuroimaging/GMV/ROI_BH_results.csv")
 
@@ -1552,8 +1270,6 @@ ggsave("ROI_Hippo_Tasks_Barplot.tiff", p, width = 7, height = 7, dpi = 600)
 ## Main scripts for partial correlations and multiple comparison correction
 # GMV - ROI
 ```{r}
-library(ppcor)
-
 # --- Load data ---
 df_all   <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_roi.csv")  # regions + tasks (same subjects/order)
 df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_roi_tasks.csv")  # tasks only     (same subjects/order)
@@ -1647,15 +1363,10 @@ k <- length(cov_cols)
 results$SE <- (1 - results$Rho^2) * (1 / sqrt(results$N - k - 3))
 
 write.csv(results, "E:/liz/Defense/Neuroimaging/GMV/ROI_BH_results.csv", row.names = FALSE)
-
 ```
-
-
 
 # GMV - all 
 ```{r}
-library(ppcor)
-
 # --- Load data ---
 df_all   <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields.csv")  # regions + tasks (same subjects/order)
 df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_tasks.csv")  # tasks only     (same subjects/order)
@@ -1750,8 +1461,6 @@ k <- length(cov_cols)
 results$SE <- (1 - results$Rho^2) * (1 / sqrt(results$N - k - 3))
 
 write.csv(results, "E:/liz/Defense/Neuroimaging/GMV/BH_results.csv", row.names = FALSE)
-
-
 ```
 
 # GMV - Total hippocampus volume
@@ -1934,13 +1643,10 @@ results <- data.frame(
 )
 
 write.csv(results, "E:/liz/Defense/Neuroimaging/GMV/totalhippo_Males_BH_results.csv", row.names = FALSE)
-
 ```
 
 # GMV - MTL - All
 ```{r}
-library(ppcor)
-
 # --- Load data ---
 df_all   <- read.csv("E:/liz/Defense/Neuroimaging/MTL.csv")  # regions + tasks (same subjects/order)
 df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/MTL_tasks.csv")  # tasks only     (same subjects/order)
@@ -2499,8 +2205,6 @@ write.csv(results, "E:/liz/Defense/Neuroimaging/freesurfer/BH_results.csv", row.
 
 # Freesurfer - ROI 
 ```{r}
-library(ppcor)
-
 # --- Load data ---
 df_all   <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized.csv")  # regions + tasks (same subjects/order)
 df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/fs_CT_roi_winsorized_tasks.csv")  # tasks only     (same subjects/order)
@@ -4764,6 +4468,6 @@ results <- data.frame(
 )
 
 write.csv(results, "E:/liz/Defense/Neuroimaging/composite/freesurfer/ROI_Males_BH_results.csv", row.names = FALSE)
-
 ```
+
 
