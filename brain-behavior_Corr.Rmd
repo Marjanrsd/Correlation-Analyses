@@ -5,6 +5,7 @@ library(tidyr)
 library(psych)
 library(ggstats)
 library(ppcor)
+library(patchwork)
 
                                                          # Freesurfer Precuneus (only for visualization)
 file_path <- "E:/liz/Defense/Neuroimaging/fs_CT_All_winsorized_plot.csv"
@@ -99,7 +100,6 @@ p <- ggplot(df, aes(x = .data[[xvar]], y = .data[[yvar]], color = .data[[gvar]])
     axis.text  = element_text(size = 14)   # axis numbers
   )
 print(p)
-
 # ---- Save (white background avoids 'all black' look in some viewers) ----
 ggsave("E:/liz/Defense/Neuroimaging/ct_mrt_by_sex_square.png",
        plot = p, width = 6, height = 6, dpi = 300, bg = "white")
@@ -198,9 +198,7 @@ results <- data.frame(
   FDR_p      = fdr_p,
   stringsAsFactors = FALSE
 )
-
 write.csv(results, "E:/liz/Defense/Neuroimaging/ants/BH_results.csv", row.names = FALSE)
-
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -293,7 +291,6 @@ results <- data.frame(
   FDR_p      = fdr_p,
   stringsAsFactors = FALSE
 )
-
 write.csv(results, "E:/liz/Defense/Neuroimaging/ants/ROI_Males_BH_results.csv", row.names = FALSE)
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -389,22 +386,16 @@ results <- data.frame(
   FDR_p      = fdr_p,
   stringsAsFactors = FALSE
 )
-
 write.csv(results, "E:/liz/Defense/Neuroimaging/ants/ROI_Females_BH_results.csv", row.names = FALSE)
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
                                                    # Plot hippocampal subfields (only for visualization)
                                                                         # triple plot
-library(ggplot2)
-library(dplyr)
-# install.packages("patchwork")  # run once
-library(patchwork)
 
-# ---- INPUTS ----
+
 file_path <- "E:/liz/Defense/Neuroimaging/hippo_subfields_plot.csv"
 df <- read.csv(file_path) |> na.omit()
-
 make_panel <- function(df, x, y, title, col = "darkgreen") {
   keep <- complete.cases(df[[x]], df[[y]])
   ct   <- suppressWarnings(cor.test(df[[x]][keep], df[[y]][keep], method = "spearman"))
@@ -447,9 +438,5 @@ p3 <- make_panel(df, "RSUB",   "winsorized_SOT", "Right Subiculum",    "#1565C0"
 
 # ---- Arrange close together ----
 combo <- (p1 | p2 | p3) + plot_layout(nrow = 1, widths = c(1, 1, 1))
-
 print(combo)
 ggsave("hippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg = "white")
-
-
-
