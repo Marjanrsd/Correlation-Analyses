@@ -7,15 +7,12 @@ library(psych)
 library(ggstats)
 library(ppcor)
 
-
 # Freesurfer Precuneus (only for visualization)
 file_path <- "E:/liz/Defense/Neuroimaging/fs_CT_All_winsorized_plot.csv"
 df <- read.csv(file_path) |> na.omit()
-
 xvar <- "lh.precuneus"     
 yvar <- "winsorized_MRT"   
 gvar <- "Sex"             
-
 col_F <- "#56B1F7"
 col_M <- "#244C70"
 
@@ -30,7 +27,6 @@ fmt_p <- function(p) ifelse(p < .001, format(p, digits = 2, scientific = TRUE), 
 overall <- spearman_stats(df, xvar, yvar) |> mutate(who = "Overall")
 stats_F <- spearman_stats(filter(df, .data[[gvar]] == "F"), xvar, yvar) |> mutate(who = "F")
 stats_M <- spearman_stats(filter(df, .data[[gvar]] == "M"), xvar, yvar) |> mutate(who = "M")
-
 fmt_p_plain <- function(p) ifelse(p < .001, "< .001", sprintf("%.3f", p))
 
 # Labels
@@ -44,7 +40,6 @@ lab_M <- stats_M |>
 # ---- Layout / label placement ----
 xr <- range(df[[xvar]], na.rm = TRUE)
 yr <- range(df[[yvar]], na.rm = TRUE)
-
 # extend x-axis to the right to make room for labels (10% extra)
 extra_x   <- 0.23 * diff(xr)
 xlim_ext  <- c(xr[1], xr[2] + extra_x)
@@ -104,16 +99,13 @@ p <- ggplot(df, aes(x = .data[[xvar]], y = .data[[yvar]], color = .data[[gvar]])
     axis.title = element_text(size = 16),  # axis labels
     axis.text  = element_text(size = 14)   # axis numbers
   )
-
 print(p)
 
 # ---- Save (white background avoids 'all black' look in some viewers) ----
 ggsave("E:/liz/Defense/Neuroimaging/ct_mrt_by_sex_square.png",
        plot = p, width = 6, height = 6, dpi = 300, bg = "white")
 
-
 # ANTs output - All Regions (do partial correlations between CT and behavior and correct for multiple comparisons)
-
 df_all   <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized.csv")          # regions + tasks (same subjects/order)
 df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_tasks.csv")     # tasks only     (same subjects/order)
 df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_cov.csv")       # Age, Sex, Volume (ICV)
@@ -145,9 +137,7 @@ region_cols <- c("RH_Cont_Temp_mean","LH_DorsAttn_PrCv_mean","LH_SalVentAttn_FrO
 
 task_cols   <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
                  "winsorized_iVTT","winsorized_RMT")
-
 cov_cols    <- c("Age","Sex","Volume")
-
 # Quick checks
 stopifnot(all(region_cols %in% names(df_all)))
 stopifnot(all(task_cols   %in% names(df_tasks)))
@@ -174,7 +164,6 @@ for (i in 1:(length(task_cols)-1)) {
     x <- df_tasks[[task_cols[i]]]
     y <- df_tasks[[task_cols[j]]]
     Z <- df_cov[, cov_cols, drop = FALSE]
-
     res <- pcor.test(x, y, Z, method = "spearman")
     labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
     pvec <- c(pvec, res$p.value)
@@ -189,7 +178,6 @@ for (t in task_cols) {
     x <- df_tasks[[t]]
     y <- df_all[[r]]
     Z <- df_cov[, cov_cols, drop = FALSE]
-
     res <- pcor.test(x, y, Z, method = "spearman")
     labs <- c(labs, paste0(t, " vs ", r))
     pvec <- c(pvec, res$p.value)
@@ -200,7 +188,6 @@ for (t in task_cols) {
 
 # --- Multiple-comparisons correction (one family across all tests) ---
 fdr_p <- p.adjust(pvec, method = "BH")
-
 results <- data.frame(
   Comparison = labs,
   Rho        = rho,
@@ -212,8 +199,6 @@ results <- data.frame(
 
 write.csv(results, "E:/liz/Defense/Neuroimaging/ants/BH_results.csv", row.names = FALSE)
 
-
-
 # ANTs output - Regions of interest - Males (do partial correlations between CT and behavior and correct for multiple comparisons)
 df_all   <- read.csv("E:/liz/Defense/Neuroimaging/ants_roi.csv")          # regions + tasks (same subjects/order)
 df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_tasks.csv")     # tasks only     (same subjects/order)
@@ -223,7 +208,6 @@ df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_cov.csv"
 df_all   <- df_all[,  !(names(df_all)   %in% "ID")]
 df_tasks <- df_tasks[,!(names(df_tasks) %in% "ID")]
 df_cov   <- df_cov[,  !(names(df_cov)   %in% "ID")]
-
 # Recode Sex
 df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
 
@@ -249,7 +233,6 @@ region_cols <- c(
 
 task_cols <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
                "winsorized_iVTT","winsorized_RMT")
-
 cov_cols <- c("Age","Volume")   # drop Sex here (since you split by it)
 
 # --- Split dataframes ---
@@ -287,7 +270,6 @@ for (t in task_cols) {
     x <- df_tasks_m[[t]]
     y <- df_all_m[[r]]
     Z <- df_cov_m[, cov_cols, drop = FALSE]
-
     res <- pcor.test(x, y, Z, method = "spearman")
     labs <- c(labs, paste0(t, " vs ", r))
     pvec <- c(pvec, res$p.value)
@@ -310,7 +292,6 @@ results <- data.frame(
 
 write.csv(results, "E:/liz/Defense/Neuroimaging/ants/ROI_Males_BH_results.csv", row.names = FALSE)
 
-
 # ANTs output - Regions of interest - Females (do partial correlations between CT and behavior and correct for multiple comparisons)
 df_all   <- read.csv("E:/liz/Defense/Neuroimaging/ants_roi.csv")          # regions + tasks (same subjects/order)
 df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_tasks.csv")     # tasks only     (same subjects/order)
@@ -320,7 +301,6 @@ df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_cov.csv"
 df_all   <- df_all[,  !(names(df_all)   %in% "ID")]
 df_tasks <- df_tasks[,!(names(df_tasks) %in% "ID")]
 df_cov   <- df_cov[,  !(names(df_cov)   %in% "ID")]
-
 # Recode Sex
 df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
 
@@ -344,10 +324,8 @@ region_cols <- c(
   "LH_DorsAttn_Post_mean"
 )
 
-
 task_cols <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
                "winsorized_iVTT","winsorized_RMT")
-
 cov_cols <- c("Age","Volume")   # drop Sex here (since you split by it)
 
 # --- Split dataframes ---
@@ -373,7 +351,6 @@ for (i in 1:(length(task_cols)-1)) {
     x <- df_tasks_f[[task_cols[i]]]
     y <- df_tasks_f[[task_cols[j]]]
     Z <- df_cov_f[, cov_cols, drop = FALSE]
-
     res <- pcor.test(x, y, Z, method = "spearman")
     labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
     pvec <- c(pvec, res$p.value)
@@ -388,7 +365,6 @@ for (t in task_cols) {
     x <- df_tasks_f[[t]]
     y <- df_all_f[[r]]
     Z <- df_cov_f[, cov_cols, drop = FALSE]
-
     res <- pcor.test(x, y, Z, method = "spearman")
     labs <- c(labs, paste0(t, " vs ", r))
     pvec <- c(pvec, res$p.value)
@@ -399,7 +375,6 @@ for (t in task_cols) {
 
 # --- Multiple-comparisons correction (one family across all tests) ---
 fdr_p <- p.adjust(pvec, method = "BH")
-
 results <- data.frame(
   Comparison = labs,
   Rho        = rho,
@@ -410,7 +385,6 @@ results <- data.frame(
 )
 
 write.csv(results, "E:/liz/Defense/Neuroimaging/ants/ROI_Females_BH_results.csv", row.names = FALSE)
-
 
 # Plot hippocampal subfields (only for visualization)
 # triple plot
@@ -468,6 +442,7 @@ combo <- (p1 | p2 | p3) + plot_layout(nrow = 1, widths = c(1, 1, 1))
 
 print(combo)
 ggsave("hippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg = "white")
+
 
 
 
