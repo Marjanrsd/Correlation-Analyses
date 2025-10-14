@@ -104,7 +104,9 @@ print(p)
 ggsave("E:/liz/Defense/Neuroimaging/ct_mrt_by_sex_square.png",
        plot = p, width = 6, height = 6, dpi = 300, bg = "white")
 
-########## ANTs output - All Regions (do partial correlations between CT and behavior and correct for multiple comparisons)##########
+
+
+# ANTs output - All Regions (do partial correlations between CT and behavior and correct for multiple comparisons)
 df_all   <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized.csv")          # regions + tasks (same subjects/order)
 df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_tasks.csv")     # tasks only     (same subjects/order)
 df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_cov.csv")       # Age, Sex, Volume (ICV)
@@ -198,6 +200,7 @@ results <- data.frame(
 
 write.csv(results, "E:/liz/Defense/Neuroimaging/ants/BH_results.csv", row.names = FALSE)
 
+
 # ANTs output - Regions of interest - Males (do partial correlations between CT and behavior and correct for multiple comparisons)
 df_all   <- read.csv("E:/liz/Defense/Neuroimaging/ants_roi.csv")          # regions + tasks (same subjects/order)
 df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_tasks.csv")     # tasks only     (same subjects/order)
@@ -289,6 +292,8 @@ results <- data.frame(
 )
 
 write.csv(results, "E:/liz/Defense/Neuroimaging/ants/ROI_Males_BH_results.csv", row.names = FALSE)
+
+
 
 # ANTs output - Regions of interest - Females (do partial correlations between CT and behavior and correct for multiple comparisons)
 df_all   <- read.csv("E:/liz/Defense/Neuroimaging/ants_roi.csv")          # regions + tasks (same subjects/order)
@@ -440,6 +445,7 @@ combo <- (p1 | p2 | p3) + plot_layout(nrow = 1, widths = c(1, 1, 1))
 
 print(combo)
 ggsave("hippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg = "white")
+
 
 
 
