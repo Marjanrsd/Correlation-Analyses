@@ -296,6 +296,7 @@ write.csv(results, "E:/liz/Defense/Neuroimaging/ants/ROI_Males_BH_results.csv", 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
               # ANTs output - Regions of interest - Females (do partial correlations between CT and behavior and correct for multiple comparisons)
+
 df_all   <- read.csv("E:/liz/Defense/Neuroimaging/ants_roi.csv")          # regions + tasks (same subjects/order)
 df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_tasks.csv")     # tasks only     (same subjects/order)
 df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/ants_ct_40_winsorized_cov.csv")       # Age, Sex, Volume (ICV)
@@ -440,3 +441,4 @@ p3 <- make_panel(df, "RSUB",   "winsorized_SOT", "Right Subiculum",    "#1565C0"
 combo <- (p1 | p2 | p3) + plot_layout(nrow = 1, widths = c(1, 1, 1))
 print(combo)
 ggsave("hippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg = "white")
+
