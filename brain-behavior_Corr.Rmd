@@ -117,105 +117,6 @@ ggsave("E:/liz/Defense/Neuroimaging/ct_mrt_by_sex_square.png",
 
 ```
 
-
-# GMV - Total hippocampus volume
-```{r}
-
-df_all   <- read.csv("E:/liz/Defense/Neuroimaging/Total_hipp.csv")  # regions + tasks (same subjects/order)
-df_tasks <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_tasks.csv")  # tasks only     (same subjects/order)
-df_cov   <- read.csv("E:/liz/Defense/Neuroimaging/hippo_subfields_cov.csv")  # Age, Sex, Volume (ICV)
-
-# --- Remove ID column if it exists ---
-df_all   <- df_all[ , !(names(df_all)   %in% "ID")]
-df_tasks <- df_tasks[ , !(names(df_tasks) %in% "ID")]
-df_cov   <- df_cov[ , !(names(df_cov)   %in% "ID")]
-
-df_cov$Sex <- ifelse(df_cov$Sex == "M", 1, 0)
-
-
-# --- Define groups ---
-region_cols <- c("LHC","RHC","TotHC")  
-
-task_cols   <- c("winsorized_MRT","winsorized_PFT","winsorized_SOT",
-                 "winsorized_iVTT","winsorized_RMT")
-
-cov_cols    <- c("Age","Sex","Volume")          
-
-# quick checks (fail fast if something is misspelled)
-stopifnot(all(region_cols %in% names(df_all)))
-stopifnot(all(task_cols   %in% names(df_tasks)))
-stopifnot(all(cov_cols    %in% names(df_cov)))
-
-# ===== FIXED-N LISTWISE DELETION ACROSS ALL VARS =====
-mask <- complete.cases(
-  df_all[,   region_cols, drop = FALSE],
-  df_tasks[, task_cols,   drop = FALSE],
-  df_cov[,   cov_cols,    drop = FALSE]
-)
-
-df_all   <- df_all[mask, ]
-df_tasks <- df_tasks[mask, ]
-df_cov   <- df_cov[mask, ]
-N_global <- nrow(df_cov)   # same for all tests
-
-# --- Containers for results ---
-labs <- c(); pvec <- c(); rho <- c(); Ns <- c()
-
-# --- TASK–TASK (within df_tasks) ---
-for (i in 1:(length(task_cols)-1)) {
-  for (j in (i+1):length(task_cols)) {
-
-    x <- df_tasks[[task_cols[i]]]
-    y <- df_tasks[[task_cols[j]]]
-    Z <- df_cov[, cov_cols, drop = FALSE]
-
-    res <- pcor.test(x, y, Z, method = "spearman")
-    labs <- c(labs, paste0(task_cols[i], " vs ", task_cols[j]))
-    pvec <- c(pvec, res$p.value)
-    rho  <- c(rho,  res$estimate)
-    Ns   <- c(Ns,   N_global)
-    
-  }
-}
-
-# --- TASK–REGION (tasks from df_tasks, regions from df_all) ---
-for (t in task_cols) {
-  for (r in region_cols) {
-
-    x <- df_tasks[[t]]      # task
-    y <- df_all[[r]]        # region
-    Z <- df_cov[, cov_cols, drop = FALSE]
-    
-    res <- pcor.test(x, y, Z, method = "spearman")
-    labs <- c(labs, paste0(t, " vs ", r))
-    pvec <- c(pvec, res$p.value)
-    rho  <- c(rho,  res$estimate)
-    Ns   <- c(Ns, N_global)
-    
-  }
-}
-
-# --- Multiple-comparisons correction (one family across all tests) ---
-fdr_p <- p.adjust(pvec, method = "BH")
-
-results <- data.frame(
-  Comparison = labs,
-  Rho        = rho,
-  N          = Ns,
-  Raw_p      = pvec,
-  FDR_p      = fdr_p,
-  stringsAsFactors = FALSE
-)
-# number of covariates you controlled for
-k <- length(cov_cols)
-
-# Fisher z-based SE for each correlation
-results$SE <- (1 - results$Rho^2) * (1 / sqrt(results$N - k - 3))
-
-write.csv(results, "E:/liz/Defense/Neuroimaging/GMV/totalhipp_BH_results.csv", row.names = FALSE)
-```
-
-
 # ANTs - All
 ```{r}
 library(ppcor)
@@ -586,3 +487,4 @@ print(combo)
 ggsave("hippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg = "white")
 
 ```
+
