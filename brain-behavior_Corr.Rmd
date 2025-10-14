@@ -1,6 +1,5 @@
 
-```{r, warning=FALSE}
-
+```{r}
 library(ggplot2)
 library(plyr)
 library(dplyr)
@@ -479,5 +478,6 @@ print(combo)
 ggsave("hippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg = "white")
 
 ```
+
 
 
