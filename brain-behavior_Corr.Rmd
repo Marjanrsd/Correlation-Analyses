@@ -203,7 +203,8 @@ results <- data.frame(
 write.csv(results, "E:/liz/Defense/Neuroimaging/ants/BH_results.csv", row.names = FALSE)
 
 
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
                 # ANTs output - Regions of interest - Males (do partial correlations between CT and behavior and correct for multiple comparisons)
 df_all   <- read.csv("E:/liz/Defense/Neuroimaging/ants_roi.csv")          # regions + tasks (same subjects/order)
@@ -451,3 +452,4 @@ combo <- (p1 | p2 | p3) + plot_layout(nrow = 1, widths = c(1, 1, 1))
 
 print(combo)
 ggsave("hippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg = "white")
+
