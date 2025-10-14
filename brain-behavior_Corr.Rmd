@@ -432,7 +432,7 @@ make_panel <- function(df, x, y, title, col = "darkgreen") {
     )
 }
 
-# ---- Build your three panels (edit x vars/titles as needed) ----
+# ---- Build three panels ----
 p1 <- make_panel(df, "LCA2.3", "winsorized_SOT", "Left CA2/3",  "#2E7D32")
 p2 <- make_panel(df, "LSUB", "winsorized_SOT", "Left Subiculum", "#1565C0")  # <-- change to your column
 p3 <- make_panel(df, "RSUB",   "winsorized_SOT", "Right Subiculum",    "#1565C0")  # <-- change to your column
@@ -441,4 +441,5 @@ p3 <- make_panel(df, "RSUB",   "winsorized_SOT", "Right Subiculum",    "#1565C0"
 combo <- (p1 | p2 | p3) + plot_layout(nrow = 1, widths = c(1, 1, 1))
 print(combo)
 ggsave("hippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg = "white")
+
 
