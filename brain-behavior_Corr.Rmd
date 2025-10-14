@@ -9,7 +9,6 @@ library(ggstats)
 library(ppcor)
 ```
 
-
 # Freesurfer Precuneus (only for visualization)
 ```{r}
 file_path <- "E:/liz/Defense/Neuroimaging/fs_CT_All_winsorized_plot.csv"
@@ -478,6 +477,7 @@ print(combo)
 ggsave("hippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg = "white")
 
 ```
+
 
 
 
