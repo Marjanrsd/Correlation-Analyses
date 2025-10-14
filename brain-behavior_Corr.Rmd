@@ -526,3 +526,63 @@ results <- data.frame(
 
 write.csv(results, "E:/liz/Defense/Neuroimaging/ants/ROI_Females_BH_results.csv", row.names = FALSE)
 ```
+
+# Plot subfields
+# triple plot
+```{r}
+library(ggplot2)
+library(dplyr)
+# install.packages("patchwork")  # run once
+library(patchwork)
+
+# ---- INPUTS ----
+file_path <- "E:/liz/Defense/Neuroimaging/hippo_subfields_plot.csv"
+df <- read.csv(file_path) |> na.omit()
+
+make_panel <- function(df, x, y, title, col = "darkgreen") {
+  keep <- complete.cases(df[[x]], df[[y]])
+  ct   <- suppressWarnings(cor.test(df[[x]][keep], df[[y]][keep], method = "spearman"))
+  rho  <- unname(ct$estimate); pval <- ct$p.value; N <- sum(keep)
+
+  # label placement + spacing
+  xr <- range(df[[x]][keep]); yr <- range(df[[y]][keep])
+  x_left <- min(xr); y_top <- max(yr)
+  step_y <- 0.10 * diff(yr)
+
+  # plotmath labels: italic letters only, numbers upright
+  p_str  <- if (pval < .001) "italic(p) < .001" else sprintf("italic(p) == %.3f", pval)
+
+  ggplot(df, aes(x = .data[[x]], y = .data[[y]])) +
+    geom_smooth(method = "lm", se = TRUE, color = col, fill = col, alpha = 0.4, linewidth = 1) +
+    geom_point(color = col, size = 3, alpha = 0.7, shape = 19) +
+    labs(title = title, x = expression("Volume (mm"^3*")"), y = "SOT (Angular Error)") +
+    annotate("text", x = x_left, y = y_top,
+             label = sprintf("italic(ρ) == %.2f", rho), parse = TRUE,
+             hjust = 0, vjust = 1, size = 4) +
+    annotate("text", x = x_left, y = y_top - step_y,
+             label = p_str, parse = TRUE,
+             hjust = 0, vjust = 1, size = 4) +
+    annotate("text", x = x_left, y = y_top - 2*step_y,
+             label = sprintf("'n ='~%d", N), parse = TRUE,
+             hjust = 0, vjust = 1, size = 4) +
+    theme_classic(base_size = 14) +
+    theme(
+      aspect.ratio = 1,
+      panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.7),
+      plot.title   = element_text(size = 16, face = "bold", hjust = 0.5),
+      plot.margin  = margin(2, 2, 2, 2)
+    )
+}
+
+# ---- Build your three panels (edit x vars/titles as needed) ----
+p1 <- make_panel(df, "LCA2.3", "winsorized_SOT", "Left CA2/3",  "#2E7D32")
+p2 <- make_panel(df, "LSUB", "winsorized_SOT", "Left Subiculum", "#1565C0")  # <-- change to your column
+p3 <- make_panel(df, "RSUB",   "winsorized_SOT", "Right Subiculum",    "#1565C0")  # <-- change to your column
+
+# ---- Arrange close together ----
+combo <- (p1 | p2 | p3) + plot_layout(nrow = 1, widths = c(1, 1, 1))
+
+print(combo)
+ggsave("hippo_tripanel.tiff", combo, width = 12, height = 4, dpi = 600, bg = "white")
+
+```
