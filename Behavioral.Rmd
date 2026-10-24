@@ -235,18 +235,6 @@ print(df)
 cols <- c("MRT","PFT","SOT","iVTT","RMT")
 sapply(cols, function(c) sum(df[[paste0("winsorized_",c)]] != df[[c]], na.rm=TRUE))
 
-hist(df$winsorized_iVTT)
-hist(df$iVTT)
-hist(df$winsorized_MRT)
-hist(df$MRT)
-hist(df$winsorized_SOT)
-hist(df$SOT)
-hist(df$winsorized_RMT)
-hist(df$RMT)
-sum(!is.na(df$winsorized_MRT))
-sum(!is.na(df$winsorized_SOT))
-
-
 # check normality on winsorized data
 # Pick the task columns
 vars <- c("winsorized_SOT","winsorized_iVTT")
