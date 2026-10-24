@@ -359,8 +359,7 @@ result <- ggbetweenstats(
       axis.title = element_text(size = 12),      # Adjust the font size of the axis titles
       axis.text = element_text(size = 12),
       legend.position = "none"  
-    )
-    
+    )  
   )
 )
 
@@ -439,8 +438,7 @@ result <- ggbetweenstats(
       axis.title = element_text(size = 12),      # Adjust the font size of the axis titles
       axis.text = element_text(size = 12),
       legend.position = "none"  
-    )
-    
+    )  
   )
 )
 
@@ -461,6 +459,5 @@ result <- ggbetweenstats(
       axis.text = element_text(size = 12),
       legend.position = "none"  
     )
-    
   )
 )
