@@ -1,5 +1,4 @@
 # Make corr plot
-```{r}
 library(psych)
 library(ggstats)
 library(psych)
