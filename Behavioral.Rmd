@@ -1,7 +1,3 @@
----
-date: "2025-08-19"
----
-
 # Make corr plot
 ```{r}
 library(psych)
@@ -263,7 +259,7 @@ for (col in columns_to_winsorize) {
                                                          mean_col + threshold)
 }
 
-# Optionally, you can set NAs for winsorized columns to NA if the original was NA
+
 for (col in columns_to_winsorize) {
   df[[paste0("winsorized_", col)]][is.na(df[[col]])] <- NA
 }
