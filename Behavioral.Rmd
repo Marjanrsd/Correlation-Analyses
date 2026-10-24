@@ -53,7 +53,7 @@ sw <- as.data.frame(sw)
 vars <- c("MRT","PFT","SOT","iVTT","RMT")
 
 # Histograms
-par(mfrow=c(2,3))  # layout: 2 rows, 3 columns
+par(mfrow=c(2,3)) 
 for (v in vars) {
   hist(df[[v]], main=paste("Histogram of", v), xlab=v, col="lightblue", border="white")
 }
@@ -91,7 +91,7 @@ summary_table <- as.data.frame(summary_table)
 file_path<-"E:/liz/Defense/Behavioral/Behavioral.csv"
 df<-read.csv(file_path)
 # Pick the task columns
-#vars <- c("MRT","PFT","SOT","iVTT","RMT")  # change to your actual column names
+#vars <- c("MRT","PFT","SOT","iVTT","RMT")
 vars <- c("MRT","PFT","SOT","iVTT","RMT")
 
 desc <- describe(df[, vars])  # handles NAs by default
@@ -139,7 +139,7 @@ lavaanExtra::nice_lavaanPlot(
   graph_options = c(rankdir = "LR")  # use c(), not list()
 )
 
-# OR 2) If you assign to g, explicitly print it:
+# OR 
 g <- lavaanExtra::nice_lavaanPlot(
   fit2,
   labels = labs,
@@ -169,7 +169,7 @@ lavaanExtra::nice_lavaanPlot(
   graph_options = c(rankdir = "LR")  # use c(), not list()
 )
 
-# OR 2) If you assign to g, explicitly print it:
+# OR 
 g <- lavaanExtra::nice_lavaanPlot(
   fit1,
   labels = labs,
@@ -285,14 +285,14 @@ m2_log <- 'object_based =~ winsorized_MRT + winsorized_PFT
 fit1_log <- cfa(m1_log, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
 fit2_log <- cfa(m2_log, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
 
-# Compare to your original fits
+# Compare to the original fits
 summary(fit2_log, fit.measures = TRUE, standardized = TRUE)
 
 # For one factor
 summary(fit1_log, fit.measures = TRUE, standardized = TRUE)
 
 # Check if factors are distigushable
-# Unconstrained two-factor (what you already fit)
+# Unconstrained two-factor
 fit2_log <- cfa(m2_log, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
 
 # Constrain the latent correlation to 1 (factors perfectly correlated)
@@ -321,13 +321,13 @@ m2 <- 'object_based =~ winsorized_MRT + winsorized_PFT
 fit1 <- cfa(m1, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
 fit2 <- cfa(m2, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
 
-# Compare to your original fits
+# Compare to the original fits
 summary(fit2 , fit.measures = TRUE, standardized = TRUE)
 
 # For one factor
 summary(fit1 , fit.measures = TRUE, standardized = TRUE)
 # check if the two factors are distingushable
-# Unconstrained two-factor (what you already fit)
+# Unconstrained two-factor
 fit2 <- cfa(m2, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
 
 # Constrain the latent correlation to 1 (factors perfectly correlated)
