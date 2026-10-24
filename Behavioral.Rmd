@@ -1,7 +1,15 @@
-# Make corr plot
 library(psych)
 library(ggstats)
 library(psych)
+library(lavaan)
+library(lavaanPlot)
+library(lavaanExtra)
+library(DiagrammeRsvg)
+library(rsvg)
+library(ggplot2)
+library(ggstatsplot)
+library(ggstats)
+
 
 file_path<-"E:/liz/Defense/Behavioral/Behavioral.csv"
 df<-read.csv(file_path)
@@ -25,10 +33,8 @@ pairs.panels(
   col = "darkred",
   cex.labels = 1.2
 )
-```
 
 # Test for Normality (Shapiro–Wilk test)
-```{r, warning=FALSE}
 file_path<-"E:/liz/Defense/Behavioral/Behavioral.csv"
 df<-read.csv(file_path)
 
@@ -42,11 +48,8 @@ sw <- t(sapply(vars, function(v){
 
 # Convert results into a nice data frame
 sw <- as.data.frame(sw)
-sw
-```
 
 # Q-Q plot - test for normality
-```{r}
 vars <- c("MRT","PFT","SOT","iVTT","RMT")
 
 # Histograms
@@ -61,12 +64,9 @@ for (v in vars) {
   qqnorm(df[[v]], main=paste("Q-Q Plot of", v))
   qqline(df[[v]], col="red")
 }
-```
 
 
 # extract mean and sd for each task
-```{r}
-
 vars <- c("MRT", "PFT", "SOT", "iVTT", "RMT")
 
 # Compute descriptive statistics
@@ -87,54 +87,38 @@ summary_table <- t(summary_table)
 # Convert to a data frame for nicer formatting
 summary_table <- as.data.frame(summary_table)
 
-summary_table
-```
-
 # skew and kurtosis
-```{r}
-library(psych)
 file_path<-"E:/liz/Defense/Behavioral/Behavioral.csv"
 df<-read.csv(file_path)
-# Pick your task columns (use raw scores; reverse only if you want the sign flipped)
+# Pick the task columns
 #vars <- c("MRT","PFT","SOT","iVTT","RMT")  # change to your actual column names
 vars <- c("MRT","PFT","SOT","iVTT","RMT")
 
 desc <- describe(df[, vars])  # handles NAs by default
 desc_out <- desc[, c("n","mean","sd","skew","kurtosis")]
 print(desc_out)
-```
 
 # Perform CFA
-```{r, warning=FALSE}
-library(lavaan)
 # Reverse code error measures so that higher = better performance
 # Example: If SOT and iVTT are error scores (lower = better), we flip them
 df$SOT_rev  <- -df$SOT
 df$iVTT_rev <- -df$iVTT
 
 # Then use the reversed variables in the CFA
-m1 <- '
-spatial_abilities =~ MRT + PFT + SOT_rev + iVTT_rev + RMT
-'
-m2 <- '
-object_based =~ MRT + PFT
+m1 <- 'spatial_abilities =~ MRT + PFT + SOT_rev + iVTT_rev + RMT'
+m2 <- 'object_based =~ MRT + PFT
 perspective_taking =~ SOT_rev + iVTT_rev + RMT
-object_based ~~ perspective_taking
-'
+object_based ~~ perspective_taking'
 
 fit1 <- cfa(m1, data = df, estimator = "MLR", missing = "fiml", std.lv = TRUE)
 fit2 <- cfa(m2, data = df, estimator = "MLR", missing = "fiml", std.lv = TRUE)
 
 summary(fit2, fit.measures = TRUE, standardized = TRUE)
-```
 
 # for one factor
-```{r}
 summary(fit1, fit.measures = TRUE, standardized = TRUE)
-```
 
 # visualization for two factor model
-```{r}
 # install.packages(c("lavaanPlot", "lavaanExtra", "DiagrammeRsvg", "rsvg"))
 library(lavaanPlot)
 library(lavaanExtra)
@@ -170,17 +154,8 @@ g <- lavaanExtra::nice_lavaanPlot(
   node_options = list(shape = "oval", fontname = "Helvetica"),
   graph_options = c(rankdir = "LR")
 )
-g            # or: print(g)
-```
-
 
 # visualization for one factor model
-```{r}
-library(lavaanPlot)
-library(lavaanExtra)
-library(DiagrammeRsvg)
-library(rsvg)
-
 # Labels for nicer node text in the figure
 labs <- list(
   spatial_abilities   = "Visuospatial-abilities",
@@ -209,30 +184,22 @@ g <- lavaanExtra::nice_lavaanPlot(
   node_options = list(shape = "oval", fontname = "Helvetica"),
   graph_options = c(rankdir = "LR")
 )
-g            # or: print(g)
-```
+
 
 # check if the two latent variables are distinguishable
-```{r}
-# Unconstrained two-factor (what you already fit)
 fit2 <- cfa(m2, data = df, estimator = "MLR", missing = "fiml", std.lv = TRUE)
 
 # Constrain the latent correlation to 1 (factors perfectly correlated)
-m2_corr1 <- '
-  object_based =~ MRT + PFT
+m2_corr1 <- 'object_based =~ MRT + PFT
   perspective_taking =~ SOT_rev + iVTT_rev + RMT
-  object_based ~~ 1*perspective_taking
-'
+  object_based ~~ 1*perspective_taking'
 fit2_corr1 <- cfa(m2_corr1, data = df, estimator = "MLR", missing = "fiml", std.lv = TRUE)
 
 # Robust Satorra–Bentler χ² difference test (nested)
 lavTestLRT(fit2_corr1, fit2, method = "satorra.bentler.2001")
-# or: anova(fit2_corr1, fit2)
-```
 
 # winsorize data, get log transform for SOT and iVTT, and redo CFA
 # winsorize data
-```{r}
 file_path <- "E:/liz/Defense/Behavioral/Behavioral.csv"
 df <- read.csv(file_path)
 
@@ -278,12 +245,10 @@ hist(df$winsorized_RMT)
 hist(df$RMT)
 sum(!is.na(df$winsorized_MRT))
 sum(!is.na(df$winsorized_SOT))
-```
+
 
 # check normality on winsorized data
-```{r}
-library(psych)
-# Pick your task columns (use raw scores; reverse only if you want the sign flipped)
+# Pick the task columns
 vars <- c("winsorized_SOT","winsorized_iVTT")
 desc <- describe(df[, vars])  # handles NAs by default
 desc_out <- desc[, c("n","mean","sd","skew","kurtosis")]
@@ -298,11 +263,8 @@ sw <- t(sapply(vars, function(v){
 
 # Convert results into a nice data frame
 sw <- as.data.frame(sw)
-sw
-```
 
 # redo corr plot
-```{r}
 vars <- df[, c(9:13)]
 # Get N for each pair (and r, p) in one place
 ct <- psych::corr.test(vars, method = "spearman", use = "pairwise", adjust = "none")
@@ -323,11 +285,8 @@ pairs.panels(
   col = "darkred",
   cex.labels = 1.2
 )
-```
-
 
 # redo CFA with winsorizes data and log transform sot and ivtt
-```{r}
 # --- Build transformed variables ---
 df$SOT_rev_log  <- -log1p(df$winsorized_SOT)   # log1p handles zeros safely
 df$iVTT_rev_log <- -log1p(df$winsorized_iVTT)
@@ -336,14 +295,10 @@ df$iVTT_rev_log <- -log1p(df$winsorized_iVTT)
 # MRT is already z; using a z-scored indicator is fine for CFA.
 
 # --- Models using transformed errors ---
-m1_log <- '
-  spatial =~ winsorized_MRT + winsorized_PFT + SOT_rev_log + iVTT_rev_log + winsorized_RMT
-'
-m2_log <- '
-  object_based =~ winsorized_MRT + winsorized_PFT
+m1_log <- 'spatial =~ winsorized_MRT + winsorized_PFT + SOT_rev_log + iVTT_rev_log + winsorized_RMT'
+m2_log <- 'object_based =~ winsorized_MRT + winsorized_PFT
   perspective_taking =~ SOT_rev_log + iVTT_rev_log + winsorized_RMT
-  object_based ~~ perspective_taking
-'
+  object_based ~~ perspective_taking'
 
 fit1_log <- cfa(m1_log, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
 fit2_log <- cfa(m2_log, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
@@ -351,34 +306,23 @@ fit2_log <- cfa(m2_log, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
 # Compare to your original fits
 summary(fit2_log, fit.measures = TRUE, standardized = TRUE)
 
-```
-
 # For one factor
-```{r}
 summary(fit1_log, fit.measures = TRUE, standardized = TRUE)
-```
 
 # Check if factors are distigushable
-```{r}
 # Unconstrained two-factor (what you already fit)
 fit2_log <- cfa(m2_log, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
 
 # Constrain the latent correlation to 1 (factors perfectly correlated)
-m2_corr1 <- '
-  object_based =~ winsorized_MRT + winsorized_PFT
+m2_corr1 <- 'object_based =~ winsorized_MRT + winsorized_PFT
   perspective_taking =~ SOT_rev_log + iVTT_rev_log + winsorized_RMT
-  object_based ~~ 1*perspective_taking
-'
+  object_based ~~ 1*perspective_taking'
 fit2_corr1 <- cfa(m2_corr1, data = df, estimator = "MLR", missing = "fiml", std.lv = TRUE)
 
 # Robust Satorra–Bentler χ² difference test (nested)
 lavTestLRT(fit2_corr1, fit2_log, method = "satorra.bentler.2001")
-# or: anova(fit2_corr1, fit2)
-
-```
 
 # redo CFA with winsorized data
-```{r}
 # --- Build transformed variables ---
 df$SOT_rev <- -df$winsorized_SOT  # log1p handles zeros safely
 df$iVTT_rev <- -df$winsorized_iVTT
@@ -387,53 +331,33 @@ df$iVTT_rev <- -df$winsorized_iVTT
 # MRT is already z; using a z-scored indicator is fine for CFA.
 
 # --- Models using transformed errors ---
-m1 <- '
-  spatial =~ winsorized_MRT + winsorized_PFT + SOT_rev + iVTT_rev + winsorized_RMT
-'
-m2 <- '
-  object_based =~ winsorized_MRT + winsorized_PFT
+m1 <- 'spatial =~ winsorized_MRT + winsorized_PFT + SOT_rev + iVTT_rev + winsorized_RMT'
+m2 <- 'object_based =~ winsorized_MRT + winsorized_PFT
   perspective_taking =~ SOT_rev + iVTT_rev + winsorized_RMT
-  object_based ~~ perspective_taking
-'
+  object_based ~~ perspective_taking'
 
 fit1 <- cfa(m1, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
 fit2 <- cfa(m2, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
 
 # Compare to your original fits
 summary(fit2 , fit.measures = TRUE, standardized = TRUE)
-```
 
 # For one factor
-```{r}
 summary(fit1 , fit.measures = TRUE, standardized = TRUE)
-```
-
 # check if the two factors are distingushable
-```{r}
 # Unconstrained two-factor (what you already fit)
 fit2 <- cfa(m2, data=df, estimator="MLR", missing="fiml", std.lv=TRUE)
 
 # Constrain the latent correlation to 1 (factors perfectly correlated)
-m2_corr1 <- '
-  object_based =~ winsorized_MRT + winsorized_PFT
+m2_corr1 <- 'object_based =~ winsorized_MRT + winsorized_PFT
   perspective_taking =~ SOT_rev + iVTT_rev + winsorized_RMT
-  object_based ~~ 1*perspective_taking
-'
+  object_based ~~ 1*perspective_taking'
 fit2_corr1 <- cfa(m2_corr1, data = df, estimator = "MLR", missing = "fiml", std.lv = TRUE)
 
 # Robust Satorra–Bentler χ² difference test (nested)
 lavTestLRT(fit2_corr1, fit2, method = "satorra.bentler.2001")
-# or: anova(fit2_corr1, fit2)
-```
 
 # Sex difference
-# MRT
-```{r}
-
-library(ggplot2)
-library(ggstatsplot)
-library(ggstats)
-
 df_mrt <-df[!is.na(df$winsorized_MRT), ]
 result <- ggbetweenstats(
   data = df_mrt,
@@ -454,15 +378,8 @@ result <- ggbetweenstats(
 
 print(result)
 sum(!is.na(df$sinsorized_MRT))
-```
-
 # sex differences
 # iVTT
-```{r}
-library(ggplot2)
-library(ggstatsplot)
-library(ggstats)
-
 df_iVTT <- df[!is.na(df$winsorized_iVTT), ]
 df_iVTT$iVTT_log <- log(df_iVTT$winsorized_iVTT)
 
@@ -482,11 +399,8 @@ result <- ggbetweenstats(
   )
 )
 
-print(result)
-```
 
 # CHECK NORMALITY
-```{r}
 vars <- c("iVTT_log") 
 
 sw <- t(sapply(vars, function(v){
@@ -497,17 +411,10 @@ sw <- t(sapply(vars, function(v){
 
 # Convert results into a nice data frame
 sw <- as.data.frame(sw)
-sw
 hist(df$iVTT_log)
-```
 
 # Sex difference
 # SOT
-```{r}
-library(ggplot2)
-library(ggstatsplot)
-library(ggstats)
-
 df_SOT <- df[!is.na(df$winsorized_SOT), ]
 df_SOT$SOT_log <- log(df_SOT$winsorized_SOT)
 print(sum(!is.na(df$SOT_log)))
@@ -529,16 +436,8 @@ result <- ggbetweenstats(
   )
 )
 
-print(result)
-```
-
 # Sex difference
 # PFT
-```{r}
-library(ggplot2)
-library(ggstatsplot)
-library(ggstats)
-
 df_PFT <- df[!is.na(df$winsorized_PFT), ]
 result <- ggbetweenstats(
   data = df_PFT,
@@ -557,12 +456,8 @@ result <- ggbetweenstats(
   )
 )
 
-print(result)
-```
-
 # sex difference
 # RMT
-```{r}
 df_RMT <- df[!is.na(df$winsorized_RMT), ]
 
 result <- ggbetweenstats(
@@ -581,6 +476,3 @@ result <- ggbetweenstats(
     
   )
 )
-
-print(result)
-```
