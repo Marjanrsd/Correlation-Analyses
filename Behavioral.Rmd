@@ -119,12 +119,6 @@ summary(fit2, fit.measures = TRUE, standardized = TRUE)
 summary(fit1, fit.measures = TRUE, standardized = TRUE)
 
 # visualization for two factor model
-# install.packages(c("lavaanPlot", "lavaanExtra", "DiagrammeRsvg", "rsvg"))
-library(lavaanPlot)
-library(lavaanExtra)
-library(DiagrammeRsvg)
-library(rsvg)
-
 # Labels for nicer node text in the figure
 labs <- list(
   object_based        = "Object-based",
